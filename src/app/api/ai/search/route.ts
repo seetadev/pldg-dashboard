@@ -7,7 +7,8 @@ const anthropic = new Anthropic({
 
 export async function POST(request: Request) {
   try {
-    const { query, data } = await request.json();
+    const requestData = await request.json(); // Read the request body once
+    const { query, data } = requestData;
     
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
@@ -43,8 +44,9 @@ export async function POST(request: Request) {
       result: textContent.text,
       success: true
     });
-  } catch (error) {
-    console.error('Error generating search results:', error);
+  } catch (error: any) {
+    console.error('Error generating search results:', error.message, {
+    });
     return NextResponse.json({ 
       error: 'Failed to process search', 
       success: false 

@@ -7,10 +7,14 @@ export function useCSVData() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [timestamp, setTimestamp] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCSV() {
       try {
+        setIsLoading(true);
+        setIsError(false);
+        setErrorMessage(null);
         console.log('Fetching CSV data...');
         const response = await fetch('/data/weekly-engagement-data.csv', {
           method: 'GET',
@@ -47,14 +51,17 @@ export function useCSVData() {
           error: (error: Error) => {
             console.error('CSV parsing error:', error);
             setIsError(true);
+            setErrorMessage(`CSV parsing error: ${error.message}`);
             setIsLoading(false);
           }
         } as ParseConfig<EngagementData>;
 
         Papa.parse(csvText, parseConfig);
-      } catch (error) {
+      } catch (error: any) {
+        setErrorMessage(`Failed to load CSV data: ${error.message}`);
         console.error('Error loading CSV:', error);
         setIsError(true);
+      } finally {
         setIsLoading(false);
       }
     }
@@ -113,6 +120,7 @@ export function useCSVData() {
     isLoading,
     isError,
     mutate,
-    timestamp
+    timestamp,
+    errorMessage
   };
 }

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
 import { Brain } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { EnhancedProcessedData } from '@/types/dashboard';
+import { ProcessedData } from '@/types/dashboard';
 
 const METRIC_EXPLANATIONS = {
   engagementScore: "Overall community engagement based on participation, NPS, and contribution metrics",
@@ -38,10 +38,32 @@ function MetricCard({ title, value, explanation }: MetricCardProps) {
   );
 }
 
-export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
+interface AIInsightsProps {
+  data: ProcessedData & { insights: any | null };
+}
+
+export default function AIInsights({ data }: AIInsightsProps) {
   if (!data.insights) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>AI Analysis</CardTitle>
+              <CardDescription>Performance Metrics & Insights</CardDescription>
+            </div>
+            <Brain className="w-5 h-5 text-muted-foreground" />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="text-muted-foreground">
+            Generating insights...
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
+
 
   const { metrics, achievements, areasOfConcern, recommendations } = data.insights;
 
@@ -62,7 +84,7 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
             <MetricCard
               key={key}
               title={key}
-              value={value}
+              value={value as number}
               explanation={METRIC_EXPLANATIONS[key as keyof typeof METRIC_EXPLANATIONS]}
             />
           ))}
@@ -72,7 +94,7 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
           <div className="space-y-2">
             <h4 className="font-medium">Key Achievements</h4>
             <ul className="list-disc pl-5 space-y-1">
-              {achievements.map((achievement, i) => (
+              {achievements.map((achievement: string, i: number) => (
                 <li key={i} className="text-sm text-muted-foreground">{achievement}</li>
               ))}
             </ul>
@@ -83,7 +105,7 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
           <div className="space-y-2">
             <h4 className="font-medium">Areas of Focus</h4>
             <ul className="list-disc pl-5 space-y-1">
-              {areasOfConcern.map((concern, i) => (
+              {areasOfConcern.map((concern: string, i: number) => (
                 <li key={i} className="text-sm text-muted-foreground">{concern}</li>
               ))}
             </ul>
@@ -94,7 +116,7 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
           <div className="space-y-2">
             <h4 className="font-medium">Recommendations</h4>
             <ul className="list-disc pl-5 space-y-1">
-              {recommendations.map((recommendation, i) => (
+              {recommendations.map((recommendation: string, i: number) => (
                 <li key={i} className="text-sm text-muted-foreground">{recommendation}</li>
               ))}
             </ul>

@@ -38,7 +38,11 @@ export async function GET() {
     console.log('GitHub API route called');
     
     if (!process.env.GITHUB_TOKEN) {
-      throw new Error('GitHub token not found');
+      console.error('GitHub token not found. Ensure GITHUB_TOKEN is set in environment variables.');
+      return NextResponse.json({
+        error: 'GitHub token not found',
+        details: 'Ensure GITHUB_TOKEN is set in environment variables.'
+      }, { status: 500 });
     }
 
     console.log('Fetching GitHub Project data...');
@@ -110,11 +114,16 @@ export async function GET() {
     });
 
     if (!response.ok) {
+      const errorText=await response.text();
       console.error('GitHub API Error:', {
         status: response.status,
-        statusText: response.statusText
+        statusText: response.statusText,
+        error: errorText,
       });
-      throw new Error(`GitHub API error: ${response.statusText}`);
+      return NextResponse.json({
+        error: `GitHub API error: ${response.statusText}`,
+        details: errorText
+      }, { status: response.status >= 400 && response.status < 600 ? response.status : 500 });
     }
 
     const rawData = await response.json();
@@ -129,7 +138,10 @@ export async function GET() {
     // Validate response structure
     if (!rawData?.data?.user?.projectV2?.items?.nodes) {
       console.error('Invalid GitHub response structure:', rawData);
-      throw new Error('Invalid response structure from GitHub');
+      return NextResponse.json({
+        error: 'Invalid response structure from GitHub',
+        details: 'The response from GitHub did not match the expected structure.'
+      }, { status: 500 });
     }
 
     const items = rawData.data.user.projectV2.items.nodes as ProjectItem[];
@@ -159,15 +171,17 @@ export async function GET() {
     };
 
     return NextResponse.json(responseData);
-  } catch (error) {
+  } catch (error: any) {
     console.error('GitHub API error:', {
-      error,
+      stack: error.stack,
       timestamp: new Date().toISOString(),
-      message: error instanceof Error ? error.message : 'Unknown error'
+      errorMsg: error instanceof Error ? error.message : 'Unknown error'
     });
     
     // Return a properly structured empty response
-    return NextResponse.json({ 
+    return NextResponse.json({
+      error: 'Failed to fetch GitHub data',
+      details: error.message, 
       project: { 
         user: { 
           projectV2: { 
@@ -184,7 +198,7 @@ export async function GET() {
         done: 0
       },
       timestamp: Date.now()
-    } as GitHubData);
+    } as GitHubData, {status: 500});
   }
 }
 
@@ -201,10 +215,11 @@ function getItemStatus(item: ProjectItem): string {
     }
     
     return COLUMN_STATUS[columnStatus as keyof typeof COLUMN_STATUS] || 'Todo';
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error getting item status:', {
       itemId: item.id,
-      error
+      error: error.message,
+      stack: error.stack
     });
     return 'Todo';
   }

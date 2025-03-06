@@ -20,6 +20,8 @@ import { EngagementData } from '@/types/dashboard';
 import { CohortSelector } from './CohortSelector';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { useCohortData } from '@/hooks/useCohortData';
+import AIInsights from './AIInsights';
+import { AISearch } from './AISearch';
 
 export default function DeveloperEngagementDashboard() {
   const { 
@@ -28,7 +30,9 @@ export default function DeveloperEngagementDashboard() {
     lastUpdated, 
     isFetching,
     selectedCohort,
-    setSelectedCohort 
+    setSelectedCohort,
+    errorHandler,
+    handleCohortChange
   } = useDashboardSystemContext();
 
   const {
@@ -49,6 +53,43 @@ export default function DeveloperEngagementDashboard() {
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
   );
 
+  // State for AI insights
+  const [aiInsights, setAiInsights] = React.useState(null);
+  const [isGeneratingInsights, setIsGeneratingInsights] = React.useState(false);
+
+  // Function to fetch AI insights
+  // const generateInsights = async () => {
+  //   if (!processedData) {
+  //     errorHandler(new Error('No data available to generate insights.'));
+  //     return;
+  //   }
+
+  //   setIsGeneratingInsights(true);
+  //   try {
+  //     const response = await fetch('/api/insights', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(processedData),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(
+  //         errorData.error || 'Failed to generate AI insights'
+  //       );
+  //     }
+
+  //     const result = await response.json();
+  //     setAiInsights(result.insights);
+  //   } catch (error: any) {
+  //     errorHandler(error, 'Failed to generate AI insights.');
+  //   } finally {
+  //     setIsGeneratingInsights(false);
+  //   }
+  // };
+
   React.useEffect(() => {
     console.log('Dashboard State:', {
       hasData: !!processedData,
@@ -66,9 +107,11 @@ export default function DeveloperEngagementDashboard() {
     });
   }, [processedData, isLoadingCSV, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
-  const handleCohortChange = (cohortId: CohortId) => {
-    setSelectedCohort(cohortId);
-  };
+  // React.useEffect(() => {
+  //   if (processedData) {
+  //     generateInsights();
+  //   }
+  // }, [processedData, errorHandler]);
 
   if (isLoadingCSV) {
     return <div>Loading CSV data...</div>;
@@ -176,6 +219,8 @@ export default function DeveloperEngagementDashboard() {
           </CardContent>
         </Card>
       </div>
+      <AIInsights data={{ ...processedData, insights: aiInsights  }} />
+      <AISearch data={processedData} />
     </div>
   );
 } 

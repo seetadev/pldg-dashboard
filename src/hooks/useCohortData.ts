@@ -3,6 +3,7 @@ import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { EngagementData, ProcessedData } from '@/types/dashboard';
 import { loadCohortData } from '@/lib/data-processing';
 import Papa from 'papaparse';
+import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
 
 interface CohortCache {
   rawData: EngagementData[];
@@ -10,17 +11,26 @@ interface CohortCache {
   lastUpdated: number;
 }
 
-export function useCohortData(selectedCohort: CohortId) {
-  const [cache, setCache] = useState<Record<CohortId, CohortCache>>({});
+interface UseCohortDataResult {
+  data: EngagementData[];
+  processedData: ProcessedData | null;
+  isLoading: boolean;
+  error: string | null; 
+  cache: Partial<Record<CohortId, CohortCache>>;
+}
+
+export function useCohortData(selectedCohort: CohortId): UseCohortDataResult  {
+  const [cache, setCache] = useState<Partial<Record<CohortId, CohortCache>>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { errorHandler } = useDashboardSystemContext();
 
   useEffect(() => {
     async function loadCohortDataWithCache() {
       // Always set loading to true when cohort changes
       setIsLoading(true);
       setError(null);
-
+      try {
       // Check cache first
       if (cache[selectedCohort] && 
           Date.now() - cache[selectedCohort].lastUpdated < 5 * 60 * 1000) { // 5 minute cache
@@ -52,21 +62,29 @@ export function useCohortData(selectedCohort: CohortId) {
             }));
             setIsLoading(false);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('CSV parsing error:', error);
             setError(error.message);
+            errorHandler(error, `Failed to parse CSV`); // Use errorHandler
             setIsLoading(false);
           }
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to load cohort data:', error);
+        errorHandler(error, `Failed to load cohort data:`);
         setError(error instanceof Error ? error.message : 'Failed to load data');
         setIsLoading(false);
       }
+    } catch (error: any) {
+      console.error('Failed to load cache data:', error);
+      errorHandler(error, `Failed to load cache data:`);
+      setError(error instanceof Error ? error.message : 'Failed to load cache data');
+      setIsLoading(false);
     }
+  }
 
     loadCohortDataWithCache();
-  }, [selectedCohort]);
+  }, [selectedCohort, errorHandler]);
 
   return {
     data: cache[selectedCohort]?.rawData ?? [],
