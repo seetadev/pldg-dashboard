@@ -6,33 +6,96 @@ import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
 import EngagementChart from './EngagementChart';
 import TechnicalProgressChart from './TechnicalProgressChart';
-import TechPartnerChart from './TechPartnerChart';
+import { TechPartnerChart } from './TechPartnerChart';
 import TopPerformersTable from './TopPerformersTable';
 import { LoadingSpinner } from '../ui/loading';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
+import { enhanceTechPartnerData } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
+import { processData } from '@/lib/data-processing';
+import { EngagementData } from '@/types/dashboard';
+import CohortSelector from './CohortSelector';
 
 export default function DeveloperEngagementDashboard() {
   const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
+  const [csvData, setCsvData] = useState<EngagementData[]>([]);
+  const [isLoadingCSV, setIsLoadingCSV] = useState(true);
+  const [errorCSV, setErrorCSV] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadCSVData() {
+      try {
+        console.log('Loading CSV data...');
+        const response = await fetch('/data/Weekly Engagement Survey Breakdown (4).csv');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch CSV: ${response.statusText}`);
+        }
+        const csvText = await response.text();
+        
+        Papa.parse<EngagementData>(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: (header: string) => header.trim(),
+          complete: (results: ParseResult<EngagementData>) => {
+            console.log('CSV Parse Results:', {
+              weekRange: results.data.map(d => d['Program Week']),
+              totalRows: results.data.length,
+              errors: results.errors
+            });
+            setCsvData(results.data);
+            setIsLoadingCSV(false);
+          },
+          error: (error: ParseError): void => {
+            console.error('CSV parsing error:', error);
+            setErrorCSV(error.message);
+          }
+        } as ParseConfig<EngagementData>);
+      } catch (error) {
+        console.error('Failed to load CSV:', error);
+        setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
+      }
+    }
+    loadCSVData();
+  }, []);
+
+  const processedData = csvData.length > 0 ? processData(csvData) : null;
+
+  const enhancedTechPartnerData = React.useMemo(() =>
+    processedData?.techPartnerPerformance && processedData?.rawEngagementData
+      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
+      : [],
+    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+  );
 
   React.useEffect(() => {
     console.log('Dashboard State:', {
-      hasData: !!data,
-      metrics: data ? {
-        contributors: data.activeContributors,
-        techPartners: data.programHealth.activeTechPartners,
-        engagementTrends: data.engagementTrends.length,
-        technicalProgress: data.technicalProgress.length
+      hasData: !!processedData,
+      metrics: processedData ? {
+        contributors: processedData.activeContributors,
+        techPartners: processedData.programHealth.activeTechPartners,
+        engagementTrends: processedData.engagementTrends.length,
+        technicalProgress: processedData.technicalProgress.length,
+        techPartnerData: enhancedTechPartnerData
       } : null,
       isLoading,
       isError,
       isFetching,
       lastUpdated: new Date(lastUpdated).toISOString()
     });
-  }, [data, isLoading, isError, isFetching, lastUpdated]);
+  }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
-  if (isLoading || (!data && !isError)) {
+  if (isLoadingCSV) {
+    return <div>Loading CSV data...</div>;
+  }
+
+  if (errorCSV || !processedData) {
+    return <div>Error: {errorCSV || 'No data available'}</div>;
+  }
+
+  if (!processedData && isLoading) {
     return (
       <div className="container mx-auto p-4">
         <div className="h-[calc(100vh-200px)] flex items-center justify-center">
@@ -42,12 +105,12 @@ export default function DeveloperEngagementDashboard() {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !processedData) {
     return (
       <div className="container mx-auto p-4">
         <div className="p-4 text-center text-red-600">
           Unable to load dashboard data. Please try refreshing.
-          <Button 
+          <Button
             variant="outline"
             size="sm"
             onClick={refresh}
@@ -68,13 +131,17 @@ export default function DeveloperEngagementDashboard() {
           <div>
             <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
             <p className="mt-2 text-indigo-100">Real-time insights and engagement metrics</p>
+            {/* Insert CohortSelector here */}
+            <div className="mt-4">
+              <CohortSelector />
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-indigo-200">
               Last updated: {new Date(lastUpdated).toLocaleString()}
             </span>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={refresh}
               disabled={isFetching}
@@ -89,22 +156,22 @@ export default function DeveloperEngagementDashboard() {
 
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
-        <ExecutiveSummary data={data} />
+        <ExecutiveSummary data={processedData} />
       </div>
 
       {/* Action Items Section */}
       <div className="mb-8">
-        <ActionableInsights data={data} />
+        <ActionableInsights data={processedData} />
       </div>
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <EngagementChart data={data.engagementTrends} />
-        <TechnicalProgressChart 
-          data={data.technicalProgress} 
+        <EngagementChart data={processedData.engagementTrends} />
+        <TechnicalProgressChart
+          data={processedData.technicalProgress}
           githubData={{
-            inProgress: data.issueMetrics[0]?.open || 0,
-            done: data.issueMetrics[0]?.closed || 0
+            inProgress: processedData.issueMetrics[0]?.open || 0,
+            done: processedData.issueMetrics[0]?.closed || 0
           }}
         />
       </div>
@@ -112,7 +179,7 @@ export default function DeveloperEngagementDashboard() {
       {/* Full Width Sections */}
       <div className="space-y-8">
         {/* Tech Partner Overview */}
-        <TechPartnerChart data={data.techPartnerPerformance} />
+        <TechPartnerChart data={enhancedTechPartnerData} />
 
         {/* Top Contributors */}
         <Card>
@@ -120,10 +187,10 @@ export default function DeveloperEngagementDashboard() {
             <CardTitle>Top Contributors</CardTitle>
           </CardHeader>
           <CardContent>
-            <TopPerformersTable data={data.topPerformers} />
+            <TopPerformersTable data={processedData.topPerformers} />
           </CardContent>
         </Card>
       </div>
     </div>
   );
-} 
+}

@@ -15,14 +15,14 @@ export function calculateMetrics({
   const safeProjectBoard = projectBoard || { issues: [], statusGroups: { todo: 0, inProgress: 0, done: 0 } };
 
   // Basic metrics with safe access
-  const totalContributions = Object.values(safeUserContributions).reduce((acc, curr) => 
+  const totalContributions = Object.values(safeUserContributions).reduce((acc, curr) =>
     acc + ((curr?.issues?.created || 0)), 0);
 
   const activeContributors = Object.values(safeUserContributions).filter(
     user => (user?.issues?.created || 0) > 0
   ).length;
 
-  const averageEngagement = activeContributors > 0 ? 
+  const averageEngagement = activeContributors > 0 ?
     totalContributions / activeContributors : 0;
 
   // Generate trend data for charts with safe access
@@ -41,7 +41,9 @@ export function calculateMetrics({
     techPartner: [],
     techPartnerPerformance: Object.entries(safeValidatedContributions).map(([partner, contrib]) => ({
       partner,
-      issues: contrib?.github || 0
+      issues: contrib?.github || 0,
+      timeSeriesData: [],  // Add required property
+      contributorDetails: []  // Add required property
     })),
     contributorGrowth: [{
       week: new Date().toISOString().split('T')[0],
@@ -111,7 +113,9 @@ export function generateTrendData(data: {
     techPartner: [],
     techPartnerPerformance: Object.entries(validatedContributions).map(([partner, contrib]) => ({
       partner,
-      issues: contrib?.github || 0
+      issues: contrib?.github || 0,
+      timeSeriesData: [],  // Add required property
+      contributorDetails: []  // Add required property
     })),
     contributorGrowth: [{
       week: new Date().toISOString().split('T')[0],

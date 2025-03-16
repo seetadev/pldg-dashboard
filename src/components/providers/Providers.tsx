@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
+import { CohortProvider } from '@/context/CohortContext';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -13,9 +14,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <DashboardSystemProvider>
-      <TooltipProvider delayDuration={0} skipDelayDuration={0}>
-        {stableChildren.current}
-      </TooltipProvider>
+      <CohortProvider>
+        <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+          {stableChildren.current}
+        </TooltipProvider>
+      </CohortProvider>
     </DashboardSystemProvider>
   );
-} 
+}
