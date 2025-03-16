@@ -2,44 +2,41 @@ import { GitHubData } from '@/types/dashboard';
 import useSWR from 'swr';
 
 const fetcher = async (): Promise<GitHubData> => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-  const response = await fetch(`${baseUrl}/api/github`);
+  console.log('Fetching GitHub data...');
+  const response = await fetch('/api/github');
+
   if (!response.ok) {
-    throw new Error('Failed to fetch GitHub data');
+    console.error('GitHub API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`GitHub API error: ${response.statusText}`);
   }
+
   const rawData = await response.json();
-  
+
   console.log('GitHub raw data:', {
     hasData: !!rawData,
     statusGroups: rawData?.statusGroups,
+    issueCount: rawData?.issues?.length,
     timestamp: new Date().toISOString()
   });
 
+  if (!rawData || !rawData.statusGroups) {
+    console.error('Invalid GitHub response format:', {
+      hasData: !!rawData,
+      statusGroups: rawData?.statusGroups,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error('Invalid GitHub response format');
+  }
+
   return {
     issues: rawData.issues || [],
-    statusGroups: {
-      inProgress: rawData.statusGroups?.inProgress || 0,
-      done: rawData.statusGroups?.done || 0,
-      todo: rawData.statusGroups?.todo || 0
-    },
-    project: {
-      user: {
-        projectV2: {
-          items: {
-            nodes: rawData.project?.user?.projectV2?.items?.nodes || []
-          }
-        }
-      }
-    },
-    projectBoard: {
-      issues: rawData.projectBoard?.issues || [],
-      statusGroups: {
-        todo: rawData.projectBoard?.statusGroups?.todo || 0,
-        inProgress: rawData.projectBoard?.statusGroups?.inProgress || 0,
-        done: rawData.projectBoard?.statusGroups?.done || 0
-      },
-      project: rawData.projectBoard?.project || {}
-    },
+    statusGroups: rawData.statusGroups,
+    project: rawData.project || { user: { projectV2: { items: { nodes: [] } } } },
+    projectBoard: rawData.projectBoard || { issues: [], statusGroups: { todo: 0, inProgress: 0, done: 0 }, project: {} },
     userContributions: rawData.userContributions || {},
     timestamp: Date.now()
   };

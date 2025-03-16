@@ -43,12 +43,17 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
     );
   }
 
-  const combinedData = data.map((weekData) => ({
-    week: weekData.week,
-    'New Issues': weekData['Total Issues'],
-    'In Progress': githubData?.inProgress || 0,
-    'Completed': githubData?.done || 0
-  }));
+  const combinedData = React.useMemo(() => {
+    if (!data?.length) return [];
+
+    // Data is already sorted in processData function
+    return data.map((weekData) => ({
+      week: weekData.week,
+      'New Issues': weekData['Total Issues'],
+      'In Progress': githubData?.inProgress || 0,
+      'Completed': githubData?.done || 0
+    }));
+  }, [data, githubData]);
 
   return (
     <Card className="h-[500px]">

@@ -1,5 +1,6 @@
 import { GitHubData, GitHubUserContribution, ValidatedContribution } from '@/types/dashboard';
 import { VALIDATION_CONFIG, normalizeContributorName } from './constants';
+import { EngagementData } from '@/types/dashboard';
 
 export interface AirtableRecord {
   fields: {
@@ -84,4 +85,23 @@ export function countUserGithubContributions(contribution?: GitHubUserContributi
     contribution.pullRequests.created +
     contribution.pullRequests.reviewed
   );
+}
+
+export function validateCSVData(data: EngagementData[]): EngagementData[] {
+  return data.filter(record => {
+    // Basic validation checks
+    const isValid = 
+      // Required fields check
+      record.Name && 
+      record['Program Week'] &&
+      record.cohortId &&
+      // Cohort format check (optional)
+      /^cohort-\d+$/.test(record.cohortId);
+    
+    if (!isValid) {
+      console.warn('Invalid record found:', record);
+    }
+    
+    return isValid;
+  });
 }

@@ -1,6 +1,8 @@
-# PLDG Dashboard
+# PLDG Dashboard V0
 
 A real-time analytics dashboard for tracking developer engagement, technical progress, and contribution metrics across the PLDG (Protocol Labs Developer Guild) program.
+
+<img width="1090" alt="Screenshot 2024-11-09 at 10 42 26 AM" src="https://github.com/user-attachments/assets/c2b41770-6fc4-4dd8-94c9-d9ace0ecc385">
 
 ## Features
 

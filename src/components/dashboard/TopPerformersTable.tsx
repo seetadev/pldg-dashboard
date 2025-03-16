@@ -41,17 +41,14 @@ export default function TopPerformersTable({ data }: Props) {
         nameMap.set(finalName, {
           name: finalName,
           totalIssues: existing.totalIssues + performer.totalIssues,
-          // Take the weighted average of engagement scores
-          avgEngagement: (existing.avgEngagement * existing.totalIssues + 
-                         performer.avgEngagement * performer.totalIssues) / 
-                        (existing.totalIssues + performer.totalIssues)
+          avgEngagement: 0 // We're not using this anymore
         });
       } else {
         // Add new performer with original name
         nameMap.set(finalName, {
           name: finalName,
           totalIssues: performer.totalIssues || 0, // Ensure non-null
-          avgEngagement: performer.avgEngagement || 0 // Ensure non-null
+          avgEngagement: 0 // We're not using this anymore
         });
       }
     });
@@ -92,7 +89,6 @@ export default function TopPerformersTable({ data }: Props) {
           <tr className="border-b">
             <th className="px-4 py-2 text-left">Name</th>
             <th className="px-4 py-2 text-left">Total Issues</th>
-            <th className="px-4 py-2 text-left">Avg Engagement</th>
             <th className="px-4 py-2 text-left">Status</th>
           </tr>
         </thead>
@@ -101,7 +97,6 @@ export default function TopPerformersTable({ data }: Props) {
             <tr key={performer.name} className="border-b hover:bg-gray-50">
               <td className="px-4 py-2">{performer.name}</td>
               <td className="px-4 py-2">{performer.totalIssues}</td>
-              <td className="px-4 py-2">{performer.avgEngagement.toFixed(2)}</td>
               <td className="px-4 py-2">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                   ${index < 3 ? 'bg-green-100 text-green-800' : 
