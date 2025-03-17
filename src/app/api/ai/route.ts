@@ -44,10 +44,12 @@ export async function POST(request: Request) {
       insights: textContent.text,
       success: true
     });
-  } catch (error) {
-    console.error('Error generating AI insights:', error);
+  } catch (error: any) {
+    console.error('Error generating AI insights:', error.message, {
+      stack: error.stack, // the stack trace for debugging
+    });
     return NextResponse.json({ 
-      error: 'Failed to generate insights', 
+      error: 'Failed to generate insights' + error.message, 
       success: false 
     }, { 
       status: 500 

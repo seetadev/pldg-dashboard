@@ -13,7 +13,7 @@ export async function GET() {
       console.log('Using local CSV data...');
       try {
         // Read the CSV file from the public directory
-        const csvPath = path.join(process.cwd(), 'public', 'data', 'Weekly Engagement Survey Breakdown (4).csv');
+        const csvPath = path.join(process.cwd(), 'public', 'data', 'Weekly Engagement Survey Breakdown (3).csv');
         const csvData = await fs.readFile(csvPath, 'utf-8');
         
         // Parse CSV data
@@ -34,9 +34,14 @@ export async function GET() {
         }
 
         return NextResponse.json(parsedData.data);
-      } catch (error) {
-        console.error('Error loading CSV:', error);
-        throw new Error('Failed to load CSV data');
+      } catch (error: any) {
+        console.error('Error loading CSV:', error.message, {
+          stack: error.stack,
+        });
+        return NextResponse.json(
+          { error: 'Failed to load CSV data', details: error.message },
+          { status: 500 }
+        );
       }
     }
 
@@ -48,6 +53,11 @@ export async function GET() {
     const tableName = process.env.AIRTABLE_TABLE_NAME;
 
     if (!baseId || !apiKey || !tableName) {
+      const missingVariables = [];
+      if (!baseId) missingVariables.push('AIRTABLE_BASE_ID');
+      if (!apiKey) missingVariables.push('AIRTABLE_API_KEY');
+      if (!tableName) missingVariables.push('AIRTABLE_TABLE_NAME');
+
       console.error('Missing required Airtable environment variables');
       return NextResponse.json(
         { error: 'Airtable configuration missing' },
@@ -55,6 +65,7 @@ export async function GET() {
       );
     }
 
+    try{
     // Use the table name from environment variables instead of hardcoded ID
     const response = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`,
@@ -83,7 +94,10 @@ export async function GET() {
         tableName,
         requestUrl: `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`
       });
-      throw new Error(`Airtable API error: ${response.statusText}`);
+      return NextResponse.json(
+        { error: `Airtable API error: ${response.statusText}`, details: errorText },
+        { status: response.status >= 400 && response.status < 600 ? response.status : 500 }
+      );
     }
 
     const data = await response.json();
@@ -95,7 +109,10 @@ export async function GET() {
 
     if (!data.records || !Array.isArray(data.records)) {
       console.error('Invalid Airtable response format:', data);
-      throw new Error('Invalid Airtable response format');
+      return NextResponse.json(
+        { error: 'Invalid Airtable response format', details: 'Data.records is missing or not an array' },
+        { status: 500 }
+      );
     }
 
     // Transform data at API level to match expected EngagementData type
@@ -120,13 +137,23 @@ export async function GET() {
     });
 
     return NextResponse.json(transformedData);
-  } catch (error) {
-    console.error('Airtable API error:', error);
+  } catch (error: any) {
+    console.error('Airtable API error:', error.message, {
+      stack: error.stack,
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch Airtable data' },
+      { error: 'Failed to fetch Airtable data' + error.message },
       { status: 500 }
     );
   }
+} catch (generalError: any) {
+  // Catch any unexpected errors
+  console.error('Unexpected error in Airtable API:', generalError);
+  return NextResponse.json(
+    { error: 'Unexpected error', details: generalError.message },
+    { status: 500 }
+  );
+}
 }
 
 function parseTechPartners(techPartner: string | string[]): string[] {

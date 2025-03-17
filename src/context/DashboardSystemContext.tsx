@@ -3,11 +3,13 @@
 import * as React from 'react';
 import { ProcessedData, EngagementData } from '@/types/dashboard';
 import { useDashboardSystem } from '@/lib/system';
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { loadCohortData, processData } from '@/lib/data-processing';
 import { trackCohortUsage } from '@/lib/analytics';
 import Papa from 'papaparse';
+import { toast } from '../components/ui/use-toast';
+import { errorMonitor } from 'events';
 
 interface DashboardSystemContextType {
   data: ProcessedData | null;
@@ -19,6 +21,10 @@ interface DashboardSystemContextType {
   refresh: () => Promise<void>;
   selectedCohort: CohortId;
   setSelectedCohort: (cohort: CohortId) => void;
+  setIsError: (isError: boolean) => void;
+  loadCohortDataWithCache: (cohort: CohortId) => Promise<void>;
+  handleCohortChange: (cohort: CohortId) => void;
+  errorHandler: (error: Error, message?: string) => void; // Add errorHandler
 }
 
 interface CachedData {
@@ -40,9 +46,23 @@ export function DashboardSystemProvider({ children }: { children: React.ReactNod
   const [isFetching, setIsFetching] = useState(false);
   
   // Add cache ref
-  const dataCache = React.useRef<Record<CohortId, CachedData>>({});
+  const dataCache = React.useRef<Partial<Record<CohortId, CachedData>>>({});
 
-  const loadCohortDataWithCache = async (cohortId: CohortId) => {
+  // Error Handler Function
+  const errorHandler = useCallback(
+    (error: Error, message?: string) => {
+      console.error('Dashboard Error:', error.message, error.stack);
+      setIsError(true);
+      toast({
+        variant: 'destructive',
+        title: message || 'An error occurred.',
+        description: error.message,
+      });
+    },
+    [toast]
+  );
+
+  const loadCohortDataWithCache = useCallback(async (cohortId: CohortId) => {
     const cached = dataCache.current[cohortId];
     const now = Date.now();
 
@@ -58,6 +78,7 @@ export function DashboardSystemProvider({ children }: { children: React.ReactNod
 
     try {
       setIsFetching(true);
+      setIsError(false);
       const csvText = await loadCohortData(cohortId);
       
       return new Promise<ProcessedData>((resolve, reject) => {
@@ -81,42 +102,51 @@ export function DashboardSystemProvider({ children }: { children: React.ReactNod
             
             resolve(processedData);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('CSV parsing error:', error);
             reject(error);
           }
         });
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error loading cohort ${cohortId} data:`, error);
-      throw error;
+      errorHandler(error, `Failed to load Cohort ${cohortId} data`)
+      setIsError(true)
     } finally {
       setIsFetching(false);
     }
-  };
+  }, [errorHandler]);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       const freshData = await loadCohortDataWithCache(selectedCohort);
-      setData(freshData);
+      if (freshData) {
+        setData(freshData);
+      } else {
+        setData(null);
+      }
       setLastUpdated(new Date().toISOString());
+      toast({
+        title: 'Data Refreshed',
+        description: 'Successfully refreshed data from Airtable.',
+      });
       setIsError(false);
-    } catch (error) {
-      console.error('Error refreshing data:', error);
+    } catch (error: any) {
+      errorHandler(error, 'Failed to refresh data.');
       setIsError(true);
       setError(error instanceof Error ? error.message : 'Failed to refresh data');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast, errorHandler]);
 
   // Track cohort switches
-  const handleCohortChange = (newCohortId: CohortId) => {
+  const handleCohortChange = useCallback((newCohortId: CohortId) => {
     trackCohortUsage(newCohortId, 'switch');
     setSelectedCohort(newCohortId);
-  };
+  }, [loadCohortDataWithCache]);
 
   // Load data when cohort changes
   useEffect(() => {
@@ -129,6 +159,10 @@ export function DashboardSystemProvider({ children }: { children: React.ReactNod
       isLoading,
       isError,
       error,
+      setIsError,
+      loadCohortDataWithCache: loadCohortDataWithCache as (cohort: CohortId) => Promise<void>,
+      errorHandler,
+      handleCohortChange,
       refresh,
       lastUpdated,
       isFetching,
