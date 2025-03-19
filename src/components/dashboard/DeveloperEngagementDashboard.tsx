@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
 import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
@@ -13,98 +13,178 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
 import { enhanceTechPartnerData } from '@/lib/utils';
-import { useEffect, useState } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
-import { processData, loadCohortData } from '@/lib/data-processing';
-import { EngagementData } from '@/types/dashboard';
-import { CohortSelector } from './CohortSelector';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { useCohortData } from '@/hooks/useCohortData';
+import { processData } from '@/lib/data-processing';
+import { EngagementData, ProcessedData } from '@/types/dashboard';
+// import CohortSelector from './CohortSelector';
+// import { useCohortContext } from '@/context/CohortContext';
+
+// Export processed data for both cohorts
+export let processedDataCohort1: ProcessedData | null = null;
+export let processedDataCohort2: ProcessedData | null = null;
 
 export default function DeveloperEngagementDashboard() {
-  const { 
-    isError, 
-    refresh, 
-    lastUpdated, 
-    isFetching,
-    selectedCohort,
-    setSelectedCohort 
-  } = useDashboardSystemContext();
+  const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
+  // const { selectedCohort } = useCohortContext();
+  const selectedCohort = 'Cohort 1';
+  const [csvDataCohort1, setCsvDataCohort1] = useState<EngagementData[]>([]);
+  const [csvDataCohort2, setCsvDataCohort2] = useState<EngagementData[]>([]);
+  const [isLoadingCSV, setIsLoadingCSV] = useState(true);
+  const [errorCSV, setErrorCSV] = useState<string | null>(null);
+  const [currentProcessedData, setCurrentProcessedData] = useState<ProcessedData | null>(null);
 
-  const {
-    data: csvData,
-    isLoading: isLoadingCSV,
-    error: errorCSV,
-  } = useCohortData(selectedCohort);
+  async function loadCSVData(cohort: 'cohort-1' | 'cohort-2') {
+    try {
+      console.log(`Loading CSV data for ${cohort}...`);
+      const response = await fetch(`/data/${cohort}/weekly-engagement-data.csv`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch CSV for ${cohort}: ${response.statusText}`);
+      }
+      const csvText = await response.text();
+      
+      Papa.parse<EngagementData>(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: (header: string) => header.trim(),
+        complete: (results: ParseResult<EngagementData>) => {
+          console.log(`CSV Parse Results for ${cohort}:`, {
+            weekRange: results.data.map(d => d['Program Week']),
+            totalRows: results.data.length,
+            errors: results.errors
+          });
+          if (cohort === 'cohort-1') {
+            setCsvDataCohort1(results.data);
+          } else {
+            setCsvDataCohort2(results.data);
+          }
+        },
+        error: (error: ParseError): void => {
+          console.error(`CSV parsing error for ${cohort}:`, error);
+          setErrorCSV(error.message);
+        }
+      } as ParseConfig<EngagementData>);
+    } catch (error) {
+      console.error(`Failed to load CSV for ${cohort}:`, error);
+      setErrorCSV(error instanceof Error ? error.message : `Failed to load data for ${cohort}`);
+    }
+  }
+  
+  useEffect(() => {
+    loadCSVData('cohort-1');
+    loadCSVData('cohort-2');
+  }, []);
 
-  const processedData = React.useMemo(() => 
-    csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
-    [csvData, selectedCohort]
-  );
+  // Process data for cohort 1 and update the exported variable
+  useEffect(() => {
+    if (csvDataCohort1.length > 0) {
+      processedDataCohort1 = processData(csvDataCohort1);
+      console.log('Processed data for cohort 1 is ready');
+      
+      // If this is the currently selected cohort or no cohort is selected, update the state
+      if (selectedCohort === 'Cohort 1' || !selectedCohort) {
+        setCurrentProcessedData(processedDataCohort1);
+      }
+      
+      // If both cohorts are loaded, we can stop the loading state
+      if (csvDataCohort2.length > 0) {
+        setIsLoadingCSV(false);
+      }
+    }
+  }, [csvDataCohort1, selectedCohort]);
+
+  // Process data for cohort 2 and update the exported variable
+  useEffect(() => {
+    if (csvDataCohort2.length > 0) {
+      processedDataCohort2 = processData(csvDataCohort2);
+      console.log('Processed data for cohort 2 is ready');
+      
+      // If this is the currently selected cohort, update the state
+      if (selectedCohort === 'Cohort 2') {
+        setCurrentProcessedData(processedDataCohort2);
+      }
+      
+      // If both cohorts are loaded, we can stop the loading state
+      if (csvDataCohort1.length > 0) {
+        setIsLoadingCSV(false);
+      }
+    }
+  }, [csvDataCohort2, selectedCohort]);
+
+  // Update current processed data when selected cohort changes
+  useEffect(() => {
+    console.log(`Cohort selection changed to: ${selectedCohort}`);
+    if (selectedCohort === 'Cohort 1' && processedDataCohort1) {
+      setCurrentProcessedData(processedDataCohort1);
+    } else if (selectedCohort === 'Cohort 2' && processedDataCohort2) {
+      setCurrentProcessedData(processedDataCohort2);
+    }
+  }, [selectedCohort]);
 
   const enhancedTechPartnerData = React.useMemo(() =>
-    processedData?.techPartnerPerformance && processedData?.rawEngagementData
-      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
+    currentProcessedData?.techPartnerPerformance && currentProcessedData?.rawEngagementData
+      ? enhanceTechPartnerData(currentProcessedData.techPartnerPerformance, currentProcessedData.rawEngagementData)
       : [],
-    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+    [currentProcessedData?.techPartnerPerformance, currentProcessedData?.rawEngagementData]
   );
 
   React.useEffect(() => {
     console.log('Dashboard State:', {
-      hasData: !!processedData,
-      metrics: processedData ? {
-        contributors: processedData.activeContributors,
-        techPartners: processedData.programHealth.activeTechPartners,
-        engagementTrends: processedData.engagementTrends.length,
-        technicalProgress: processedData.technicalProgress.length,
+      hasData: !!currentProcessedData,
+      selectedCohort,
+      metrics: currentProcessedData ? {
+        contributors: currentProcessedData.activeContributors,
+        techPartners: currentProcessedData.programHealth.activeTechPartners,
+        engagementTrends: currentProcessedData.engagementTrends.length,
+        technicalProgress: currentProcessedData.technicalProgress.length,
         techPartnerData: enhancedTechPartnerData
       } : null,
-      isLoadingCSV,
+      isLoading,
       isError,
       isFetching,
       lastUpdated: new Date(lastUpdated).toISOString()
     });
-  }, [processedData, isLoadingCSV, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
-
-  const handleCohortChange = (cohortId: CohortId) => {
-    setSelectedCohort(cohortId);
-  };
+  }, [currentProcessedData, selectedCohort, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
   if (isLoadingCSV) {
-    return <div>Loading CSV data...</div>;
-  }
-
-  if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
-  }
-
-  if (!processedData && isLoadingCSV) {
-    return (
-      <div className="container mx-auto p-4">
-        <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
+    return <div className="container mx-auto p-4">
+      <div className="h-[calc(100vh-200px)] flex items-center justify-center">
+        <LoadingSpinner />
+        <span className="ml-2">Loading cohort data...</span>
       </div>
-    );
+    </div>;
   }
 
-  if (isError || !processedData) {
-    return (
-      <div className="container mx-auto p-4">
-        <div className="p-4 text-center text-red-600">
-          Unable to load dashboard data. Please try refreshing.
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refresh}
-            className="mt-4 mx-auto"
-          >
-            Retry
-          </Button>
-        </div>
+  if (errorCSV) {
+    return <div className="container mx-auto p-4">
+      <div className="p-4 text-center text-red-600">
+        Error loading data: {errorCSV}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setErrorCSV(null);
+            setIsLoadingCSV(true);
+            loadCSVData('cohort-1');
+            loadCSVData('cohort-2');
+          }}
+          className="mt-4 mx-auto"
+        >
+          Retry
+        </Button>
       </div>
-    );
+    </div>;
   }
+
+  // if (!currentProcessedData) {
+  //   return <div className="container mx-auto p-4">
+  //     <div className="p-4 text-center text-amber-600">
+  //       No data available for the selected cohort. Please select a different cohort.
+  //       <div className="mt-4">
+  //         <CohortSelector />
+  //       </div>
+  //     </div>
+  //   </div>;
+  // }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -113,15 +193,13 @@ export default function DeveloperEngagementDashboard() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
-            <p className="mt-2 text-indigo-100">
-              {COHORT_DATA[selectedCohort].name} - Real-time insights and engagement metrics
-            </p>
+            <p className="mt-2 text-indigo-100">Real-time insights and engagement metrics</p>
+            {/* Insert CohortSelector here */}
+            {/* <div className="mt-4">
+              <CohortSelector />
+            </div> */}
           </div>
           <div className="flex items-center gap-4">
-            <CohortSelector 
-              selectedCohort={selectedCohort}
-              onCohortChange={handleCohortChange}
-            />
             <span className="text-sm text-indigo-200">
               Last updated: {new Date(lastUpdated).toLocaleString()}
             </span>
@@ -141,22 +219,22 @@ export default function DeveloperEngagementDashboard() {
 
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
-        <ExecutiveSummary data={processedData} />
+        <ExecutiveSummary data={currentProcessedData} />
       </div>
 
       {/* Action Items Section */}
       <div className="mb-8">
-        <ActionableInsights data={processedData} />
+        <ActionableInsights data={currentProcessedData} />
       </div>
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <EngagementChart data={processedData.engagementTrends} />
+        <EngagementChart data={currentProcessedData.engagementTrends} />
         <TechnicalProgressChart
-          data={processedData.technicalProgress}
+          data={currentProcessedData.technicalProgress}
           githubData={{
-            inProgress: processedData.issueMetrics[0]?.open || 0,
-            done: processedData.issueMetrics[0]?.closed || 0
+            inProgress: currentProcessedData.issueMetrics[0]?.open || 0,
+            done: currentProcessedData.issueMetrics[0]?.closed || 0
           }}
         />
       </div>
@@ -172,10 +250,10 @@ export default function DeveloperEngagementDashboard() {
             <CardTitle>Top Contributors</CardTitle>
           </CardHeader>
           <CardContent>
-            <TopPerformersTable data={processedData.topPerformers} />
+            <TopPerformersTable data={currentProcessedData.topPerformers} />
           </CardContent>
         </Card>
       </div>
     </div>
   );
-} 
+}
