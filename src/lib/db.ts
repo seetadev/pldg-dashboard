@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 
+// Default connection string for local Docker development
 const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/pldg-dashboard";
+  process.env.MONGODB_URI ||
+  "mongodb://pldg:password@localhost:27017/pldg-dashboard?authSource=admin";
 
 interface Cached {
   conn: typeof mongoose | null;

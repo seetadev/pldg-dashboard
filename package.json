@@ -2,6 +2,7 @@
   "name": "developer-engagement-dashboard",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +12,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "vercel-build": "next build",
-    "seed": "tsc -p scripts/tsconfig.json && node dist/seed-database.js"
+    "seed": "tsc -p scripts/tsconfig.json && node --experimental-specifier-resolution=node scripts/dist/scripts/seed-database.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.1",

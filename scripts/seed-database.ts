@@ -1,12 +1,21 @@
 import fs from "fs";
 import path from "path";
-import { parse } from "papaparse";
-import dotenv from "dotenv";
-import connectToDatabase from "../src/lib/db";
-import { engagementService } from "../src/lib/engagement-data";
+import papaparse from "papaparse";
+import dotenvPkg from "dotenv";
+import { fileURLToPath } from "url";
+import connectToDatabase from "../src/lib/db.js";
+import { engagementService } from "../src/lib/engagement-data/index.js";
+
+// Get exports from CommonJS packages
+const { parse } = papaparse;
+const { config } = dotenvPkg;
+
+// Setup dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
-dotenv.config();
+config();
 
 /**
  * Reads a CSV file and parses its content
@@ -90,7 +99,8 @@ async function seedDatabase() {
     console.log("Connecting to database...");
     await connectToDatabase();
 
-    const dataDir = path.join(process.cwd(), "public", "data");
+    // Use path.resolve for cross-platform compatibility
+    const dataDir = path.resolve(process.cwd(), "public", "data");
     console.log(`Looking for CSV files in ${dataDir}...`);
 
     const csvFiles = getCSVFiles(dataDir);
