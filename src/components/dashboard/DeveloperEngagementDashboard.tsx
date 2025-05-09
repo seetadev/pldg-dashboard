@@ -17,41 +17,38 @@ import { useEffect, useState } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
+import normalizeEngagementData from '@/lib/formatDBData';
 
 export default function DeveloperEngagementDashboard() {
   const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
   const [csvData, setCsvData] = useState<EngagementData[]>([]);
   const [isLoadingCSV, setIsLoadingCSV] = useState(true);
   const [errorCSV, setErrorCSV] = useState<string | null>(null);
+  
+  
 
   useEffect(() => {
     async function loadCSVData() {
       try {
         console.log('Loading CSV data...');
-        const response = await fetch('/data/Weekly Engagement Survey Breakdown (4).csv');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch CSV: ${response.statusText}`);
-        }
-        const csvText = await response.text();
+        const response = await fetch('/api/cohort');
+
+        const responseData = await fetch('/data/Weekly Engagement Survey Breakdown (4).csv');
+
         
-        Papa.parse<EngagementData>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header: string) => header.trim(),
-          complete: (results: ParseResult<EngagementData>) => {
-            console.log('CSV Parse Results:', {
-              weekRange: results.data.map(d => d['Program Week']),
-              totalRows: results.data.length,
-              errors: results.errors
-            });
-            setCsvData(results.data);
-            setIsLoadingCSV(false);
-          },
-          error: (error: ParseError): void => {
-            console.error('CSV parsing error:', error);
-            setErrorCSV(error.message);
-          }
-        } as ParseConfig<EngagementData>);
+        const csvText = await responseData.text();
+
+        console.log('CSV Text:', csvText);
+
+        const rawData: Record<string, any>[] = await response.json();
+
+         // Normalize each entry
+        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
+        console.log('CSV Text:', cleanedData);
+
+        setCsvData(cleanedData);
+        setIsLoadingCSV(false)
+        
       } catch (error) {
         console.error('Failed to load CSV:', error);
         setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
