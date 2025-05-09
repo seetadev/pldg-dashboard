@@ -1,97 +1,103 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
-import ExecutiveSummary from './ExecutiveSummary';
-import { ActionableInsights } from './ActionableInsights';
-import EngagementChart from './EngagementChart';
-import TechnicalProgressChart from './TechnicalProgressChart';
-import { TechPartnerChart } from './TechPartnerChart';
-import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner } from '../ui/loading';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { RefreshCw } from 'lucide-react';
-import { enhanceTechPartnerData } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
-import { processData } from '@/lib/data-processing';
-import { EngagementData } from '@/types/dashboard';
+import * as React from "react";
+import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
+import ExecutiveSummary from "./ExecutiveSummary";
+import { ActionableInsights } from "./ActionableInsights";
+import EngagementChart from "./EngagementChart";
+import TechnicalProgressChart from "./TechnicalProgressChart";
+import { TechPartnerChart } from "./TechPartnerChart";
+import TopPerformersTable from "./TopPerformersTable";
+import { LoadingSpinner } from "../ui/loading";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
+import { RefreshCw } from "lucide-react";
+import { enhanceTechPartnerData } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { processData } from "@/lib/data-processing";
+import { EngagementData } from "@/types/dashboard";
 
 export default function DeveloperEngagementDashboard() {
-  const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
-  const [csvData, setCsvData] = useState<EngagementData[]>([]);
-  const [isLoadingCSV, setIsLoadingCSV] = useState(true);
-  const [errorCSV, setErrorCSV] = useState<string | null>(null);
+  const { data, isLoading, isError, refresh, lastUpdated, isFetching } =
+    useDashboardSystemContext();
+  const [engagementData, setEngagementData] = useState<EngagementData[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [errorData, setErrorData] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadCSVData() {
+    async function loadEngagementData() {
       try {
-        console.log('Loading CSV data...');
-        const response = await fetch('/data/Weekly Engagement Survey Breakdown (4).csv');
+        console.log("Loading engagement data from API...");
+        const response = await fetch("/api/engagement-data");
         if (!response.ok) {
-          throw new Error(`Failed to fetch CSV: ${response.statusText}`);
+          throw new Error(`Failed to fetch data: ${response.statusText}`);
         }
-        const csvText = await response.text();
-        
-        Papa.parse<EngagementData>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header: string) => header.trim(),
-          complete: (results: ParseResult<EngagementData>) => {
-            console.log('CSV Parse Results:', {
-              weekRange: results.data.map(d => d['Program Week']),
-              totalRows: results.data.length,
-              errors: results.errors
-            });
-            setCsvData(results.data);
-            setIsLoadingCSV(false);
-          },
-          error: (error: ParseError): void => {
-            console.error('CSV parsing error:', error);
-            setErrorCSV(error.message);
-          }
-        } as ParseConfig<EngagementData>);
+        const data = await response.json();
+
+        console.log("API Response:", {
+          totalRows: data.length,
+          sampleData: data[0],
+        });
+
+        setEngagementData(data);
+        setIsLoadingData(false);
       } catch (error) {
-        console.error('Failed to load CSV:', error);
-        setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
+        console.error("Failed to load data:", error);
+        setErrorData(
+          error instanceof Error ? error.message : "Failed to load data"
+        );
+        setIsLoadingData(false);
       }
     }
-    loadCSVData();
+    loadEngagementData();
   }, []);
 
-  const processedData = csvData.length > 0 ? processData(csvData) : null;
+  const processedData =
+    engagementData.length > 0 ? processData(engagementData) : null;
 
-  const enhancedTechPartnerData = React.useMemo(() =>
-    processedData?.techPartnerPerformance && processedData?.rawEngagementData
-      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
-      : [],
+  const enhancedTechPartnerData = React.useMemo(
+    () =>
+      processedData?.techPartnerPerformance && processedData?.rawEngagementData
+        ? enhanceTechPartnerData(
+            processedData.techPartnerPerformance,
+            processedData.rawEngagementData
+          )
+        : [],
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
   );
 
   React.useEffect(() => {
-    console.log('Dashboard State:', {
+    console.log("Dashboard State:", {
       hasData: !!processedData,
-      metrics: processedData ? {
-        contributors: processedData.activeContributors,
-        techPartners: processedData.programHealth.activeTechPartners,
-        engagementTrends: processedData.engagementTrends.length,
-        technicalProgress: processedData.technicalProgress.length,
-        techPartnerData: enhancedTechPartnerData
-      } : null,
+      metrics: processedData
+        ? {
+            contributors: processedData.activeContributors,
+            techPartners: processedData.programHealth.activeTechPartners,
+            engagementTrends: processedData.engagementTrends.length,
+            technicalProgress: processedData.technicalProgress.length,
+            techPartnerData: enhancedTechPartnerData,
+          }
+        : null,
       isLoading,
       isError,
       isFetching,
-      lastUpdated: new Date(lastUpdated).toISOString()
+      lastUpdated: new Date(lastUpdated).toISOString(),
     });
-  }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
+  }, [
+    processedData,
+    isLoading,
+    isError,
+    isFetching,
+    lastUpdated,
+    enhancedTechPartnerData,
+  ]);
 
-  if (isLoadingCSV) {
-    return <div>Loading CSV data...</div>;
+  if (isLoadingData) {
+    return <div>Loading engagement data...</div>;
   }
 
-  if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
+  if (errorData || !processedData) {
+    return <div>Error: {errorData || "No data available"}</div>;
   }
 
   if (!processedData && isLoading) {
@@ -129,7 +135,9 @@ export default function DeveloperEngagementDashboard() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
-            <p className="mt-2 text-indigo-100">Real-time insights and engagement metrics</p>
+            <p className="mt-2 text-indigo-100">
+              Real-time insights and engagement metrics
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-indigo-200">
@@ -142,7 +150,9 @@ export default function DeveloperEngagementDashboard() {
               disabled={isFetching}
               className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
             >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+              />
               Refresh Data
             </Button>
           </div>
@@ -166,7 +176,7 @@ export default function DeveloperEngagementDashboard() {
           data={processedData.technicalProgress}
           githubData={{
             inProgress: processedData.issueMetrics[0]?.open || 0,
-            done: processedData.issueMetrics[0]?.closed || 0
+            done: processedData.issueMetrics[0]?.closed || 0,
           }}
         />
       </div>
@@ -188,4 +198,4 @@ export default function DeveloperEngagementDashboard() {
       </div>
     </div>
   );
-} 
+}
