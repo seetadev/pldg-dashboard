@@ -33,12 +33,6 @@ export default function DeveloperEngagementDashboard() {
         console.log('Loading CSV data...');
         const response = await fetch('/api/cohort');
 
-        const responseData = await fetch('/data/Weekly Engagement Survey Breakdown (4).csv');
-
-        
-        const csvText = await responseData.text();
-
-        console.log('CSV Text:', csvText);
 
         const rawData: Record<string, any>[] = await response.json();
 
@@ -63,17 +57,17 @@ export default function DeveloperEngagementDashboard() {
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
       ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
       : [],
-    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-  );
+  [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+);
 
   React.useEffect(() => {
     console.log('Dashboard State:', {
       hasData: !!processedData,
       metrics: processedData ? {
-        contributors: processedData.activeContributors,
-        techPartners: processedData.programHealth.activeTechPartners,
-        engagementTrends: processedData.engagementTrends.length,
-        technicalProgress: processedData.technicalProgress.length,
+            contributors: processedData.activeContributors,
+            techPartners: processedData.programHealth.activeTechPartners,
+            engagementTrends: processedData.engagementTrends.length,
+            technicalProgress: processedData.technicalProgress.length,
         techPartnerData: enhancedTechPartnerData
       } : null,
       isLoading,
