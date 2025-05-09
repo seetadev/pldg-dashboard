@@ -1,21 +1,11 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { EngagementData } from "../../types/dashboard";
 
 // Interface for the Mongoose document
-export interface EngagementDataDocument extends Document {
-  Name: string;
-  "Github Username"?: string;
-  "Program Week": string;
-  "Engagement Participation "?: string;
-  "Tech Partner Collaboration?": string;
-  "Which Tech Partner": string | string[];
-  "How many issues, PRs, or projects this week?": string;
-  "Issue Title 1"?: string | string[];
-  "Issue Link 1"?: string | string[];
-  "Issue Title 2"?: string | string[];
-  "Issue Link 2"?: string | string[];
-  "Issue Title 3"?: string | string[];
-  "Issue Link 3"?: string | string[];
-  [key: string]: any;
+export interface EngagementDataDocument
+  extends Omit<Document, keyof EngagementData>,
+    EngagementData {
+  // Additional properties can be added here if needed
 }
 
 // Schema definition
@@ -42,11 +32,11 @@ const EngagementDataSchema = new Schema<EngagementDataDocument>(
 );
 
 // Create and export model
-const EngagementData =
+const EngagementDataModel =
   mongoose.models.EngagementData ||
   mongoose.model<EngagementDataDocument>(
     "EngagementData",
     EngagementDataSchema
   );
 
-export default EngagementData;
+export default EngagementDataModel;
