@@ -206,7 +206,7 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
 // Calculate Top Performers
 function calculateTopPerformers(data: EngagementData[]) {
   return _(data)
-    .groupBy('Name')
+    .groupBy('Github Username')
     .map((entries, name) => ({
       name,
       totalIssues: _.sumBy(entries, e => {

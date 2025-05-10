@@ -3,6 +3,7 @@ import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { EngagementData, ProcessedData } from '@/types/dashboard';
 import { loadCohortData } from '@/lib/data-processing';
 import Papa from 'papaparse';
+import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
   rawData: EngagementData[];
@@ -29,35 +30,25 @@ export function useCohortData(selectedCohort: CohortId) {
       }
 
       try {
-        const csvText = await loadCohortData(selectedCohort);
-        
-        Papa.parse<EngagementData>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header: string) => header.trim(),
-          complete: (results) => {
-            console.log('Cohort Data Loaded:', {
-              cohort: selectedCohort,
-              rows: results.data.length,
-              weekRange: results.data.map(d => d['Program Week'])
-            });
+        // Fetch the CSV data from the API
+        const response = await fetch(`/api/cohort${selectedCohort}`);
 
-            setCache(prev => ({
-              ...prev,
-              [selectedCohort]: {
-                rawData: results.data,
-                processedData: null, // Will be processed on demand
-                lastUpdated: Date.now()
-              }
-            }));
-            setIsLoading(false);
-          },
-          error: (error) => {
-            console.error('CSV parsing error:', error);
-            setError(error.message);
-            setIsLoading(false);
+        const rawData: Record<string, any>[] = await response.json();
+
+         // Normalize each entry
+        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
+
+        setCache(prev => ({
+          ...prev,
+          [selectedCohort]: {
+            rawData: cleanedData,
+            processedData: null, // Will be processed on demand
+            lastUpdated: Date.now()
           }
-        });
+        }));
+        
+        setIsLoading(false);
+
       } catch (error) {
         console.error('Failed to load cohort data:', error);
         setError(error instanceof Error ? error.message : 'Failed to load data');

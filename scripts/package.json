@@ -1,0 +1,27 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "main": "csv-uploader.js",
+  "type": "module",
+  "dependencies": {
+    "bson": "^6.10.3",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.5.0",
+    "memory-pager": "^1.5.0",
+    "mongodb": "^6.16.0",
+    "mongodb-connection-string-url": "^3.0.2",
+    "punycode": "^2.3.1",
+    "sparse-bitfield": "^3.0.3",
+    "tr46": "^5.1.1",
+    "webidl-conversions": "^7.0.0",
+    "whatwg-url": "^14.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node csv-uploader.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
