@@ -31,6 +31,7 @@
     "graphql-request": "^7.1.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.454.0",
+    "mongodb": "^6.16.0",
     "next": "14.2.10",
     "node-fetch": "^2.6.1",
     "papaparse": "^5.4.1",
