@@ -345,4 +345,34 @@ export interface GitHubIssue {
     merged_at: string | null;
   };
   requested_reviewers?: Array<{ login: string }>;
+}
+
+export interface TimelineEvent {
+  id: string;
+  type: 'issue' | 'pr' | 'survey';
+  title: string;
+  url?: string;
+  date: string;
+  contributor: string;
+  contributorUsername?: string;
+  techPartner: string;
+  cohort: string;
+  week: string;
+  description?: string;
+  status?: 'open' | 'closed' | 'merged';
+}
+
+export interface TimelineFilters {
+  dateRange?: DateRange;
+  contributors: string[];
+  cohorts: string[];
+  eventTypes: Array<'issue' | 'pr' | 'survey'>;
+}
+
+export interface TimelineSnapshot {
+  id: string;
+  name: string;
+  events: TimelineEvent[];
+  filters: TimelineFilters;
+  createdAt: string;
 } 
