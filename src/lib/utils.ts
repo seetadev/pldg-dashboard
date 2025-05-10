@@ -14,6 +14,10 @@ import {
 } from '../types/dashboard'
 import { processDataWithAI } from './ai';
 
+export function nanoid(): string {
+  return Math.random().toString(36).substring(2, 11);
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -660,9 +664,6 @@ function processContributorDetails(engagementData: EngagementData[]): Contributo
     };
   });
 }
-
-
-
 
 export function enhanceTechPartnerData(
   baseData: TechPartnerPerformance[] | undefined,
