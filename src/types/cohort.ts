@@ -19,8 +19,8 @@ export const COHORT_DATA: Record<CohortId, CohortMetadata> = {
   '2': {
     id: '2',
     name: 'Cohort 2',
-    startDate: '2024-01-13',
-    endDate: '2024-04-11',
+    startDate: '2025-01-13',
+    endDate: '2025-04-11',
     description: 'Current active cohort'
   }
 };

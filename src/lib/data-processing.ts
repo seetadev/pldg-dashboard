@@ -206,7 +206,7 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
 // Calculate Top Performers
 function calculateTopPerformers(data: EngagementData[]) {
   return _(data)
-    .groupBy('Github Username')
+    .groupBy('Name')
     .map((entries, name) => ({
       name,
       totalIssues: _.sumBy(entries, e => {
@@ -661,14 +661,42 @@ export function processData(
 
   // Add cohort metadata to processed data
   const cohortInfo = cohortId ? COHORT_DATA[cohortId] : null;
-  
-  // Filter data by date range if cohort is specified
-  const cohortDataFiltered = cohortId ? csvData.filter(row => {
-    const weekDate = new Date(row['Program Week'].match(/\((.*?)\)/)?.[1] || '');
-    return weekDate >= new Date(cohortInfo!.startDate) && 
-           weekDate <= new Date(cohortInfo!.endDate);
-  }) : csvData;
 
+  console.log('Cohort Info:', cohortInfo);
+
+  const cohortDataFiltered = cohortId && cohortInfo ? csvData.filter(row => {
+    const programWeek = row['Program Week'];
+    if (!programWeek) return false;
+  
+    let parsedStartDate: Date | null = null;
+  
+    if (cohortId === '1') {
+      // Format: "Week 2 (October 7 - October 11, 2024)"
+      const matchCohort1 = programWeek.match(/\(([^)]+)\)/)?.[1]; // Extract "October 7 - October 11, 2024"
+      if (matchCohort1) {
+        const [startPart] = matchCohort1.split('-'); // "October 7"
+        const cleanedStart = startPart.trim().replace(/(st|nd|rd|th)/g, ''); // Remove ordinal suffixes
+        const yearMatch = matchCohort1.match(/\d{4}/);
+        const year = yearMatch ? yearMatch[0] : new Date(cohortInfo.startDate).getFullYear();
+        parsedStartDate = new Date(`${cleanedStart}, ${year}`);
+      }
+    } else {
+      // Format: "Week 2: January 20, 2025 (Monday) – January 26, 2025 (Sunday)"
+      const matchCohort2 = programWeek.match(/:\s*([A-Za-z]+\s\d{1,2},\s\d{4})/); // Extract "January 20, 2025"
+      if (matchCohort2) {
+        parsedStartDate = new Date(matchCohort2[1].trim());
+      }
+    }
+  
+    if (!parsedStartDate || isNaN(parsedStartDate.getTime())) return false;
+  
+    const cohortStart = new Date(cohortInfo.startDate);
+    const cohortEnd = new Date(cohortInfo.endDate);
+  
+    return parsedStartDate >= cohortStart && parsedStartDate <= cohortEnd;
+  }) : csvData;
+  
+  
   return {
     weeklyChange: calculateWeeklyChange(cohortDataFiltered),
     activeContributors,

@@ -2,7 +2,7 @@ import { EngagementData } from "@/types/dashboard";
 
 export default function normalizeEngagementData(record: Record<string, any>): EngagementData {
     const normalized: EngagementData = {
-      Name: record['Name'] || record['﻿Name'] || '',
+      Name: (record['Name'] || record['﻿Name'] || record['Github Username']?.trim() || ''),
       'Github Username': record['Github Username'] || '',
       'Program Week': record['Program Week'] || '',
       'Engagement Tracking': record['Engagement Tracking'] || '',
