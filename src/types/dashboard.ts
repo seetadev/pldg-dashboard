@@ -1,4 +1,5 @@
 import { DateRange } from 'react-day-picker';
+import { CohortId } from './cohort';
 
 export type ActionItemType = 'warning' | 'opportunity' | 'success';
 
@@ -198,7 +199,17 @@ export interface ProcessedData {
   techPartnerPerformance: TechPartnerPerformance[];
   contributorGrowth: ContributorGrowth[];
   rawEngagementData: EngagementData[];
+  cohortId?: CohortId ;
+  cohortInfo: CohortInfo | null;
 }
+
+export interface CohortInfo {     
+  id: CohortId;     
+  name: string;     
+  startDate: string;     
+  endDate: string;     
+  description?: string;   
+};
 
 export interface AIMetrics {
   engagementScore: number;

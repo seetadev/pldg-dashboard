@@ -3,8 +3,9 @@ import {
   EngagementData, ProcessedData, TechPartnerMetrics,
   TechPartnerPerformance, ContributorDetails, IssueResult,
   IssueHighlight, EnhancedTechPartnerData, ActionItem,
-  GitHubData, IssueMetrics, EngagementTrend, CohortId
+  GitHubData, IssueMetrics, EngagementTrend
 } from '@/types/dashboard';
+import { CohortId } from '@/types/cohort';
 import * as utils from './utils';
 import Papa from 'papaparse';
 import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
