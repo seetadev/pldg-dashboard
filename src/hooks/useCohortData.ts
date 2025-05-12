@@ -33,6 +33,12 @@ export function useCohortData(selectedCohort: CohortId) {
         // Fetch the CSV data from the API
         const response = await fetch(`/api/cohort${selectedCohort}`);
 
+        const partnerFeedbackResponse = await fetch(`/api/cohort${selectedCohort}feedback`);
+
+        const partnerResponse = await partnerFeedbackResponse.json();
+
+        console.log('Partner Feedback Data:', partnerResponse);
+
         const rawData: Record<string, any>[] = await response.json();
 
          // Normalize each entry
