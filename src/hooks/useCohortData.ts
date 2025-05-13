@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { EngagementData, ProcessedData } from '@/types/dashboard';
+import { EngagementData, ProcessedData,FeedbackEntry } from '@/types/dashboard';
 import { loadCohortData } from '@/lib/data-processing';
 import Papa from 'papaparse';
 import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
   rawData: EngagementData[];
-  partnerFeedbackData: Record<string, any>;
+  partnerFeedbackData: FeedbackEntry[];
   processedData: ProcessedData | null;
   lastUpdated: number;
 }

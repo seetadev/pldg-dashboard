@@ -10,6 +10,12 @@ export interface ActionItem {
   action: string;
 }
 
+export interface FeedbackEntry {
+  Address: string;
+  Week: string;
+  Feedback: string;
+};
+
 export interface EngagementData {
   Name: string;
   'Github Username'?: string;

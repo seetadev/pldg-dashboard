@@ -157,7 +157,7 @@ export default function DeveloperEngagementDashboard() {
       </div>
 
       {/* Partners Feedback Section */}
-      <div>
+      <div className="mb-8">
         <PartnerFeedbackMatrix data={partnerFeedbackData} />
       </div>
       
