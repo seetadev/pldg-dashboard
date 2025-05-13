@@ -39,15 +39,10 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  console.log('Cohort Data:', partnerFeedbackData);
-
   const processedData = React.useMemo(() => 
     csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
-
-  console.log('Cohort Data:', processedData);
-
 
   const enhancedTechPartnerData = React.useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData

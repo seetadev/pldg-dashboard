@@ -38,21 +38,23 @@ export default function PartnerFeedbackMatrix({ data }: Props) {
         <Card>
             <CardHeader>
 
-                <CardTitle>Partner Feedback Matrix</CardTitle>
-                <CardDescription className='pt-4'>
-                    <input
-                        type="text"
-                        placeholder="Search by address"
-                        className="mb-4 border p-2 w-full rounded"
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            setCurrentPage(1); // Reset to first page on search
-                        }}
-                    /></CardDescription>
+                <CardTitle>RetroPGF Impact</CardTitle>
+                <CardDescription>
+                    This is a list of all the feedback received from the tech partners to the contributors. You can search by address to find specific feedback.
+                </CardDescription>
             </CardHeader>
 
             <CardContent className='pb-5'>
+                <input
+                    type="text"
+                    placeholder="Search by address"
+                    className="mb-4 border p-2 w-full rounded"
+                    value={search}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setCurrentPage(1); // Reset to first page on search
+                    }}
+                />
                 <div className="space-y-4">
                     {paginatedEntries.length > 0 ? (paginatedEntries.map(([contributor, feedbacks]) => (
                         <div key={contributor} className="mb-6 border rounded p-4 bg-white shadow-sm">
