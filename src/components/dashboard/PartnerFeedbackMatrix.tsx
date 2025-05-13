@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card } from '../ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { FeedbackEntry } from '@/types/dashboard';
 
 interface Props {
@@ -36,55 +36,63 @@ export default function PartnerFeedbackMatrix({ data }: Props) {
 
     return (
         <Card>
-            <div className='p-4'>
-                <h2 className="text-xl font-semibold mb-4">Partner Feedback Matrix</h2>
+            <CardHeader>
 
-                <input
-                    type="text"
-                    placeholder="Search by address"
-                    className="mb-4 border p-2 w-full rounded"
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setCurrentPage(1); // Reset to first page on search
-                    }}
-                />
+                <CardTitle>Partner Feedback Matrix</CardTitle>
+                <CardDescription className='pt-4'>
+                    <input
+                        type="text"
+                        placeholder="Search by address"
+                        className="mb-4 border p-2 w-full rounded"
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setCurrentPage(1); // Reset to first page on search
+                        }}
+                    /></CardDescription>
+            </CardHeader>
 
-                {paginatedEntries.map(([contributor, feedbacks]) => (
-                    <div key={contributor} className="mb-6 border rounded p-4 bg-white shadow-sm">
-                        <h3 className="text-lg font-bold mb-2">{contributor}</h3>
-                        <ul className="space-y-2 list-disc pl-6">
-                            {feedbacks.map((f, i) => (
-                                <li key={i}>
-                                    <strong>{f.Week}:</strong> {f.Feedback}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
+            <CardContent className='pb-5'>
+                <div className="space-y-4">
+                    {paginatedEntries.length > 0 ? (paginatedEntries.map(([contributor, feedbacks]) => (
+                        <div key={contributor} className="mb-6 border rounded p-4 bg-white shadow-sm">
+                            <h3 className="text-lg font-bold mb-2">Contributor Address : {contributor}</h3>
+                            <ul className="space-y-2 list-disc pl-6">
+                                {feedbacks.map((f, i) => (
+                                    <li key={i}>
+                                        <strong>{f.Week}:</strong> {f.Feedback}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )))
+                        : (<div className="text-center py-2 text-muted-foreground">
+                            No feedback data found
+                        </div>)}
 
-                {totalPages > 1 && (
-                    <div className="flex justify-center gap-2 mt-4">
-                        <button
-                            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border rounded disabled:opacity-50 disabled:hover:bg-white disabled:cursor-not-allowed hover:bg-slate-100"
-                        >
-                            Prev
-                        </button>
-                        <span className="px-4 py-1 font-medium">
-                            Page {currentPage} of {totalPages}
-                        </span>
-                        <button
-                            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border rounded disabled:opacity-50 disabled:hover:bg-white disabled:cursor-not-allowed hover:bg-slate-100"
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
-            </div>
+                    {totalPages > 1 && (
+                        <div className="flex justify-center gap-2 mt-4">
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1 border rounded disabled:opacity-50 disabled:hover:bg-white disabled:cursor-not-allowed hover:bg-slate-100"
+                            >
+                                Prev
+                            </button>
+                            <span className="px-4 py-1 font-medium">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-1 border rounded disabled:opacity-50 disabled:hover:bg-white disabled:cursor-not-allowed hover:bg-slate-100"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </CardContent>
         </Card>
     );
 }
