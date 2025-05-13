@@ -31,9 +31,9 @@ export function useCohortData(selectedCohort: CohortId) {
 
       try {
         // Fetch the CSV data from the API
-        const response = await fetch(`/api/cohort${selectedCohort}`);
+        const response = await fetch(`/api/cohort?id=${selectedCohort}`);
 
-        const partnerFeedbackResponse = await fetch(`/api/cohort${selectedCohort}feedback`);
+        const partnerFeedbackResponse = await fetch(`/api/cohort-feedback?id=${selectedCohort}`);
 
         const partnerResponse = await partnerFeedbackResponse.json();
 
