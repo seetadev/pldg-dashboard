@@ -7,6 +7,7 @@ import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
   rawData: EngagementData[];
+  partnerFeedbackData: Record<string, any>;
   processedData: ProcessedData | null;
   lastUpdated: number;
 }
@@ -48,6 +49,7 @@ export function useCohortData(selectedCohort: CohortId) {
           ...prev,
           [selectedCohort]: {
             rawData: cleanedData,
+            partnerFeedbackData: partnerResponse,
             processedData: null, // Will be processed on demand
             lastUpdated: Date.now()
           }
@@ -67,6 +69,7 @@ export function useCohortData(selectedCohort: CohortId) {
 
   return {
     data: cache[selectedCohort]?.rawData ?? [],
+    partnerFeedbackData: cache[selectedCohort]?.partnerFeedbackData ?? {},
     processedData: cache[selectedCohort]?.processedData ?? null,
     isLoading,
     error,

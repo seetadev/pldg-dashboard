@@ -20,6 +20,7 @@ import { EngagementData } from '@/types/dashboard';
 import { CohortSelector } from './CohortSelector';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { useCohortData } from '@/hooks/useCohortData';
+import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
 
 export default function DeveloperEngagementDashboard() {
   const { 
@@ -33,11 +34,12 @@ export default function DeveloperEngagementDashboard() {
 
   const {
     data: csvData,
+    partnerFeedbackData,
     isLoading: isLoadingCSV,
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  console.log('Cohort Data:', csvData);
+  console.log('Cohort Data:', partnerFeedbackData);
 
   const processedData = React.useMemo(() => 
     csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
@@ -153,6 +155,12 @@ export default function DeveloperEngagementDashboard() {
       <div className="mb-8">
         <ActionableInsights data={processedData} />
       </div>
+
+      {/* Partners Feedback Section */}
+      <div>
+        <PartnerFeedbackMatrix data={partnerFeedbackData} />
+      </div>
+      
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
