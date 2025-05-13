@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { NextResponse } from "next/server";
+import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -8,13 +8,14 @@ const anthropic = new Anthropic({
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    
+
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: "claude-3-5-haiku-20241022",
       max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: `You are analyzing PLDG (Protocol Labs Developer Guild) engagement data. 
+      messages: [
+        {
+          role: "user",
+          content: `You are analyzing PLDG (Protocol Labs Developer Guild) engagement data. 
         Please provide insights and recommendations based on the following metrics:
 
         Engagement Trends:
@@ -35,16 +36,20 @@ export async function POST(request: Request) {
         3. Specific Recommendations
         4. Notable Achievements
         
-        Format the response in markdown.`
-      }]
+        Format the response in markdown.`,
+        },
+      ],
     });
 
     return NextResponse.json({
       insights: response.content,
-      success: true
+      success: true,
     });
   } catch (error) {
-    console.error('Error generating insights:', error);
-    return NextResponse.json({ error: 'Failed to generate insights', success: false }, { status: 500 });
+    console.error("Error generating insights:", error);
+    return NextResponse.json(
+      { error: "Failed to generate insights", success: false },
+      { status: 500 },
+    );
   }
-} 
+}

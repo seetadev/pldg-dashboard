@@ -1,97 +1,107 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { ProcessedData } from '@/types/dashboard';
-import { 
-  Download, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  GitPullRequest, 
-  Star, 
-  Target, 
-  Activity, 
+import * as React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { ProcessedData } from "@/types/dashboard";
+import {
+  Download,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  GitPullRequest,
+  Star,
+  Target,
+  Activity,
   ThumbsUp,
-  HelpCircle 
-} from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { Button } from '../ui/button';
-import { exportDashboardAction } from '@/lib/actions';
-import { toast } from '../ui/use-toast';
+  HelpCircle,
+} from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Button } from "../ui/button";
+import { exportDashboardAction } from "@/lib/actions";
+import { toast } from "../ui/use-toast";
 
 interface Props {
   data: ProcessedData;
 }
 
 const METRIC_EXPLANATIONS = {
-  weeklyChange: "Percentage change in total contributions compared to last week. Calculated from both GitHub and Airtable data.",
-  activeContributors: "Number of unique contributors who submitted at least one contribution in the current week.",
-  totalContributions: "Total number of issues, PRs, and technical contributions across all tech partners.",
-  npsScore: "Net Promoter Score (range: -100 to 100) calculated from weekly engagement surveys.",
-  engagementRate: "Percentage of contributors actively participating in program activities and submissions.",
-  activeTechPartners: "Number of tech partners with at least one active contribution or engagement this week."
+  weeklyChange:
+    "Percentage change in total contributions compared to last week. Calculated from both GitHub and Airtable data.",
+  activeContributors:
+    "Number of unique contributors who submitted at least one contribution in the current week.",
+  totalContributions:
+    "Total number of issues, PRs, and technical contributions across all tech partners.",
+  npsScore:
+    "Net Promoter Score (range: -100 to 100) calculated from weekly engagement surveys.",
+  engagementRate:
+    "Percentage of contributors actively participating in program activities and submissions.",
+  activeTechPartners:
+    "Number of tech partners with at least one active contribution or engagement this week.",
 };
 
 export default function ExecutiveSummary({ data }: Props) {
   const [isExporting, setIsExporting] = React.useState(false);
 
-  const insights = React.useMemo(() => ({
-    weeklyChange: {
-      issues: data.weeklyChange,
-      contributors: data.activeContributors,
-      partners: data.programHealth.activeTechPartners
-    },
-    programHealth: {
-      nps: data.programHealth.npsScore,
-      engagementRate: data.programHealth.engagementRate,
-      totalContributions: data.totalContributions
-    },
-    keyHighlights: [
-      `${data.activeContributors} active contributors across ${data.programHealth.activeTechPartners} tech partners`,
-      `${data.feedbackSentiment.positive} positive feedback responses`,
-      `${Math.abs(data.weeklyChange)}% ${data.weeklyChange >= 0 ? 'increase' : 'decrease'} in weekly contributions`
-    ]
-  }), [data]);
+  const insights = React.useMemo(
+    () => ({
+      weeklyChange: {
+        issues: data.weeklyChange,
+        contributors: data.activeContributors,
+        partners: data.programHealth.activeTechPartners,
+      },
+      programHealth: {
+        nps: data.programHealth.npsScore,
+        engagementRate: data.programHealth.engagementRate,
+        totalContributions: data.totalContributions,
+      },
+      keyHighlights: [
+        `${data.activeContributors} active contributors across ${data.programHealth.activeTechPartners} tech partners`,
+        `${data.feedbackSentiment.positive} positive feedback responses`,
+        `${Math.abs(data.weeklyChange)}% ${data.weeklyChange >= 0 ? "increase" : "decrease"} in weekly contributions`,
+      ],
+    }),
+    [data],
+  );
 
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      console.log('Starting export process...');
+      console.log("Starting export process...");
 
       const result = await exportDashboardAction(data);
-      
+
       if (result.success && result.data) {
-        console.log('Export data received, creating blob...');
+        console.log("Export data received, creating blob...");
 
         try {
           // Create blob with error handling
-          const buffer = Buffer.from(result.data, 'base64');
+          const buffer = Buffer.from(result.data, "base64");
           if (buffer.length === 0) {
-            throw new Error('Empty buffer received');
+            throw new Error("Empty buffer received");
           }
 
-          const blob = new Blob(
-            [buffer], 
-            { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
-          );
+          const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
 
           if (blob.size === 0) {
-            throw new Error('Empty blob created');
+            throw new Error("Empty blob created");
           }
 
-          console.log('Blob created, initiating download...');
+          console.log("Blob created, initiating download...");
 
           // Create and trigger download
           const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
+          const a = document.createElement("a");
           a.href = url;
-          a.download = result.filename || `PLDG_Dashboard_${new Date().toISOString().split('T')[0]}.xlsx`;
-          
+          a.download =
+            result.filename ||
+            `PLDG_Dashboard_${new Date().toISOString().split("T")[0]}.xlsx`;
+
           // Append, click, and cleanup
           document.body.appendChild(a);
           a.click();
-          
+
           // Cleanup with delay to ensure download starts
           setTimeout(() => {
             window.URL.revokeObjectURL(url);
@@ -99,24 +109,27 @@ export default function ExecutiveSummary({ data }: Props) {
           }, 100);
 
           toast({
-            title: 'Export successful',
-            description: 'Dashboard data has been downloaded.'
+            title: "Export successful",
+            description: "Dashboard data has been downloaded.",
           });
 
-          console.log('Download initiated successfully');
+          console.log("Download initiated successfully");
         } catch (blobError) {
-          console.error('Blob creation/download failed:', blobError);
-          throw new Error('Failed to create downloadable file');
+          console.error("Blob creation/download failed:", blobError);
+          throw new Error("Failed to create downloadable file");
         }
       } else {
-        throw new Error(result.error || 'Export failed');
+        throw new Error(result.error || "Export failed");
       }
     } catch (error) {
-      console.error('Export error:', error);
+      console.error("Export error:", error);
       toast({
-        title: 'Export failed',
-        description: error instanceof Error ? error.message : 'Unable to export dashboard data.',
-        variant: 'destructive'
+        title: "Export failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Unable to export dashboard data.",
+        variant: "destructive",
       });
     } finally {
       setIsExporting(false);
@@ -133,14 +146,16 @@ export default function ExecutiveSummary({ data }: Props) {
               Key metrics and program health indicators
             </p>
           </div>
-          <Button 
+          <Button
             variant="outline"
             size="sm"
             onClick={handleExport}
             disabled={isExporting}
             className="flex items-center gap-2"
           >
-            <Download className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`} />
+            <Download
+              className={`w-4 h-4 ${isExporting ? "animate-spin" : ""}`}
+            />
             Export Report
           </Button>
         </div>
@@ -158,24 +173,29 @@ export default function ExecutiveSummary({ data }: Props) {
                   ) : (
                     <TrendingDown className="text-red-500" size={20} />
                   )}
-                  <span>
-                    {Math.abs(insights.weeklyChange.issues)}% WoW
-                  </span>
+                  <span>{Math.abs(insights.weeklyChange.issues)}% WoW</span>
                   <Tooltip>
                     <TooltipTrigger>
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
-                    <TooltipContent>{METRIC_EXPLANATIONS.weeklyChange}</TooltipContent>
+                    <TooltipContent>
+                      {METRIC_EXPLANATIONS.weeklyChange}
+                    </TooltipContent>
                   </Tooltip>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Users className="text-blue-500" size={20} />
-                <span>{insights.weeklyChange.contributors} Active Contributors</span>
+                <span>
+                  {insights.weeklyChange.contributors} Active Contributors
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <GitPullRequest className="text-purple-500" size={20} />
-                <span>{insights.programHealth.totalContributions} Total Contributions</span>
+                <span>
+                  {insights.programHealth.totalContributions} Total
+                  Contributions
+                </span>
               </div>
             </div>
           </div>
@@ -192,17 +212,23 @@ export default function ExecutiveSummary({ data }: Props) {
                     <TooltipTrigger>
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
-                    <TooltipContent>{METRIC_EXPLANATIONS.npsScore}</TooltipContent>
+                    <TooltipContent>
+                      {METRIC_EXPLANATIONS.npsScore}
+                    </TooltipContent>
                   </Tooltip>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Activity className="text-green-500" size={20} />
-                <span>Engagement Rate: {insights.programHealth.engagementRate}%</span>
+                <span>
+                  Engagement Rate: {insights.programHealth.engagementRate}%
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <Target className="text-blue-500" size={20} />
-                <span>Active Tech Partners: {insights.weeklyChange.partners}</span>
+                <span>
+                  Active Tech Partners: {insights.weeklyChange.partners}
+                </span>
               </div>
             </div>
           </div>
@@ -214,11 +240,15 @@ export default function ExecutiveSummary({ data }: Props) {
               {insights.keyHighlights.map((highlight, index) => (
                 <div key={index} className="flex items-center gap-3">
                   {index === 0 && <Users className="text-blue-500" size={20} />}
-                  {index === 1 && <ThumbsUp className="text-green-500" size={20} />}
-                  {index === 2 && (insights.weeklyChange.issues >= 0 ? 
-                    <TrendingUp className="text-green-500" size={20} /> : 
-                    <TrendingDown className="text-red-500" size={20} />
+                  {index === 1 && (
+                    <ThumbsUp className="text-green-500" size={20} />
                   )}
+                  {index === 2 &&
+                    (insights.weeklyChange.issues >= 0 ? (
+                      <TrendingUp className="text-green-500" size={20} />
+                    ) : (
+                      <TrendingDown className="text-red-500" size={20} />
+                    ))}
                   <span>{highlight}</span>
                 </div>
               ))}
@@ -228,4 +258,4 @@ export default function ExecutiveSummary({ data }: Props) {
       </CardContent>
     </Card>
   );
-} 
+}

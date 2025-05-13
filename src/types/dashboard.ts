@@ -1,6 +1,6 @@
-import { DateRange } from 'react-day-picker';
+import { CohortMetadata } from "./cohort";
 
-export type ActionItemType = 'warning' | 'opportunity' | 'success';
+export type ActionItemType = "warning" | "opportunity" | "success";
 
 export interface ActionItem {
   type: ActionItemType;
@@ -11,18 +11,18 @@ export interface ActionItem {
 
 export interface EngagementData {
   Name: string;
-  'Github Username'?: string;
-  'Program Week': string;
-  'Engagement Participation '?: string;
-  'Tech Partner Collaboration?': string;
-  'Which Tech Partner': string | string[];
-  'How many issues, PRs, or projects this week?': string;
-  'Issue Title 1'?: string | string[];
-  'Issue Link 1'?: string | string[];
-  'Issue Title 2'?: string | string[];
-  'Issue Link 2'?: string | string[];
-  'Issue Title 3'?: string | string[];
-  'Issue Link 3'?: string | string[];
+  "Github Username"?: string;
+  "Program Week": string;
+  "Engagement Participation "?: string;
+  "Tech Partner Collaboration?": string;
+  "Which Tech Partner": string | string[];
+  "How many issues, PRs, or projects this week?": string;
+  "Issue Title 1"?: string | string[];
+  "Issue Link 1"?: string | string[];
+  "Issue Title 2"?: string | string[];
+  "Issue Link 2"?: string | string[];
+  "Issue Title 3"?: string | string[];
+  "Issue Link 3"?: string | string[];
   [key: string]: string | string[] | undefined;
 }
 
@@ -83,7 +83,7 @@ export interface TechPartnerPerformance {
     issues: Array<{
       title: string;
       url: string;
-      status: 'open' | 'closed';
+      status: "open" | "closed";
       lastUpdated: string;
       contributor: string;
     }>;
@@ -111,12 +111,12 @@ export interface ContributorDetails {
 }
 
 export interface TechPartnerFilter {
-  selectedPartner: string | 'all';
+  selectedPartner: string | "all";
   weeks: string[]; // Chronologically ordered weeks 1-12
 }
 
 export interface ActionableInsight {
-  type: 'success' | 'warning';
+  type: "success" | "warning";
   title: string;
   description: string;
   link?: string;
@@ -125,7 +125,7 @@ export interface ActionableInsight {
 export interface IssueTracking {
   title: string;
   link: string;
-  status: 'open' | 'closed';
+  status: "open" | "closed";
   engagement: number;
   week: string;
   contributor: string;
@@ -141,7 +141,7 @@ export interface EnhancedTechPartnerData extends TechPartnerPerformance {
     issues: Array<{
       title: string;
       url: string;
-      status: 'open' | 'closed';
+      status: "open" | "closed";
       lastUpdated: string;
       contributor: string;
     }>;
@@ -156,14 +156,14 @@ export interface EngagementTrend {
   week: string;
   total: number;
   // Optional fields for backward compatibility
-  'High Engagement'?: number;
-  'Medium Engagement'?: number;
-  'Low Engagement'?: number;
+  "High Engagement"?: number;
+  "Medium Engagement"?: number;
+  "Low Engagement"?: number;
 }
 
 export interface TechnicalProgress {
   week: string;
-  'Total Issues': number;
+  "Total Issues": number;
 }
 
 export interface ContributorGrowth {
@@ -188,6 +188,8 @@ export interface ProcessedData {
     positiveFeedback: string;
     weeklyContributions: string;
   };
+  cohortId: string;
+  cohortInfo: CohortMetadata | null;
   topPerformers: TopPerformer[];
   actionItems: ActionItem[];
   engagementTrends: EngagementTrend[];
@@ -223,7 +225,8 @@ export interface GitHubData {
     user: {
       projectV2: {
         items: {
-          nodes: Array<any>;
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          nodes: Array<any>; // we're not really pulling data from GitHub via octokit. so this corresponding interface may go away pending when we discus the direction in detail
         };
       };
     };
@@ -275,7 +278,7 @@ export interface EnhancedGitHubData extends GitHubData {
   userContributions: Record<string, GitHubUserContribution>;
   contributionDiscrepancies: Array<{
     username: string;
-    discrepancy: string
+    discrepancy: string;
   }>;
 }
 
@@ -345,4 +348,4 @@ export interface GitHubIssue {
     merged_at: string | null;
   };
   requested_reviewers?: Array<{ login: string }>;
-} 
+}

@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from 'react';
-import { Search, Loader2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { ProcessedData } from '@/types/dashboard';
-import { DateRange as ReactDayPickerDateRange } from 'react-day-picker';
+import * as React from "react";
+import { Search, Loader2 } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ProcessedData } from "@/types/dashboard";
+import { DateRange as ReactDayPickerDateRange } from "react-day-picker";
 
 interface AISearchProps {
   data: ProcessedData | null;
@@ -14,22 +14,22 @@ interface AISearchProps {
 }
 
 export function AISearch({ data, onDateRangeChange }: AISearchProps) {
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = React.useState("");
   const [isSearching, setIsSearching] = React.useState(false);
   const [result, setResult] = React.useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!query.trim() || !data) return;
-    
+
     setIsSearching(true);
     try {
-      const response = await fetch('/api/ai/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/ai/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           query,
-          data
-        })
+          data,
+        }),
       });
 
       const { result } = await response.json();
@@ -40,8 +40,8 @@ export function AISearch({ data, onDateRangeChange }: AISearchProps) {
         onDateRangeChange(result.dateRange);
       }
     } catch (error) {
-      console.error('Search error:', error);
-      setResult('Sorry, there was an error processing your search.');
+      console.error("Search error:", error);
+      setResult("Sorry, there was an error processing your search.");
     } finally {
       setIsSearching(false);
     }
@@ -50,7 +50,9 @@ export function AISearch({ data, onDateRangeChange }: AISearchProps) {
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle className="text-lg font-medium">AI Insights Search</CardTitle>
+        <CardTitle className="text-lg font-medium">
+          AI Insights Search
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex gap-2 mb-4">
@@ -58,12 +60,16 @@ export function AISearch({ data, onDateRangeChange }: AISearchProps) {
             <Input
               placeholder="Ask about contributors, trends, or specific metrics..."
               value={query}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
-              onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleSearch()}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setQuery(e.target.value)
+              }
+              onKeyDown={(e: React.KeyboardEvent) =>
+                e.key === "Enter" && handleSearch()
+              }
               className="w-full"
             />
           </div>
-          <Button 
+          <Button
             onClick={handleSearch}
             disabled={isSearching}
             className="flex items-center gap-2"
@@ -76,13 +82,16 @@ export function AISearch({ data, onDateRangeChange }: AISearchProps) {
             Search
           </Button>
         </div>
-        
+
         {result && (
           <div className="p-4 bg-muted rounded-lg">
-            <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: result }} />
+            <div
+              className="prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: result }}
+            />
           </div>
         )}
       </CardContent>
     </Card>
   );
-} 
+}

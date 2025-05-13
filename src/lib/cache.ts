@@ -1,5 +1,7 @@
+// ideally we'd want to create a key-value store that is serializable
+// data should go in via JSON.stringify()
 type CacheEntry = {
-  data: any;
+  data: string;
   timestamp: number;
 };
 
@@ -16,32 +18,32 @@ class Cache {
     if (!entry) return undefined;
 
     if (Date.now() - entry.timestamp > this.TTL) {
-      console.log('Cache entry expired:', key);
+      console.log("Cache entry expired:", key);
       this.delete(key);
       return undefined;
     }
 
-    console.log('Cache hit:', key);
+    console.log("Cache hit:", key);
     return entry;
   }
 
-  set(key: string, value: any): void {
-    console.log('Cache set:', key);
+  set(key: string, value: string): void {
+    console.log("Cache set:", key);
     this.store.set(key, {
       data: value,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
   delete(key: string): void {
-    console.log('Cache delete:', key);
+    console.log("Cache delete:", key);
     this.store.delete(key);
   }
 
   clear(): void {
-    console.log('Cache clear');
+    console.log("Cache clear");
     this.store.clear();
   }
 }
 
-export const cache = new Cache(); 
+export const cache = new Cache();

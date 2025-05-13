@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -25,18 +21,10 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/components/*": [
-        "./src/components/*"
-      ],
-      "@/lib/*": [
-        "./src/lib/*"
-      ],
-      "@/types/*": [
-        "./src/types/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/types/*": ["./src/types/*"]
     },
     "baseUrl": ".",
     "types": ["node", "jest", "@testing-library/jest-dom"]
@@ -48,9 +36,5 @@
     ".next/types/**/*.ts",
     "src/**/*"
   ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "out"
-  ]
+  "exclude": ["node_modules", ".next", "out"]
 }

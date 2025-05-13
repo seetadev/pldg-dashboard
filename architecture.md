@@ -54,11 +54,13 @@ sequenceDiagram
 ## Key Design Decisions
 
 1. **API Integration**
+
    - GraphQL for efficient GitHub project data
    - REST for repository-level GitHub data
    - Airtable API for engagement metrics
 
 2. **Data Processing**
+
    - Type-safe data transformation
    - Zod schema validation
    - Lodash for data manipulation

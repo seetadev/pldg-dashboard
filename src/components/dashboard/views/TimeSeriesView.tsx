@@ -1,9 +1,18 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { EnhancedTechPartnerData } from '@/types/dashboard';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card } from '@/components/ui/card';
+import * as React from "react";
+import { EnhancedTechPartnerData } from "@/types/dashboard";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { Card } from "@/components/ui/card";
 
 interface TimeSeriesViewProps {
   data: EnhancedTechPartnerData[];
@@ -11,14 +20,17 @@ interface TimeSeriesViewProps {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: {
+    name: string;
+    value: number;
+  }[];
   label?: string;
 }
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length || !label) return null;
 
-  const weekNumber = label.replace(/Week Week/, 'Week');
+  const weekNumber = label.replace(/Week Week/, "Week");
 
   return (
     <Card className="p-3 bg-white/95 shadow-lg border-0">
@@ -29,10 +41,11 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             <div key={index} className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
+                style={{ backgroundColor: entry.name }}
               />
               <span>
-                {entry.name}: {entry.value} {entry.value === 1 ? 'issue' : 'issues'}
+                {entry.name}: {entry.value}{" "}
+                {entry.value === 1 ? "issue" : "issues"}
               </span>
             </div>
           ))}
@@ -48,8 +61,8 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
 
     // Get all unique weeks and format them
     const allWeeks = new Set<string>();
-    data.forEach(partner => {
-      partner.timeSeriesData.forEach(ts => {
+    data.forEach((partner) => {
+      partner.timeSeriesData.forEach((ts) => {
         if (ts.week) {
           // Extract just the week number
           const weekNum = ts.week.match(/Week (\d+)/)?.[1];
@@ -60,19 +73,19 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
 
     // Sort weeks by number
     const sortedWeeks = Array.from(allWeeks).sort((a, b) => {
-      const weekA = parseInt(a.match(/\d+/)?.[1] || '0');
-      const weekB = parseInt(b.match(/\d+/)?.[1] || '0');
+      const weekA = parseInt(a.match(/\d+/)?.[1] || "0");
+      const weekB = parseInt(b.match(/\d+/)?.[1] || "0");
       return weekA - weekB;
     });
 
     // Create data points for each week
-    return sortedWeeks.map(weekLabel => {
-      const point: Record<string, any> = { week: weekLabel };
-      
+    return sortedWeeks.map((weekLabel) => {
+      const point: Record<string, string | number> = { week: weekLabel };
+
       // Process each partner's data for this week
-      data.forEach(partner => {
+      data.forEach((partner) => {
         // Find matching week data by comparing week numbers
-        const weekData = partner.timeSeriesData.find(ts => {
+        const weekData = partner.timeSeriesData.find((ts) => {
           const tsWeekNum = ts.week.match(/Week (\d+)/)?.[1];
           const currentWeekNum = weekLabel.match(/Week (\d+)/)?.[1];
           return tsWeekNum === currentWeekNum;
@@ -88,23 +101,25 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
 
   // Debug logging
   React.useEffect(() => {
-    console.log('Chart Data:', chartData);
+    console.log("Chart Data:", chartData);
   }, [chartData]);
 
   if (!chartData.length) {
-    return <div className="h-[400px] w-full flex items-center justify-center text-gray-500">
-      No data available
-    </div>;
+    return (
+      <div className="h-[400px] w-full flex items-center justify-center text-gray-500">
+        No data available
+      </div>
+    );
   }
 
   const COLORS = {
-    'Libp2p': '#3B82F6',
-    'IPFS': '#14B8A6',
-    'Fil-B': '#A855F7',
-    'Fil-Oz': '#6366F1',
-    'Coordination Network': '#F43F5E',
-    'Storacha': '#F59E0B',
-    'Drand': '#10B981'
+    Libp2p: "#3B82F6",
+    IPFS: "#14B8A6",
+    "Fil-B": "#A855F7",
+    "Fil-Oz": "#6366F1",
+    "Coordination Network": "#F43F5E",
+    Storacha: "#F59E0B",
+    Drand: "#10B981",
   };
 
   return (
@@ -112,17 +127,14 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
       <ResponsiveContainer>
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="week"
+          <XAxis dataKey="week" tick={{ fontSize: 12 }} />
+          <YAxis
             tick={{ fontSize: 12 }}
-          />
-          <YAxis 
-            tick={{ fontSize: 12 }}
-            label={{ 
-              value: 'Issues', 
-              angle: -90, 
-              position: 'insideLeft',
-              style: { textAnchor: 'middle' }
+            label={{
+              value: "Issues",
+              angle: -90,
+              position: "insideLeft",
+              style: { textAnchor: "middle" },
             }}
           />
           <Tooltip content={<CustomTooltip />} />
@@ -133,7 +145,7 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
               dataKey={partner}
               fill={color}
               stackId="stack"
-              name={partner} // Add name for tooltip
+              name={partner}
             />
           ))}
         </BarChart>
