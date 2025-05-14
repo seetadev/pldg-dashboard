@@ -20,11 +20,13 @@ A real-time analytics dashboard for tracking developer engagement, technical pro
 The dashboard now supports multiple cohorts with data segmentation:
 
 ### Cohort 1 (Fall 2024)
+
 - Initial PLDG cohort
 - Data located in `/public/data/cohort-1/`
 - Historical baseline for program metrics
 
 ### Cohort 2 (Spring 2025)
+
 - Current active cohort
 - Data located in `/public/data/cohort-2/`
 - Real-time engagement tracking
@@ -84,11 +86,13 @@ src/
 ## Data Flow
 
 1. **Data Sources**:
+
    - Airtable: Weekly engagement surveys
    - GitHub: Issue tracking and project data
    - Cohort-specific CSV data files
 
 2. **Processing Pipeline**:
+
    - Raw data fetching with cohort segmentation
    - Data validation (Zod schemas)
    - Cohort-specific metric calculations
@@ -113,12 +117,14 @@ MIT License
 ## Known Limitations
 
 1. **Historical Data**:
+
    - No persistent storage of historical status changes
    - GitHub status counts reset on page refresh
    - Limited trend analysis capabilities
    - Week-over-week comparisons reset on refresh
 
 2. **Real-time Constraints**:
+
    - Data freshness limited by API rate limits
    - Snapshot-based metrics without historical context
    - Limited ability to track long-term patterns
@@ -140,12 +146,14 @@ MIT License
 ### Phase 2 (Planned)
 
 1. **Historical Data Storage**
+
    - Implement database for metric persistence
    - Track status changes over time
    - Enable historical trend analysis
    - Add date-range filtering for all metrics
 
 2. **Enhanced Analytics**
+
    - Long-term trend analysis
    - Predictive engagement metrics
    - Advanced collaboration patterns
@@ -160,6 +168,7 @@ MIT License
 ### Phase 3 (Future)
 
 1. **Advanced Features**
+
    - Custom metric definitions
    - Automated reporting
    - Integration with more data sources
@@ -175,6 +184,7 @@ MIT License
 ### Phase 4 (Cohort Enhancement)
 
 1. **Automated Cohort Management**
+
    - Automated data import for new cohorts
    - Cohort transition automation
    - Cross-cohort analytics

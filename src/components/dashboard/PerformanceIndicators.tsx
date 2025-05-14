@@ -39,4 +39,4 @@ export function PerformanceIndicators({ data }: { data: ProcessedData }) {
       />
     </div>
   );
-} 
+}

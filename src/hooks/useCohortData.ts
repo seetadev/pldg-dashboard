@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { EngagementData, ProcessedData } from '@/types/dashboard';
-import { loadCohortData } from '@/lib/data-processing';
-import Papa from 'papaparse';
+import { useState, useEffect } from "react";
+import { CohortId } from "@/types/cohort";
+import { EngagementData, ProcessedData } from "@/types/dashboard";
+import { loadCohortData } from "@/lib/data-processing";
+import Papa from "papaparse";
 
 interface CohortCache {
   rawData: EngagementData[];
@@ -11,7 +11,10 @@ interface CohortCache {
 }
 
 export function useCohortData(selectedCohort: CohortId) {
-  const [cache, setCache] = useState<Record<CohortId, CohortCache>>({});
+  const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
+    "1": { rawData: [], processedData: null, lastUpdated: 0 },
+    "2": { rawData: [], processedData: null, lastUpdated: 0 },
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,57 +25,56 @@ export function useCohortData(selectedCohort: CohortId) {
       setError(null);
 
       // Check cache first
-      if (cache[selectedCohort] && 
-          Date.now() - cache[selectedCohort].lastUpdated < 5 * 60 * 1000) { // 5 minute cache
+      if (
+        cache[selectedCohort] &&
+        Date.now() - cache[selectedCohort].lastUpdated < 5 * 60 * 1000
+      ) {
+        // 5 minute cache
         setIsLoading(false);
         return;
       }
 
       try {
         const csvText = await loadCohortData(selectedCohort);
-        
+
         Papa.parse<EngagementData>(csvText, {
           header: true,
           skipEmptyLines: true,
           transformHeader: (header: string) => header.trim(),
           complete: (results) => {
-            console.log('Cohort Data Loaded:', {
-              cohort: selectedCohort,
-              rows: results.data.length,
-              weekRange: results.data.map(d => d['Program Week'])
-            });
-
-            setCache(prev => ({
+            setCache((prev) => ({
               ...prev,
               [selectedCohort]: {
                 rawData: results.data,
                 processedData: null, // Will be processed on demand
-                lastUpdated: Date.now()
-              }
+                lastUpdated: Date.now(),
+              },
             }));
             setIsLoading(false);
           },
-          error: (error) => {
-            console.error('CSV parsing error:', error);
+          error: (error: Error) => {
+            console.error("CSV parsing error:", error);
             setError(error.message);
             setIsLoading(false);
-          }
+          },
         });
       } catch (error) {
-        console.error('Failed to load cohort data:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load data');
+        console.error("Failed to load cohort data:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to load data",
+        );
         setIsLoading(false);
       }
     }
 
     loadCohortDataWithCache();
-  }, [selectedCohort]);
+  }, [selectedCohort, cache]);
 
   return {
     data: cache[selectedCohort]?.rawData ?? [],
     processedData: cache[selectedCohort]?.processedData ?? null,
     isLoading,
     error,
-    cache
+    cache,
   };
-} 
+}

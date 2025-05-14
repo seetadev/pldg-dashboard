@@ -13,4 +13,4 @@ export function LoadingCard() {
       </CardContent>
     </Card>
   );
-} 
+}
