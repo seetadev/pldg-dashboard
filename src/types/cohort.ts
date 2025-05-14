@@ -34,7 +34,7 @@ export interface CohortState {
 export function getCohortDataPath(cohortId: CohortId): string {
   const filenames = {
     '1': 'Weekly Engagement Survey Breakdown (4).csv',
-    '2': '[cohort 2] Weekly Engagement Survey-Raw Dataset.csv'
+    '2': 'Cohort 2 Weekly Engagement Survey Raw Dataset.csv'
 
   };
   return `/data/cohort-${cohortId}/${filenames[cohortId]}`;
