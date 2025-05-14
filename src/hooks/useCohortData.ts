@@ -14,8 +14,8 @@ interface CohortCache {
 
 export function useCohortData(selectedCohort: CohortId) {
   const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
-    "1": { rawData: [], processedData: null, lastUpdated: 0 },
-    "2": { rawData: [], processedData: null, lastUpdated: 0 },
+    "1": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
+    "2": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
