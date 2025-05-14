@@ -137,10 +137,7 @@ export function useDashboardSystem() {
     githubData,
     isCSVLoading,
     isAirtableLoading,
-    isGithubLoading,
-    isCSVError,
-    isAirtableError,
-    isGithubError,
+    isGithubLoading
   ]);
 
   return {
