@@ -3,6 +3,8 @@ import { cache } from "@/lib/cache";
 
 export async function POST() {
   try {
+    console.log("Refreshing Airtable data...");
+
     // Clear the cache
     cache.delete("airtable_data");
 
@@ -23,11 +25,13 @@ export async function POST() {
 
     const data = await response.json();
 
-    // Update cache with fresh data
-    cache.set("airtable_data", {
-      data: data.records,
-      timestamp: Date.now(),
-    });
+    cache.set(
+      "airtable_data",
+      JSON.stringify({
+        data: data.records,
+        timestamp: Date.now(),
+      }),
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

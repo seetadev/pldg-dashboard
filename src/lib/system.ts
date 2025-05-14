@@ -4,7 +4,6 @@ import { useGitHubData } from "./github";
 import { useCSVData } from "@/hooks/useCSVData";
 import { processData } from "./data-processing";
 import { GitHubData } from "@/types/dashboard";
-import React from "react";
 
 export function useDashboardSystem() {
   const {
