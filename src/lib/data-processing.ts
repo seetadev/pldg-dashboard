@@ -189,7 +189,7 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
 // Calculate Top Performers
 function calculateTopPerformers(data: EngagementData[]) {
   return _(data)
-    .groupBy("Name")
+    .groupBy("Github Username")
     .map((entries, name) => ({
       name,
       totalIssues: _.sumBy(entries, (e) => {
@@ -489,11 +489,6 @@ type TechPartner = string;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function processCSVData(csvData: any[]): TechPartnerPerformance[] {
-  console.log("Processing CSV data input:", {
-    recordCount: csvData.length,
-    sampleRecord: csvData[0],
-  });
-
   const partnerData = new Map<
     TechPartner,
     {
@@ -649,15 +644,7 @@ export function processData(
   githubData?: GitHubData | null,
   cohortId?: CohortId,
 ): ProcessedData {
-  console.log("Processing data:", {
-    recordCount: csvData.length,
-    sampleRecord: csvData[0],
-    hasGithubData: !!githubData,
-  });
-
   const techPartnerPerformance = processCSVData(csvData);
-  console.log("Tech Partner Performance:", techPartnerPerformance);
-
   // Calculate core metrics with validation
   const activeContributors = new Set(
     csvData
@@ -692,6 +679,8 @@ export function processData(
         );
       })
     : csvData;
+
+  console.log("top performers", calculateTopPerformers(cohortDataFiltered))
 
   return {
     weeklyChange: calculateWeeklyChange(cohortDataFiltered),
@@ -752,12 +741,6 @@ function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
     new Set(csvData.map((row) => row["Program Week"])),
   ).sort((a, b) => parseWeekNumber(a) - parseWeekNumber(b));
 
-  console.log("Week Processing:", {
-    uniqueWeeks: allWeeks,
-    weekCount: allWeeks.length,
-    lastWeek: allWeeks[allWeeks.length - 1],
-  });
-
   // Create a map of week data
   const weeklyData = _.groupBy(csvData, "Program Week");
 
@@ -769,11 +752,6 @@ function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
     const activeContributors = new Set(entries.map((e) => e["Github Username"]))
       .size;
 
-    // Debug logging
-    console.log(`Week ${week} contributors:`, {
-      total: activeContributors,
-      uniqueNames: new Set(entries.map((e) => e.Name)),
-    });
 
     return {
       week: `Week ${parseWeekNumber(week)}`,
@@ -934,9 +912,6 @@ export async function loadCohortData(cohortId: CohortId) {
     }
 
     const data = await response.text();
-    console.log(
-      `Successfully loaded cohort ${cohortId} data: ${data.length} bytes`,
-    );
     return data;
   } catch (error) {
     console.error(`Error loading cohort ${cohortId} data:`, error);

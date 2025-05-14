@@ -51,32 +51,6 @@ export default function DeveloperEngagementDashboard() {
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData],
   );
 
-  React.useEffect(() => {
-    console.log("Dashboard State:", {
-      hasData: !!processedData,
-      metrics: processedData
-        ? {
-            contributors: processedData.activeContributors,
-            techPartners: processedData.programHealth.activeTechPartners,
-            engagementTrends: processedData.engagementTrends.length,
-            technicalProgress: processedData.technicalProgress.length,
-            techPartnerData: enhancedTechPartnerData,
-          }
-        : null,
-      isLoadingCSV,
-      isError,
-      isFetching,
-      lastUpdated: new Date(lastUpdated).toISOString(),
-    });
-  }, [
-    processedData,
-    isLoadingCSV,
-    isError,
-    isFetching,
-    lastUpdated,
-    enhancedTechPartnerData,
-  ]);
-
   const handleCohortChange = (cohortId: CohortId) => {
     setSelectedCohort(cohortId);
   };

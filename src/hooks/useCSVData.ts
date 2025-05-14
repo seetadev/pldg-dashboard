@@ -11,7 +11,6 @@ export function useCSVData() {
   useEffect(() => {
     async function fetchCSV() {
       try {
-        console.log("Fetching CSV data...");
         const response = await fetch("/data/weekly-engagement-data.csv", {
           method: "GET",
           headers: {
@@ -23,19 +22,12 @@ export function useCSVData() {
         }
 
         const csvText = await response.text();
-        console.log("CSV data received, starting parsing...");
 
         const parseConfig: ParseConfig<EngagementData> = {
           header: true,
           dynamicTyping: true,
           skipEmptyLines: true,
           complete: (results: ParseResult<EngagementData>) => {
-            console.log("CSV parsing complete:", {
-              rows: results.data.length,
-              fields: results.meta.fields,
-              errors: results.errors,
-            });
-
             if (results.errors.length > 0) {
               console.error("CSV parsing errors:", results.errors);
             }
@@ -66,7 +58,6 @@ export function useCSVData() {
     setIsLoading(true);
     setIsError(false);
     try {
-      console.log("Manually refreshing CSV data...");
       const response = await fetch("/data/weekly-engagement-data.csv", {
         method: "GET",
         headers: {
@@ -77,7 +68,6 @@ export function useCSVData() {
         throw new Error("Failed to fetch CSV: " + response.statusText);
       }
       const csvText = await response.text();
-      console.log("CSV refresh: data received, starting parsing...");
 
       const parseConfig: ParseConfig<EngagementData> = {
         header: true,

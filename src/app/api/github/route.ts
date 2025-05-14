@@ -35,13 +35,9 @@ interface ProjectItem {
 
 export async function GET() {
   try {
-    console.log("GitHub API route called");
-
     if (!process.env.GITHUB_TOKEN) {
       throw new Error("GitHub token not found");
     }
-
-    console.log("Fetching GitHub Project data...");
 
     const headers = {
       Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
@@ -119,14 +115,6 @@ export async function GET() {
 
     const rawData = await response.json();
 
-    // Add validation and logging
-    console.log("GitHub Raw Response:", {
-      hasData: !!rawData?.data?.user?.projectV2,
-      itemsCount: rawData?.data?.user?.projectV2?.items?.nodes?.length || 0,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Validate response structure
     if (!rawData?.data?.user?.projectV2?.items?.nodes) {
       console.error("Invalid GitHub response structure:", rawData);
       throw new Error("Invalid response structure from GitHub");
@@ -144,8 +132,6 @@ export async function GET() {
       done: items.filter((item: ProjectItem) => getItemStatus(item) === "Done")
         .length,
     };
-
-    console.log("Status counts:", statusCounts);
 
     const responseData: GitHubData = {
       project: rawData.data,

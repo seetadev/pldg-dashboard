@@ -5,15 +5,6 @@ import ExcelJS from "exceljs";
 
 export async function exportDashboardAction(data: ProcessedData) {
   try {
-    console.log("Starting dashboard export...", {
-      hasData: !!data,
-      metrics: {
-        contributors: data?.activeContributors,
-        trends: data?.engagementTrends?.length,
-        techPartners: data?.techPartnerMetrics?.length,
-      },
-    });
-
     if (!data) {
       throw new Error("No data provided for export");
     }
@@ -140,12 +131,6 @@ export async function exportDashboardAction(data: ProcessedData) {
     if (!base64) {
       throw new Error("Base64 conversion failed");
     }
-
-    console.log("Export completed successfully:", {
-      bufferSize: buffer.length,
-      base64Length: base64.length,
-      timestamp: new Date().toISOString(),
-    });
 
     return {
       success: true,

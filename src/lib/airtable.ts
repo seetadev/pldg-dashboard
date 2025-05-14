@@ -5,7 +5,6 @@ export function useAirtableData() {
   const { data, error, isValidating, mutate } = useSWR<EngagementData[]>(
     "/api/airtable",
     async () => {
-      console.log("Fetching Airtable data...");
       const response = await fetch("/api/airtable");
 
       if (!response.ok) {
@@ -14,23 +13,10 @@ export function useAirtableData() {
       }
 
       const rawData = await response.json();
-      console.log("Airtable raw response:", {
-        hasData: Array.isArray(rawData),
-        recordCount: Array.isArray(rawData) ? rawData.length : 0,
-        sampleRecord:
-          Array.isArray(rawData) && rawData.length > 0 ? rawData[0] : null,
-      });
-
       if (!Array.isArray(rawData)) {
         console.error("Invalid Airtable response format:", rawData);
         throw new Error("Invalid Airtable response format");
       }
-
-      console.log("Airtable data received:", {
-        recordCount: rawData.length,
-        sampleRecord: rawData[0],
-        timestamp: new Date().toISOString(),
-      });
 
       return rawData;
     },
@@ -51,15 +37,6 @@ export function useAirtableData() {
     mutate,
     timestamp: Date.now(),
   };
-
-  console.log("Airtable Hook Result:", {
-    hasData: !!result.data?.length,
-    recordCount: result.data?.length || 0,
-    sampleRecord: result.data?.[0],
-    isLoading: result.isLoading,
-    isError: result.isError,
-    timestamp: new Date(result.timestamp).toISOString(),
-  });
 
   return result;
 }

@@ -31,63 +31,8 @@ export function useDashboardSystem() {
     timestamp: githubTimestamp,
   } = useGitHubData();
 
-  React.useEffect(() => {
-    console.log("Data Sources State:", {
-      csv: {
-        hasData: !!csvData?.length,
-        recordCount: csvData?.length,
-        isLoading: isCSVLoading,
-      },
-      airtable: {
-        hasData: !!airtableData?.length,
-        recordCount: airtableData?.length,
-        isLoading: isAirtableLoading,
-        timestamp: airtableTimestamp,
-      },
-      github: {
-        hasData: !!githubData,
-        statusGroups: githubData?.statusGroups,
-        isLoading: isGithubLoading,
-        timestamp: githubTimestamp,
-      },
-    });
-  }, [
-    csvData,
-    airtableData,
-    githubData,
-    isCSVLoading,
-    isAirtableLoading,
-    isGithubLoading,
-    csvTimestamp,
-    airtableTimestamp,
-    githubTimestamp,
-  ]);
 
   const processedData = useMemo(() => {
-    console.log("Starting data processing...", {
-      csv: {
-        hasData: !!csvData?.length,
-        recordCount: csvData?.length,
-        sampleRecord: csvData?.[0],
-        isLoading: isCSVLoading,
-        error: isCSVError,
-      },
-      airtable: {
-        hasData: !!airtableData?.length,
-        recordCount: airtableData?.length,
-        sampleRecord: airtableData?.[0],
-        isLoading: isAirtableLoading,
-        error: isAirtableError,
-      },
-      github: {
-        hasData: !!githubData,
-        statusGroups: githubData?.statusGroups,
-        isLoading: isGithubLoading,
-        error: isGithubError,
-      },
-      timestamp: new Date().toISOString(),
-    });
-
     // Try CSV data first - make GitHub data optional
     if (!isCSVLoading && csvData?.length > 0) {
       try {

@@ -37,14 +37,6 @@ const GITHUB_LINKS = {
 };
 
 export default function TechnicalProgressChart({ data, githubData }: Props) {
-  React.useEffect(() => {
-    console.log("TechnicalProgress data:", {
-      dataPoints: data.length,
-      githubData,
-      timestamp: new Date().toISOString(),
-    });
-  }, [data, githubData]);
-
   const combinedData = React.useMemo(() => {
     if (!data?.length) return [];
 

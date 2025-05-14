@@ -2,7 +2,6 @@ import { GitHubData } from "@/types/dashboard";
 import useSWR from "swr";
 
 const fetcher = async (): Promise<GitHubData> => {
-  console.log("Fetching GitHub data...");
   const response = await fetch("/api/github");
 
   if (!response.ok) {
@@ -15,13 +14,6 @@ const fetcher = async (): Promise<GitHubData> => {
   }
 
   const rawData = await response.json();
-
-  console.log("GitHub raw data:", {
-    hasData: !!rawData,
-    statusGroups: rawData?.statusGroups,
-    issueCount: rawData?.issues?.length,
-    timestamp: new Date().toISOString(),
-  });
 
   if (!rawData || !rawData.statusGroups) {
     console.error("Invalid GitHub response format:", {

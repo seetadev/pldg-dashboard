@@ -10,7 +10,6 @@ export async function GET() {
     const useLocalData = process.env.USE_LOCAL_DATA === "true";
 
     if (useLocalData) {
-      console.log("Using local CSV data...");
       try {
         // Read the CSV file from the public directory
         const csvPath = path.join(
@@ -28,12 +27,6 @@ export async function GET() {
           transformHeader: (header) => header.trim(),
         });
 
-        console.log("CSV Data Loaded:", {
-          rowCount: parsedData.data.length,
-          sampleRow: parsedData.data[0],
-          errors: parsedData.errors,
-        });
-
         if (parsedData.errors.length > 0) {
           console.warn("CSV parsing warnings:", parsedData.errors);
         }
@@ -45,7 +38,6 @@ export async function GET() {
       }
     }
 
-    console.log("Fetching from Airtable API...");
 
     // Validate environment variables
     const baseId = process.env.AIRTABLE_BASE_ID;
@@ -72,12 +64,6 @@ export async function GET() {
       },
     );
 
-    console.log("Airtable API Response:", {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-    });
-
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Airtable API error:", {
@@ -92,11 +78,6 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log("Raw Airtable response:", {
-      hasRecords: !!data.records,
-      recordCount: data.records?.length || 0,
-      sampleRecord: data.records?.[0],
-    });
 
     if (!data.records || !Array.isArray(data.records)) {
       console.error("Invalid Airtable response format:", data);
@@ -124,12 +105,6 @@ export async function GET() {
       "GitHub Issue URL": record.fields["GitHub Issue URL"] || "",
       Created: record.fields["Created"] || record.createdTime || "",
     }));
-
-    console.log("Airtable API Response:", {
-      recordCount: transformedData.length,
-      sampleRecord: transformedData[0],
-      timestamp: new Date().toISOString(),
-    });
 
     return NextResponse.json(transformedData);
   } catch (error) {

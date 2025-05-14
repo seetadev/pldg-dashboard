@@ -50,14 +50,7 @@ export async function GET() {
     const rawData = await fetchAirtableData();
     const githubData = await fetchGitHubData();
 
-    // Process the data using our enhanced processing functions
     const processedData = processData(rawData, githubData);
-    console.log("Processed data:", {
-      weeklyChange: processedData.weeklyChange,
-      activeContributors: processedData.activeContributors,
-      totalContributions: processedData.totalContributions,
-      timestamp: new Date().toISOString(),
-    });
 
     return NextResponse.json(processedData);
   } catch (error) {

@@ -42,12 +42,6 @@ export function useCohortData(selectedCohort: CohortId) {
           skipEmptyLines: true,
           transformHeader: (header: string) => header.trim(),
           complete: (results) => {
-            console.log("Cohort Data Loaded:", {
-              cohort: selectedCohort,
-              rows: results.data.length,
-              weekRange: results.data.map((d) => d["Program Week"]),
-            });
-
             setCache((prev) => ({
               ...prev,
               [selectedCohort]: {

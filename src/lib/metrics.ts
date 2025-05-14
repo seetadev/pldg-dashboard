@@ -71,18 +71,6 @@ export function calculateMetrics({
     ],
   };
 
-  // Add console logging for debugging
-  console.log("Metrics Calculation:", {
-    totalContributions,
-    activeContributors,
-    hasUserContributions: Object.keys(safeUserContributions).length > 0,
-    trendDataSizes: {
-      engagement: trends.engagement.length,
-      technical: trends.technical.length,
-      techPartner: trends.techPartnerPerformance.length,
-      growth: trends.contributorGrowth.length,
-    },
-  });
 
   return {
     totalContributions,

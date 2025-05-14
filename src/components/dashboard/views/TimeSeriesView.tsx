@@ -99,10 +99,7 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
     });
   }, [data]);
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log("Chart Data:", chartData);
-  }, [chartData]);
+
 
   if (!chartData.length) {
     return (

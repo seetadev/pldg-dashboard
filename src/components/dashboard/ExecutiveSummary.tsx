@@ -66,15 +66,12 @@ export default function ExecutiveSummary({ data }: Props) {
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      console.log("Starting export process...");
-
       const result = await exportDashboardAction(data);
 
       if (result.success && result.data) {
         console.log("Export data received, creating blob...");
 
         try {
-          // Create blob with error handling
           const buffer = Buffer.from(result.data, "base64");
           if (buffer.length === 0) {
             throw new Error("Empty buffer received");

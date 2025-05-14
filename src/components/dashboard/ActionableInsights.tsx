@@ -86,15 +86,6 @@ export function ActionableInsights({ data }: { data: ProcessedData }) {
       });
     }
 
-    // Debug logging
-    console.log("Insight Generation:", {
-      recentWeeks: recentWeeks.map((w) => ({ week: w.week, total: w.total })),
-      contributionTrend,
-      isDecreasingTrend,
-      partnerEngagementRate,
-      generatedInsights: insights.length,
-    });
-
     return insights;
   }, [data]);
 

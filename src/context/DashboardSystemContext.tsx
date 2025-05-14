@@ -58,7 +58,6 @@ export function DashboardSystemProvider({
     const now = Date.now();
 
     if (cached && now - cached.timestamp < CACHE_DURATION) {
-      console.log(`Using cached data for cohort ${cohortId}`);
       trackCohortUsage(cohortId, "view", {
         activeContributors: cached.data.activeContributors,
         totalContributions: cached.data.totalContributions,

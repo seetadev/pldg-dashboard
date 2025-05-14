@@ -3,8 +3,6 @@ import { cache } from "@/lib/cache";
 
 export async function POST() {
   try {
-    console.log("Refreshing Airtable data...");
-
     // Clear the cache
     cache.delete("airtable_data");
 

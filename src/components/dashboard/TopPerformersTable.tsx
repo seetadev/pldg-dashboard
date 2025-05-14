@@ -8,14 +8,7 @@ interface Props {
 }
 
 export default function TopPerformersTable({ data }: Props) {
-  // Add debug logging
-  React.useEffect(() => {
-    console.log("Raw TopPerformers Data:", data);
-  }, [data]);
-
-  // Normalize and combine duplicate performers
   const normalizedPerformers = React.useMemo(() => {
-    // Create a map to store normalized names
     const nameMap = new Map<string, TopPerformer>();
 
     // Add debug logging for data processing
@@ -66,12 +59,6 @@ export default function TopPerformersTable({ data }: Props) {
         return b.avgEngagement - a.avgEngagement;
       })
       .slice(0, 10); // Get top 10
-
-    // Log processed data
-    console.log("Processed TopPerformers:", {
-      normalizedCount: sortedPerformers.length,
-      topPerformer: sortedPerformers[0],
-    });
 
     return sortedPerformers;
   }, [data]);

@@ -122,19 +122,6 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
   const [selectedPartner, setSelectedPartner] = useState<string>("all");
   const [view, setView] = useState<ViewType>("timeline");
 
-  // Add debug logging
-  React.useEffect(() => {
-    console.log("TechPartnerChart processing data:", {
-      totalPartners: data.length,
-      partners: data.map((p) => ({
-        name: p.partner,
-        totalIssues: p.issues,
-        weekCount: p.timeSeriesData.length,
-        sampleWeek: p.timeSeriesData[0],
-      })),
-    });
-  }, [data]);
-
   const handleRepoClick = (partner: TechPartnerName) => {
     try {
       if (!TECH_PARTNER_REPOS[partner]) {
@@ -203,13 +190,6 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
   };
 
   const filteredData = React.useMemo(() => {
-    // Add debug logging
-    console.log("TechPartnerChart Data:", {
-      allData: data,
-      selectedPartner,
-      dataLength: data.length,
-    });
-
     return selectedPartner === "all"
       ? data
       : data.filter((item) => item.partner === selectedPartner);

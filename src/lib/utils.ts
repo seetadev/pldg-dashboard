@@ -392,14 +392,6 @@ export function calculateEngagementScore(data: ProcessedData): number {
   // Combine with NPS score for overall health metric
   const score = Math.round((engagementRate + data.programHealth.npsScore) / 2);
 
-  // Debug logging
-  console.log("Engagement Score Calculation:", {
-    recentWeekTotal: recentEngagement.total,
-    averageContributors,
-    engagementRate,
-    npsScore: data.programHealth.npsScore,
-    finalScore: score,
-  });
 
   return score;
 }
@@ -780,20 +772,7 @@ export function enhanceTechPartnerData(
   baseData: TechPartnerPerformance[] | undefined,
   engagementData: EngagementData[] | undefined,
 ): EnhancedTechPartnerData[] {
-  if (!baseData || !engagementData) {
-    console.log("enhanceTechPartnerData: Missing data", {
-      hasBaseData: !!baseData,
-      hasEngagementData: !!engagementData,
-    });
-    return [];
-  }
-
-  console.log("enhanceTechPartnerData: Processing", {
-    baseDataCount: baseData.length,
-    engagementDataCount: engagementData.length,
-    sampleBaseData: baseData[0],
-    sampleEngagementData: engagementData[0],
-  });
+  if (!baseData || !engagementData) return [];
 
   return baseData.map((partner) => {
     if (!partner.partner) {
@@ -817,14 +796,6 @@ export function enhanceTechPartnerData(
               ?.split(",")
               .map((p: string) => p.trim())
               .includes(partner.partner)),
-    );
-
-    console.log(
-      `enhanceTechPartnerData: Processing partner ${partner.partner}`,
-      {
-        engagementCount: partnerEngagements.length,
-        sampleEngagement: partnerEngagements[0],
-      },
     );
 
     const timeSeriesData = processTimeSeriesData(partnerEngagements);
