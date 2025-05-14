@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { EngagementData, ProcessedData } from '@/types/dashboard';
-import { loadCohortData } from '@/lib/data-processing';
-import Papa from 'papaparse';
+import { CohortId } from '@/types/cohort';
+import { EngagementData, ProcessedData,FeedbackEntry } from '@/types/dashboard';
 import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
   rawData: EngagementData[];
+  partnerFeedbackData: FeedbackEntry[];
   processedData: ProcessedData | null;
   lastUpdated: number;
 }
 
 export function useCohortData(selectedCohort: CohortId) {
   const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
-    "1": { rawData: [], processedData: null, lastUpdated: 0 },
-    "2": { rawData: [], processedData: null, lastUpdated: 0 },
+    "1": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
+    "2": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,15 +36,15 @@ export function useCohortData(selectedCohort: CohortId) {
 
       try {
         // Fetch the CSV data from the API
-        const response = await fetch(`/api/cohort${selectedCohort}`);
+        const response = await fetch(`/api/cohort?id=${selectedCohort}`);
 
-        const partnerFeedbackResponse = await fetch(`/api/cohort${selectedCohort}feedback`);
+        const partnerFeedbackResponse = await fetch(`/api/cohort-feedback?id=${selectedCohort}`);
 
         const partnerResponse = await partnerFeedbackResponse.json();
 
         console.log('Partner Feedback Data:', partnerResponse);
 
-        const rawData: Record<string, any>[] = await response.json();
+        const rawData: Record<string, EngagementData>[] = await response.json();
 
          // Normalize each entry
         const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
@@ -54,6 +53,7 @@ export function useCohortData(selectedCohort: CohortId) {
           ...prev,
           [selectedCohort]: {
             rawData: cleanedData,
+            partnerFeedbackData: partnerResponse,
             processedData: null, // Will be processed on demand
             lastUpdated: Date.now()
           }
@@ -76,6 +76,7 @@ export function useCohortData(selectedCohort: CohortId) {
 
   return {
     data: cache[selectedCohort]?.rawData ?? [],
+    partnerFeedbackData: cache[selectedCohort]?.partnerFeedbackData ?? {},
     processedData: cache[selectedCohort]?.processedData ?? null,
     isLoading,
     error,

@@ -10,6 +10,7 @@ const client = new MongoClient(uri);
 
 const cohort1CSVPath = '../public/data/cohort-1/Weekly Engagement Survey Breakdown (4).csv';
 const cohort2CSVPath = '../public/data/cohort-2/[cohort 2] Weekly Engagement Survey-Raw Dataset.csv';
+const cohort1FeedbackCSVPath = '../public/data/cohort-1/PLDG Cohort 1 RetroPGF - TechPartner Feedback.csv';
 const cohort2FeedbackCSVPath = '../public/data/cohort-2/PLDG Cohort 2 RetroPGF - TechPartner Feedback.csv';
 
 async function uploadCSV() {
@@ -20,7 +21,7 @@ async function uploadCSV() {
 
     const results = [];
 
-    fs.createReadStream(cohort1CSVPath)  // Replace with your file path
+    fs.createReadStream(cohort2FeedbackCSVPath)  // Replace with your file path
       .pipe(csvParser())
       .on('data', (data) => results.push(data))
       .on('end', async () => {

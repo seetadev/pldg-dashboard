@@ -1,5 +1,5 @@
 import { EngagementData } from "@/types/dashboard";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function normalizeEngagementData(record: Record<string, any>): EngagementData {
     const normalized: EngagementData = {
       Name: (record['Name'] || record['﻿Name'] || record['Github Username']?.trim() || ''),

@@ -1,16 +1,11 @@
 import _ from "lodash";
 import {
-  EngagementData, ProcessedData, TechPartnerMetrics,
-  TechPartnerPerformance, ContributorDetails, IssueResult,
-  IssueHighlight, EnhancedTechPartnerData, ActionItem,
+  EngagementData, ProcessedData,
+  TechPartnerPerformance, ActionItem,
   GitHubData, IssueMetrics, EngagementTrend
 } from '@/types/dashboard';
 import { CohortId } from '@/types/cohort';
-import * as utils from './utils';
-import Papa from 'papaparse';
-
 import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
-import { Gem, Pi } from "lucide-react";
 
 // This may be useful. leaving it commented out.
 // interface WeeklyEngagementEntry {
@@ -686,37 +681,37 @@ export function processData(
 
   console.log('Cohort Info:', cohortInfo);
 
-  const cohortDataFiltered = cohortId && cohortInfo ? csvData.filter(row => {
-    const programWeek = row['Program Week'];
-    if (!programWeek) return false;
+  // const cohortDataFiltered = cohortId && cohortInfo ? csvData.filter(row => {
+  //   const programWeek = row['Program Week'];
+  //   if (!programWeek) return false;
   
-    let parsedStartDate: Date | null = null;
+  //   let parsedStartDate: Date | null = null;
   
-    if (cohortId === '1') {
-      // Format: "Week 2 (October 7 - October 11, 2024)"
-      const matchCohort1 = programWeek.match(/\(([^)]+)\)/)?.[1]; // Extract "October 7 - October 11, 2024"
-      if (matchCohort1) {
-        const [startPart] = matchCohort1.split('-'); // "October 7"
-        const cleanedStart = startPart.trim().replace(/(st|nd|rd|th)/g, ''); // Remove ordinal suffixes
-        const yearMatch = matchCohort1.match(/\d{4}/);
-        const year = yearMatch ? yearMatch[0] : new Date(cohortInfo.startDate).getFullYear();
-        parsedStartDate = new Date(`${cleanedStart}, ${year}`);
-      }
-    } else {
-      // Format: "Week 2: January 20, 2025 (Monday) – January 26, 2025 (Sunday)"
-      const matchCohort2 = programWeek.match(/:\s*([A-Za-z]+\s\d{1,2},\s\d{4})/); // Extract "January 20, 2025"
-      if (matchCohort2) {
-        parsedStartDate = new Date(matchCohort2[1].trim());
-      }
-    }
+  //   if (cohortId === '1') {
+  //     // Format: "Week 2 (October 7 - October 11, 2024)"
+  //     const matchCohort1 = programWeek.match(/\(([^)]+)\)/)?.[1]; // Extract "October 7 - October 11, 2024"
+  //     if (matchCohort1) {
+  //       const [startPart] = matchCohort1.split('-'); // "October 7"
+  //       const cleanedStart = startPart.trim().replace(/(st|nd|rd|th)/g, ''); // Remove ordinal suffixes
+  //       const yearMatch = matchCohort1.match(/\d{4}/);
+  //       const year = yearMatch ? yearMatch[0] : new Date(cohortInfo.startDate).getFullYear();
+  //       parsedStartDate = new Date(`${cleanedStart}, ${year}`);
+  //     }
+  //   } else {
+  //     // Format: "Week 2: January 20, 2025 (Monday) – January 26, 2025 (Sunday)"
+  //     const matchCohort2 = programWeek.match(/:\s*([A-Za-z]+\s\d{1,2},\s\d{4})/); // Extract "January 20, 2025"
+  //     if (matchCohort2) {
+  //       parsedStartDate = new Date(matchCohort2[1].trim());
+  //     }
+  //   }
   
-    if (!parsedStartDate || isNaN(parsedStartDate.getTime())) return false;
+  //   if (!parsedStartDate || isNaN(parsedStartDate.getTime())) return false;
   
-    const cohortStart = new Date(cohortInfo.startDate);
-    const cohortEnd = new Date(cohortInfo.endDate);
+  //   const cohortStart = new Date(cohortInfo.startDate);
+  //   const cohortEnd = new Date(cohortInfo.endDate);
   
-    return parsedStartDate >= cohortStart && parsedStartDate <= cohortEnd;
-  }) : csvData;
+  //   return parsedStartDate >= cohortStart && parsedStartDate <= cohortEnd;
+  // }) : csvData;
   
   
   return {
