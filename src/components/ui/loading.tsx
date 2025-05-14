@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from 'react';
+import * as React from "react";
 
 export function LoadingSpinner() {
   return (
@@ -9,4 +9,4 @@ export function LoadingSpinner() {
       <span className="text-indigo-600 font-medium">Loading dashboard...</span>
     </div>
   );
-} 
+}

@@ -1,34 +1,31 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
-import ExecutiveSummary from './ExecutiveSummary';
-import { ActionableInsights } from './ActionableInsights';
-import EngagementChart from './EngagementChart';
-import TechnicalProgressChart from './TechnicalProgressChart';
-import { TechPartnerChart } from './TechPartnerChart';
-import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner } from '../ui/loading';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { RefreshCw } from 'lucide-react';
-import { enhanceTechPartnerData } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
-import { processData, loadCohortData } from '@/lib/data-processing';
-import { EngagementData } from '@/types/dashboard';
-import { CohortSelector } from './CohortSelector';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { useCohortData } from '@/hooks/useCohortData';
+import * as React from "react";
+import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
+import ExecutiveSummary from "./ExecutiveSummary";
+import { ActionableInsights } from "./ActionableInsights";
+import EngagementChart from "./EngagementChart";
+import TechnicalProgressChart from "./TechnicalProgressChart";
+import { TechPartnerChart } from "./TechPartnerChart";
+import TopPerformersTable from "./TopPerformersTable";
+import { LoadingSpinner } from "../ui/loading";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
+import { RefreshCw } from "lucide-react";
+import { enhanceTechPartnerData } from "@/lib/utils";
+import { processData } from "@/lib/data-processing";
+import { CohortSelector } from "./CohortSelector";
+import { CohortId, COHORT_DATA } from "@/types/cohort";
+import { useCohortData } from "@/hooks/useCohortData";
 
 export default function DeveloperEngagementDashboard() {
-  const { 
-    isError, 
-    refresh, 
-    lastUpdated, 
+  const {
+    isError,
+    refresh,
+    lastUpdated,
     isFetching,
     selectedCohort,
-    setSelectedCohort 
+    setSelectedCohort,
   } = useDashboardSystemContext();
 
   const {
@@ -37,39 +34,18 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  console.log('Cohort Data:', csvData);
-
   const processedData = React.useMemo(() => 
     csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
-
-  console.log('Cohort Data:', processedData);
-
 
   const enhancedTechPartnerData = React.useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
       ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
       : [],
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-  );
 
-  React.useEffect(() => {
-    console.log('Dashboard State:', {
-      hasData: !!processedData,
-      metrics: processedData ? {
-        contributors: processedData.activeContributors,
-        techPartners: processedData.programHealth.activeTechPartners,
-        engagementTrends: processedData.engagementTrends.length,
-        technicalProgress: processedData.technicalProgress.length,
-        techPartnerData: enhancedTechPartnerData
-      } : null,
-      isLoadingCSV,
-      isError,
-      isFetching,
-      lastUpdated: new Date(lastUpdated).toISOString()
-    });
-  }, [processedData, isLoadingCSV, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
+  );
 
   const handleCohortChange = (cohortId: CohortId) => {
     setSelectedCohort(cohortId);
@@ -80,7 +56,7 @@ export default function DeveloperEngagementDashboard() {
   }
 
   if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
+    return <div>Error: {errorCSV || "No data available"}</div>;
   }
 
   if (!processedData && isLoadingCSV) {
@@ -119,11 +95,12 @@ export default function DeveloperEngagementDashboard() {
           <div>
             <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
             <p className="mt-2 text-indigo-100">
-              {COHORT_DATA[selectedCohort].name} - Real-time insights and engagement metrics
+              {COHORT_DATA[selectedCohort].name} - Real-time insights and
+              engagement metrics
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <CohortSelector 
+            <CohortSelector
               selectedCohort={selectedCohort}
               onCohortChange={handleCohortChange}
             />
@@ -137,7 +114,9 @@ export default function DeveloperEngagementDashboard() {
               disabled={isFetching}
               className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
             >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+              />
               Refresh Data
             </Button>
           </div>
@@ -161,7 +140,7 @@ export default function DeveloperEngagementDashboard() {
           data={processedData.technicalProgress}
           githubData={{
             inProgress: processedData.issueMetrics[0]?.open || 0,
-            done: processedData.issueMetrics[0]?.closed || 0
+            done: processedData.issueMetrics[0]?.closed || 0,
           }}
         />
       </div>
@@ -183,4 +162,4 @@ export default function DeveloperEngagementDashboard() {
       </div>
     </div>
   );
-} 
+}

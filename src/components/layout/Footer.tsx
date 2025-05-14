@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Github } from 'lucide-react';
-import Image from 'next/image';
+import * as React from "react";
+import { Github } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -11,24 +11,24 @@ export function Footer() {
             <h3 className="font-semibold mb-3 text-indigo-900">Data Sources</h3>
             <ul className="space-y-3">
               <li>
-                <a 
+                <a
                   href="https://airtable.com/appFEDy5FPBFHPY5r/shr773Cn3Q3owRDDR"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
                 >
-                  <Image 
-                    src="/logos/Airtable Icon.png" 
-                    alt="Airtable" 
-                    width={16} 
-                    height={16} 
+                  <Image
+                    src="/logos/Airtable Icon.png"
+                    alt="Airtable"
+                    width={16}
+                    height={16}
                     className="group-hover:opacity-80 transition-opacity"
                   />
                   <span>Engagement Data (Airtable)</span>
                 </a>
               </li>
               <li>
-                <a 
+                <a
                   href="https://github.com/jbarnes850/pldg-dashboard/tree/main"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -39,17 +39,17 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a 
+                <a
                   href="https://discord.gg/hCw74E2mE4"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
                 >
-                  <Image 
-                    src="/logos/Discord Icon.png" 
-                    alt="Discord" 
-                    width={16} 
-                    height={16} 
+                  <Image
+                    src="/logos/Discord Icon.png"
+                    alt="Discord"
+                    width={16}
+                    height={16}
                     className="group-hover:opacity-80 transition-opacity"
                   />
                   <span>Community Discussion (Discord)</span>
@@ -57,16 +57,19 @@ export function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div>
-            <h3 className="font-semibold mb-3 text-indigo-900">Update Frequency</h3>
+            <h3 className="font-semibold mb-3 text-indigo-900">
+              Update Frequency
+            </h3>
             <p className="text-sm text-indigo-600">
-              • Airtable: Real-time updates<br />
-              • GitHub: Every 5 minutes<br />
-              • Discord: Daily digest
+              • Airtable: Real-time updates
+              <br />
+              • GitHub: Every 5 minutes
+              <br />• Discord: Daily digest
             </p>
           </div>
-          
+
           <div>
             <h3 className="font-semibold mb-3 text-indigo-900">About PLDG</h3>
             <p className="text-sm text-indigo-600">
@@ -74,11 +77,13 @@ export function Footer() {
             </p>
           </div>
         </div>
-        
+
         <div className="mt-8 pt-6 border-t text-center text-sm text-indigo-600">
-          <p>© {new Date().getFullYear()} Protocol Labs. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} Protocol Labs. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
   );
-} 
+}
