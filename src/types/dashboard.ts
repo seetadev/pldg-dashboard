@@ -1,4 +1,4 @@
-import { CohortMetadata } from "./cohort";
+import { CohortId, CohortMetadata } from './cohort';
 
 export type ActionItemType = "warning" | "opportunity" | "success";
 
@@ -8,6 +8,12 @@ export interface ActionItem {
   description: string;
   action: string;
 }
+
+export interface FeedbackEntry {
+  Address: string;
+  Week: string;
+  Feedback: string;
+};
 
 export interface EngagementData {
   Name: string;
@@ -201,6 +207,14 @@ export interface ProcessedData {
   contributorGrowth: ContributorGrowth[];
   rawEngagementData: EngagementData[];
 }
+
+export interface CohortInfo {     
+  id: CohortId;     
+  name: string;     
+  startDate: string;     
+  endDate: string;     
+  description?: string;   
+};
 
 export interface AIMetrics {
   engagementScore: number;

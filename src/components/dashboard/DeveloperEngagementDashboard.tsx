@@ -1,22 +1,23 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
-import ExecutiveSummary from "./ExecutiveSummary";
-import { ActionableInsights } from "./ActionableInsights";
-import EngagementChart from "./EngagementChart";
-import TechnicalProgressChart from "./TechnicalProgressChart";
-import { TechPartnerChart } from "./TechPartnerChart";
-import TopPerformersTable from "./TopPerformersTable";
-import { LoadingSpinner } from "../ui/loading";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { RefreshCw } from "lucide-react";
-import { enhanceTechPartnerData } from "@/lib/utils";
-import { processData } from "@/lib/data-processing";
-import { CohortSelector } from "./CohortSelector";
-import { CohortId, COHORT_DATA } from "@/types/cohort";
-import { useCohortData } from "@/hooks/useCohortData";
+import * as React from 'react';
+import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
+import ExecutiveSummary from './ExecutiveSummary';
+import { ActionableInsights } from './ActionableInsights';
+import EngagementChart from './EngagementChart';
+import TechnicalProgressChart from './TechnicalProgressChart';
+import { TechPartnerChart } from './TechPartnerChart';
+import TopPerformersTable from './TopPerformersTable';
+import { LoadingSpinner } from '../ui/loading';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { RefreshCw } from 'lucide-react';
+import { enhanceTechPartnerData } from '@/lib/utils';
+import { processData } from '@/lib/data-processing';
+import { CohortSelector } from './CohortSelector';
+import { CohortId, COHORT_DATA } from '@/types/cohort';
+import { useCohortData } from '@/hooks/useCohortData';
+import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -30,25 +31,22 @@ export default function DeveloperEngagementDashboard() {
 
   const {
     data: csvData,
+    partnerFeedbackData,
     isLoading: isLoadingCSV,
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  const processedData = React.useMemo(
-    () =>
-      csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
-    [csvData, selectedCohort],
+  const processedData = React.useMemo(() => 
+    csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
+    [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = React.useMemo(
-    () =>
-      processedData?.techPartnerPerformance && processedData?.rawEngagementData
-        ? enhanceTechPartnerData(
-            processedData.techPartnerPerformance,
-            processedData.rawEngagementData,
-          )
-        : [],
-    [processedData?.techPartnerPerformance, processedData?.rawEngagementData],
+  const enhancedTechPartnerData = React.useMemo(() =>
+    processedData?.techPartnerPerformance && processedData?.rawEngagementData
+      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
+      : [],
+    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+
   );
 
   const handleCohortChange = (cohortId: CohortId) => {
@@ -136,6 +134,12 @@ export default function DeveloperEngagementDashboard() {
       <div className="mb-8">
         <ActionableInsights data={processedData} />
       </div>
+
+      {/* Partners Feedback Section */}
+      <div className="mb-8">
+        <PartnerFeedbackMatrix data={partnerFeedbackData} />
+      </div>
+      
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
