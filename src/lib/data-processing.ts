@@ -10,6 +10,7 @@ import {
 } from "@/types/dashboard";
 import { CohortId } from "@/types/cohort";
 import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
+import { Gem, Pi } from "lucide-react";
 
 // This may be useful. leaving it commented out.
 // interface WeeklyEngagementEntry {
@@ -86,22 +87,19 @@ function parseTechPartners(techPartner: string | string[]): string[] {
   return techPartner?.split(",").map((p) => p.trim()) ?? [];
 }
 
-// Update the week parsing function to handle CSV format correctly
-function parseWeekNumber(weekString: string): number {
-  // Format: "Week X (Month Day - Month Day, Year)"
-  const match = weekString.match(/Week (\d+)/i);
+function parseWeekNumber(week: string): number {
+  const match = week.match(/Week (\d+):/i)
   if (!match) {
-    console.warn(`Invalid week format: ${weekString}`);
-    return 0;
+    console.warn(`Invalid week format: ${week}`)
+    return 0
   }
-  return parseInt(match[1]);
+  return parseInt(match[1])
 }
 
-// Helper function to format week string consistently
-function formatWeekString(weekString: string): string {
-  return weekString.replace(/\(.*?\)/, "").trim();
+function formatWeekString(week: string): string {
+  const match = week.match(/Week \d+/i)
+  return match ? match[0] : week
 }
-
 // Add helper function to safely handle string or string[] fields
 function getStringValue(value: string | string[] | undefined): string {
   if (!value) return "";
@@ -142,19 +140,40 @@ function calculateEngagementRate(data: EngagementData[]): number {
   return Math.round((activeEntries / totalEntries) * 100);
 }
 
-// Calculate Weekly Change
 function calculateWeeklyChange(data: EngagementData[]): number {
-  const weeks = _.groupBy(data, "Program Week");
-  const weekNumbers = Object.keys(weeks).sort((a, b) => {
-    const weekA = parseWeekNumber(a);
-    const weekB = parseWeekNumber(b);
-    return weekA - weekB;
-  });
+  if (!data || data.length === 0) {
+    console.log("No data available for weekly change calculation");
+    return 0;
+  }
 
-  if (weekNumbers.length < 2) return 0;
+  const weekGroups = data.reduce((groups, entry) => {
+    const weekText = entry["Program Week"];
+    if (!weekText) return groups;
 
-  const currentWeek = weeks[weekNumbers[weekNumbers.length - 1]];
-  const previousWeek = weeks[weekNumbers[weekNumbers.length - 2]];
+    const weekNumber = parseWeekNumber(weekText);
+    if (!weekNumber) return groups;
+
+    if (!groups[weekNumber]) groups[weekNumber] = [];
+    groups[weekNumber].push(entry);
+    return groups;
+  }, {} as Record<number, EngagementData[]>);
+
+  const weekNumbers = Object.keys(weekGroups)
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  if (weekNumbers.length < 2) {
+    console.log("Not enough weeks for comparison:", weekNumbers);
+    return 0;
+  }
+
+  const currentWeekNum = weekNumbers[weekNumbers.length - 1];
+  const previousWeekNum = weekNumbers[weekNumbers.length - 2];
+
+  const currentWeek = weekGroups[currentWeekNum];
+  const previousWeek = weekGroups[previousWeekNum];
+
+  console.log(`Comparing Week ${currentWeekNum} (${currentWeek.length} entries) vs Week ${previousWeekNum} (${previousWeek.length} entries)`);
 
   const currentTotal = currentWeek.reduce((sum, entry) => {
     const value = parseInt(
@@ -170,8 +189,9 @@ function calculateWeeklyChange(data: EngagementData[]): number {
     return sum + (isNaN(value) ? 0 : value);
   }, 0);
 
-  if (previousTotal === 0) return currentTotal > 0 ? 100 : 0;
+  console.log(`Totals: Current Week ${currentTotal}, Previous Week ${previousTotal}`);
 
+  if (previousTotal === 0) return currentTotal > 0 ? 100 : 0;
   return Math.round(((currentTotal - previousTotal) / previousTotal) * 100);
 }
 
@@ -484,7 +504,6 @@ function processRawIssueMetrics(entries: EngagementData[]): IssueMetrics[] {
   });
 }
 
-// Add type for tech partner string
 type TechPartner = string;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -623,8 +642,6 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
       0,
     ),
   }));
-
-  console.log("Processed tech partner data:", result);
   return result;
 }
 
@@ -667,48 +684,33 @@ export function processData(
   // Add cohort metadata to processed data
   const cohortInfo = cohortId ? COHORT_DATA[cohortId] : null;
 
-  // Filter data by date range if cohort is specified
-  const cohortDataFiltered = cohortId
-    ? csvData.filter((row) => {
-        const weekDate = new Date(
-          row["Program Week"].match(/\((.*?)\)/)?.[1] || "",
-        );
-        return (
-          weekDate >= new Date(cohortInfo!.startDate) &&
-          weekDate <= new Date(cohortInfo!.endDate)
-        );
-      })
-    : csvData;
-
-  console.log("top performers", calculateTopPerformers(cohortDataFiltered))
-
   return {
-    weeklyChange: calculateWeeklyChange(cohortDataFiltered),
+    weeklyChange: calculateWeeklyChange(csvData),
     activeContributors,
     totalContributions,
     programHealth: {
-      npsScore: calculateNPSScore(cohortDataFiltered),
-      engagementRate: calculateEngagementRate(cohortDataFiltered),
+      npsScore: calculateNPSScore(csvData),
+      engagementRate: calculateEngagementRate(csvData),
       activeTechPartners: techPartners.size,
     },
     keyHighlights: {
       activeContributorsAcrossTechPartners: `${activeContributors} across ${techPartners.size}`,
       totalContributions: `${totalContributions} total`,
-      positiveFeedback: `${calculatePositiveFeedback(cohortDataFiltered)} positive`,
-      weeklyContributions: `${calculateWeeklyChange(cohortDataFiltered)}% change`,
+      positiveFeedback: `${calculatePositiveFeedback(csvData)} positive`,
+      weeklyContributions: `${calculateWeeklyChange(csvData)}% change`,
     },
-    topPerformers: calculateTopPerformers(cohortDataFiltered),
-    techPartnerMetrics: calculateTechPartnerMetrics(cohortDataFiltered),
+    topPerformers: calculateTopPerformers(csvData),
+    techPartnerMetrics: calculateTechPartnerMetrics(csvData),
     techPartnerPerformance,
-    engagementTrends: calculateEngagementTrends(cohortDataFiltered),
+    engagementTrends: calculateEngagementTrends(csvData),
     technicalProgress: calculateTechnicalProgress(
-      cohortDataFiltered,
+      csvData,
       githubData,
     ),
-    issueMetrics: processRawIssueMetrics(cohortDataFiltered),
-    actionItems: calculateActionItems(cohortDataFiltered),
+    issueMetrics: processRawIssueMetrics(csvData),
+    actionItems: calculateActionItems(csvData),
     feedbackSentiment: {
-      positive: calculatePositiveFeedback(cohortDataFiltered),
+      positive: calculatePositiveFeedback(csvData),
       neutral: 0,
       negative: 0,
     },
@@ -720,7 +722,7 @@ export function processData(
         totalActive: activeContributors,
       },
     ],
-    rawEngagementData: cohortDataFiltered,
+    rawEngagementData: csvData,
     cohortId: cohortId || "",
     cohortInfo: cohortInfo
       ? {
@@ -751,7 +753,6 @@ function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
     // Count unique contributors for this week
     const activeContributors = new Set(entries.map((e) => e["Github Username"]))
       .size;
-
 
     return {
       week: `Week ${parseWeekNumber(week)}`,
@@ -902,8 +903,6 @@ function calculateTechnicalProgress(
 export async function loadCohortData(cohortId: CohortId) {
   try {
     const path = getCohortDataPath(cohortId);
-    console.log(`Loading cohort data from: ${path}`);
-
     const response = await fetch(path);
     if (!response.ok) {
       throw new Error(

@@ -10,15 +10,7 @@ interface Props {
 export default function TopPerformersTable({ data }: Props) {
   const normalizedPerformers = React.useMemo(() => {
     const nameMap = new Map<string, TopPerformer>();
-
-    // Add debug logging for data processing
-    console.log("Processing performers:", {
-      totalCount: data.length,
-      uniqueNames: new Set(data.map((p) => p.name)).size,
-    });
-
     data.forEach((performer) => {
-      // Normalize the name (lowercase, trim spaces)
       const normalizedName = performer.name.toLowerCase().trim();
 
       // Special cases for known duplicates with case preservation
