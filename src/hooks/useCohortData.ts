@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
+import { CohortId } from '@/types/cohort';
 import { EngagementData, ProcessedData,FeedbackEntry } from '@/types/dashboard';
-import { loadCohortData } from '@/lib/data-processing';
-import Papa from 'papaparse';
 import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
@@ -46,7 +44,7 @@ export function useCohortData(selectedCohort: CohortId) {
 
         console.log('Partner Feedback Data:', partnerResponse);
 
-        const rawData: Record<string, any>[] = await response.json();
+        const rawData: Record<string, EngagementData>[] = await response.json();
 
          // Normalize each entry
         const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);

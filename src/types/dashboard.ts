@@ -1,4 +1,3 @@
-import { DateRange } from 'react-day-picker';
 import { CohortId, CohortMetadata } from './cohort';
 
 export type ActionItemType = "warning" | "opportunity" | "success";
