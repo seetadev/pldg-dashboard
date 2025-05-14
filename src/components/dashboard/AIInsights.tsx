@@ -1,15 +1,24 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
-import { Brain } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { EnhancedProcessedData } from '@/types/dashboard';
+import * as React from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "../ui/card";
+import { Brain } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { EnhancedProcessedData } from "@/types/dashboard";
 
 const METRIC_EXPLANATIONS = {
-  engagementScore: "Overall community engagement based on participation, NPS, and contribution metrics",
-  technicalProgress: "Technical advancement measured through issue completion and partner diversity",
-  collaborationIndex: "Level of cross-partner collaboration and community growth"
+  engagementScore:
+    "Overall community engagement based on participation, NPS, and contribution metrics",
+  technicalProgress:
+    "Technical advancement measured through issue completion and partner diversity",
+  collaborationIndex:
+    "Level of cross-partner collaboration and community growth",
 };
 
 interface MetricCardProps {
@@ -25,7 +34,7 @@ function MetricCard({ title, value, explanation }: MetricCardProps) {
         <TooltipTrigger asChild>
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-muted-foreground capitalize">
-              {title.replace(/([A-Z])/g, ' $1').trim()}
+              {title.replace(/([A-Z])/g, " $1").trim()}
             </h4>
             <div className="text-2xl font-bold">{value}</div>
           </div>
@@ -43,7 +52,8 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
     return null;
   }
 
-  const { metrics, achievements, areasOfConcern, recommendations } = data.insights;
+  const { metrics, achievements, areasOfConcern, recommendations } =
+    data.insights;
 
   return (
     <Card>
@@ -63,17 +73,21 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
               key={key}
               title={key}
               value={value}
-              explanation={METRIC_EXPLANATIONS[key as keyof typeof METRIC_EXPLANATIONS]}
+              explanation={
+                METRIC_EXPLANATIONS[key as keyof typeof METRIC_EXPLANATIONS]
+              }
             />
           ))}
         </div>
-        
+
         {achievements.length > 0 && (
           <div className="space-y-2">
             <h4 className="font-medium">Key Achievements</h4>
             <ul className="list-disc pl-5 space-y-1">
               {achievements.map((achievement, i) => (
-                <li key={i} className="text-sm text-muted-foreground">{achievement}</li>
+                <li key={i} className="text-sm text-muted-foreground">
+                  {achievement}
+                </li>
               ))}
             </ul>
           </div>
@@ -84,7 +98,9 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
             <h4 className="font-medium">Areas of Focus</h4>
             <ul className="list-disc pl-5 space-y-1">
               {areasOfConcern.map((concern, i) => (
-                <li key={i} className="text-sm text-muted-foreground">{concern}</li>
+                <li key={i} className="text-sm text-muted-foreground">
+                  {concern}
+                </li>
               ))}
             </ul>
           </div>
@@ -95,7 +111,9 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
             <h4 className="font-medium">Recommendations</h4>
             <ul className="list-disc pl-5 space-y-1">
               {recommendations.map((recommendation, i) => (
-                <li key={i} className="text-sm text-muted-foreground">{recommendation}</li>
+                <li key={i} className="text-sm text-muted-foreground">
+                  {recommendation}
+                </li>
               ))}
             </ul>
           </div>
@@ -103,4 +121,4 @@ export default function AIInsights({ data }: { data: EnhancedProcessedData }) {
       </CardContent>
     </Card>
   );
-} 
+}

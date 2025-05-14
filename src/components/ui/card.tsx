@@ -1,21 +1,21 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CardProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Card({ className, ...props }: CardProps) {
   return (
     <div
       className={cn(
         "rounded-lg border bg-card text-card-foreground shadow-sm",
-        className
+        className,
       )}
       {...props}
     />
   );
 }
 
-interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
@@ -26,31 +26,30 @@ export function CardHeader({ className, ...props }: CardHeaderProps) {
   );
 }
 
-interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 export function CardTitle({ className, ...props }: CardTitleProps) {
   return (
     <h3
       className={cn(
         "text-2xl font-semibold leading-none tracking-tight",
-        className
+        className,
       )}
       {...props}
     />
   );
 }
 
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function CardContent({ className, ...props }: CardContentProps) {
   return <div className={cn("p-6 pt-0", className)} {...props} />;
 }
 
-interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 export function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
     <p className={cn("text-sm text-muted-foreground", className)} {...props} />
   );
 }
-  

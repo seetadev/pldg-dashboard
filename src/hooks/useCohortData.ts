@@ -13,7 +13,10 @@ interface CohortCache {
 }
 
 export function useCohortData(selectedCohort: CohortId) {
-  const [cache, setCache] = useState<Record<CohortId, CohortCache>>({});
+  const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
+    "1": { rawData: [], processedData: null, lastUpdated: 0 },
+    "2": { rawData: [], processedData: null, lastUpdated: 0 },
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +27,11 @@ export function useCohortData(selectedCohort: CohortId) {
       setError(null);
 
       // Check cache first
-      if (cache[selectedCohort] && 
-          Date.now() - cache[selectedCohort].lastUpdated < 5 * 60 * 1000) { // 5 minute cache
+      if (
+        cache[selectedCohort] &&
+        Date.now() - cache[selectedCohort].lastUpdated < 5 * 60 * 1000
+      ) {
+        // 5 minute cache
         setIsLoading(false);
         return;
       }
@@ -57,15 +63,18 @@ export function useCohortData(selectedCohort: CohortId) {
         
         setIsLoading(false);
 
+
       } catch (error) {
-        console.error('Failed to load cohort data:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load data');
+        console.error("Failed to load cohort data:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to load data",
+        );
         setIsLoading(false);
       }
     }
 
     loadCohortDataWithCache();
-  }, [selectedCohort]);
+  }, [selectedCohort, cache]);
 
   return {
     data: cache[selectedCohort]?.rawData ?? [],
@@ -73,6 +82,6 @@ export function useCohortData(selectedCohort: CohortId) {
     processedData: cache[selectedCohort]?.processedData ?? null,
     isLoading,
     error,
-    cache
+    cache,
   };
-} 
+}

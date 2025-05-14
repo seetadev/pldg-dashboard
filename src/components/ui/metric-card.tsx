@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface MetricCardProps {
   title: string;
@@ -20,7 +20,9 @@ export function MetricCard({ title, items, className }: MetricCardProps) {
         <div className="space-y-4">
           {items.map((item, index) => (
             <div key={index} className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">{item.label}</span>
+              <span className="text-sm text-muted-foreground">
+                {item.label}
+              </span>
               <span className="font-medium">{item.value}</span>
             </div>
           ))}
@@ -28,4 +30,4 @@ export function MetricCard({ title, items, className }: MetricCardProps) {
       </CardContent>
     </Card>
   );
-} 
+}
