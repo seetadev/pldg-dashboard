@@ -148,12 +148,14 @@ export default function ExecutiveSummary({ data }: Props) {
             size="sm"
             onClick={handleExport}
             disabled={isExporting}
-            className="flex items-center gap-2"
+            className="flex items-center xl:gap-2 max-lg:py-5 gap-2"
           >
             <Download
               className={`w-4 h-4 ${isExporting ? "animate-spin" : ""}`}
             />
-            Export Report
+            <p className='w-full  text-xs'>          Export Report</p>
+
+
           </Button>
         </div>
       </CardHeader>

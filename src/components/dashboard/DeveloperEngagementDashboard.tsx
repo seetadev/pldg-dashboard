@@ -101,7 +101,8 @@ export default function DeveloperEngagementDashboard() {
               engagement metrics
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className='flex flex-col lg:flex-row items-center gap-4'>
             <CohortSelector
               selectedCohort={selectedCohort}
               onCohortChange={handleCohortChange}
@@ -109,17 +110,18 @@ export default function DeveloperEngagementDashboard() {
             <span className="text-sm text-indigo-200">
               Last updated: {new Date(lastUpdated).toLocaleString()}
             </span>
+            </div>
             <Button
               variant="outline"
               size="sm"
               onClick={refresh}
               disabled={isFetching}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
             >
               <RefreshCw
                 className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
               />
-              Refresh Data
+              <p className='w-full  text-xs'>Refresh Data</p>
             </Button>
           </div>
         </div>

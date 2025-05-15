@@ -58,7 +58,7 @@ export default function PartnerFeedbackMatrix({ data }: Props) {
                 <div className="space-y-4">
                     {paginatedEntries.length > 0 ? (paginatedEntries.map(([contributor, feedbacks]) => (
                         <div key={contributor} className="mb-6 border rounded p-4 bg-white shadow-sm">
-                            <h3 className="text-lg font-bold mb-2">Contributor Address : {contributor}</h3>
+                            <h3 className="text-lg font-bold mb-2 hidden md:block">Contributor Address : {contributor}</h3>
                             <ul className="space-y-2 list-disc pl-6">
                                 {feedbacks.map((f, i) => (
                                     <li key={i}>
