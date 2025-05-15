@@ -93,7 +93,7 @@ export default function DeveloperEngagementDashboard() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Header Section */}
       <header className="mb-8 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-2xl p-6 text-white shadow-xl">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-10 md:gap-2">
           <div>
             <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
             <p className="mt-2 text-indigo-100">
@@ -101,8 +101,8 @@ export default function DeveloperEngagementDashboard() {
               engagement metrics
             </p>
           </div>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className='flex flex-col lg:flex-row items-center gap-4'>
+          <div className="flex flex-col justify-start w-full md:w-max lg:flex-row items-center gap-4">
+            <div className='flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4'>
             <CohortSelector
               selectedCohort={selectedCohort}
               onCohortChange={handleCohortChange}
@@ -111,6 +111,7 @@ export default function DeveloperEngagementDashboard() {
               Last updated: {new Date(lastUpdated).toLocaleString()}
             </span>
             </div>
+            <div className='flex w-full lg:w-max justify-end'>
             <Button
               variant="outline"
               size="sm"
@@ -123,6 +124,7 @@ export default function DeveloperEngagementDashboard() {
               />
               <p className='w-full  text-xs'>Refresh Data</p>
             </Button>
+            </div>
           </div>
         </div>
       </header>
