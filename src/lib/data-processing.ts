@@ -10,7 +10,6 @@ import {
 } from "@/types/dashboard";
 import { CohortId } from "@/types/cohort";
 import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
-import { Gem, Pi } from "lucide-react";
 
 // This may be useful. leaving it commented out.
 // interface WeeklyEngagementEntry {
