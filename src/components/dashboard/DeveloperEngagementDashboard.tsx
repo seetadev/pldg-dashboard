@@ -1,22 +1,23 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
-import ExecutiveSummary from "./ExecutiveSummary";
-import { ActionableInsights } from "./ActionableInsights";
-import EngagementChart from "./EngagementChart";
-import TechnicalProgressChart from "./TechnicalProgressChart";
-import { TechPartnerChart } from "./TechPartnerChart";
-import TopPerformersTable from "./TopPerformersTable";
-import { LoadingSpinner } from "../ui/loading";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { RefreshCw } from "lucide-react";
-import { enhanceTechPartnerData } from "@/lib/utils";
-import { processData } from "@/lib/data-processing";
-import { CohortSelector } from "./CohortSelector";
-import { CohortId, COHORT_DATA } from "@/types/cohort";
-import { useCohortData } from "@/hooks/useCohortData";
+import * as React from 'react';
+import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
+import ExecutiveSummary from './ExecutiveSummary';
+import { ActionableInsights } from './ActionableInsights';
+import EngagementChart from './EngagementChart';
+import TechnicalProgressChart from './TechnicalProgressChart';
+import { TechPartnerChart } from './TechPartnerChart';
+import TopPerformersTable from './TopPerformersTable';
+import { LoadingSpinner } from '../ui/loading';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { RefreshCw } from 'lucide-react';
+import { enhanceTechPartnerData } from '@/lib/utils';
+import { processData } from '@/lib/data-processing';
+import { CohortSelector } from './CohortSelector';
+import { CohortId, COHORT_DATA } from '@/types/cohort';
+import { useCohortData } from '@/hooks/useCohortData';
+import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -30,25 +31,22 @@ export default function DeveloperEngagementDashboard() {
 
   const {
     data: csvData,
+    partnerFeedbackData,
     isLoading: isLoadingCSV,
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  const processedData = React.useMemo(
-    () =>
-      csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
-    [csvData, selectedCohort],
+  const processedData = React.useMemo(() => 
+    csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
+    [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = React.useMemo(
-    () =>
-      processedData?.techPartnerPerformance && processedData?.rawEngagementData
-        ? enhanceTechPartnerData(
-            processedData.techPartnerPerformance,
-            processedData.rawEngagementData,
-          )
-        : [],
-    [processedData?.techPartnerPerformance, processedData?.rawEngagementData],
+  const enhancedTechPartnerData = React.useMemo(() =>
+    processedData?.techPartnerPerformance && processedData?.rawEngagementData
+      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
+      : [],
+    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+
   );
 
   const handleCohortChange = (cohortId: CohortId) => {
@@ -95,7 +93,7 @@ export default function DeveloperEngagementDashboard() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Header Section */}
       <header className="mb-8 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-2xl p-6 text-white shadow-xl">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-10 md:gap-2">
           <div>
             <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
             <p className="mt-2 text-indigo-100">
@@ -103,7 +101,8 @@ export default function DeveloperEngagementDashboard() {
               engagement metrics
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col justify-start w-full md:w-max lg:flex-row items-center gap-4">
+            <div className='flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4'>
             <CohortSelector
               selectedCohort={selectedCohort}
               onCohortChange={handleCohortChange}
@@ -111,18 +110,21 @@ export default function DeveloperEngagementDashboard() {
             <span className="text-sm text-indigo-200">
               Last updated: {new Date(lastUpdated).toLocaleString()}
             </span>
+            </div>
+            <div className='flex w-full lg:w-max justify-end'>
             <Button
               variant="outline"
               size="sm"
               onClick={refresh}
               disabled={isFetching}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
             >
               <RefreshCw
                 className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
               />
-              Refresh Data
+              <p className='w-full  text-xs'>Refresh Data</p>
             </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -136,6 +138,12 @@ export default function DeveloperEngagementDashboard() {
       <div className="mb-8">
         <ActionableInsights data={processedData} />
       </div>
+
+      {/* Partners Feedback Section */}
+      <div className="mb-8">
+        <PartnerFeedbackMatrix data={partnerFeedbackData} />
+      </div>
+      
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

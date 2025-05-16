@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
-import { CohortId } from "@/types/cohort";
-import { EngagementData, ProcessedData } from "@/types/dashboard";
-import { loadCohortData } from "@/lib/data-processing";
-import Papa from "papaparse";
+import { useState, useEffect } from 'react';
+import { CohortId } from '@/types/cohort';
+import { EngagementData, ProcessedData,FeedbackEntry } from '@/types/dashboard';
+import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
   rawData: EngagementData[];
+  partnerFeedbackData: FeedbackEntry[];
   processedData: ProcessedData | null;
   lastUpdated: number;
 }
 
 export function useCohortData(selectedCohort: CohortId) {
   const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
-    "1": { rawData: [], processedData: null, lastUpdated: 0 },
-    "2": { rawData: [], processedData: null, lastUpdated: 0 },
+    "1": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
+    "2": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,29 +35,33 @@ export function useCohortData(selectedCohort: CohortId) {
       }
 
       try {
-        const csvText = await loadCohortData(selectedCohort);
+        // Fetch the CSV data from the API
+        const response = await fetch(`/api/cohort?id=${selectedCohort}`);
 
-        Papa.parse<EngagementData>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header: string) => header.trim(),
-          complete: (results) => {
-            setCache((prev) => ({
-              ...prev,
-              [selectedCohort]: {
-                rawData: results.data,
-                processedData: null, // Will be processed on demand
-                lastUpdated: Date.now(),
-              },
-            }));
-            setIsLoading(false);
-          },
-          error: (error: Error) => {
-            console.error("CSV parsing error:", error);
-            setError(error.message);
-            setIsLoading(false);
-          },
-        });
+        const partnerFeedbackResponse = await fetch(`/api/cohort-feedback?id=${selectedCohort}`);
+
+        const partnerResponse = await partnerFeedbackResponse.json();
+
+        console.log('Partner Feedback Data:', partnerResponse);
+
+        const rawData: Record<string, EngagementData>[] = await response.json();
+
+         // Normalize each entry
+        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
+
+        setCache(prev => ({
+          ...prev,
+          [selectedCohort]: {
+            rawData: cleanedData,
+            partnerFeedbackData: partnerResponse,
+            processedData: null, // Will be processed on demand
+            lastUpdated: Date.now()
+          }
+        }));
+        
+        setIsLoading(false);
+
+
       } catch (error) {
         console.error("Failed to load cohort data:", error);
         setError(
@@ -72,6 +76,7 @@ export function useCohortData(selectedCohort: CohortId) {
 
   return {
     data: cache[selectedCohort]?.rawData ?? [],
+    partnerFeedbackData: cache[selectedCohort]?.partnerFeedbackData ?? {},
     processedData: cache[selectedCohort]?.processedData ?? null,
     isLoading,
     error,

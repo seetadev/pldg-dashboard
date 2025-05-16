@@ -1,14 +1,10 @@
 import _ from "lodash";
 import {
-  EngagementData,
-  ProcessedData,
-  TechPartnerPerformance,
-  ActionItem,
-  GitHubData,
-  IssueMetrics,
-  EngagementTrend,
-} from "@/types/dashboard";
-import { CohortId } from "@/types/cohort";
+  EngagementData, ProcessedData,
+  TechPartnerPerformance, ActionItem,
+  GitHubData, IssueMetrics, EngagementTrend
+} from '@/types/dashboard';
+import { CohortId } from '@/types/cohort';
 import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
 
 // This may be useful. leaving it commented out.
@@ -682,7 +678,7 @@ export function processData(
 
   // Add cohort metadata to processed data
   const cohortInfo = cohortId ? COHORT_DATA[cohortId] : null;
-
+  
   return {
     weeklyChange: calculateWeeklyChange(csvData),
     activeContributors,
