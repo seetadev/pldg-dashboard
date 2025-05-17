@@ -1,10 +1,10 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface KPICardProps {
   title: string;
   value: string | number;
   trend?: number;
-  status?: "positive" | "neutral" | "negative";
+  status?: 'positive' | 'neutral' | 'negative';
   description?: string;
 }
 
@@ -12,7 +12,7 @@ export function KPICard({
   title,
   value,
   trend,
-  status = "neutral",
+  status = 'neutral',
   description,
 }: KPICardProps) {
   return (
@@ -22,13 +22,13 @@ export function KPICard({
         {trend !== undefined && (
           <span
             className={cn(
-              "text-sm font-medium",
-              status === "positive" && "text-green-600",
-              status === "negative" && "text-red-600",
-              status === "neutral" && "text-blue-600",
+              'text-sm font-medium',
+              status === 'positive' && 'text-green-600',
+              status === 'negative' && 'text-red-600',
+              status === 'neutral' && 'text-blue-600'
             )}
           >
-            {trend > 0 ? "+" : ""}
+            {trend > 0 ? '+' : ''}
             {trend}%
           </span>
         )}

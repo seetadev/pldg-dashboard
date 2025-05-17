@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { ProcessedData, EngagementData } from "@/types/dashboard";
-import { createContext, useState, useEffect, useCallback } from "react";
-import { CohortId } from "@/types/cohort";
-import { loadCohortData, processData } from "@/lib/data-processing";
-import { trackCohortUsage } from "@/lib/analytics";
-import Papa from "papaparse";
+import * as React from 'react';
+import { ProcessedData, EngagementData } from '@/types/dashboard';
+import { createContext, useState, useEffect, useCallback } from 'react';
+import { CohortId } from '@/types/cohort';
+import { loadCohortData, processData } from '@/lib/data-processing';
+import { trackCohortUsage } from '@/lib/analytics';
+import Papa from 'papaparse';
 
 interface DashboardSystemContextType {
   data: ProcessedData | null;
@@ -37,20 +37,20 @@ export function DashboardSystemProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [selectedCohort, setSelectedCohort] = useState<CohortId>("2");
+  const [selectedCohort, setSelectedCohort] = useState<CohortId>('2');
   const [data, setData] = useState<ProcessedData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>(
-    new Date().toISOString(),
+    new Date().toISOString()
   );
   const [isFetching, setIsFetching] = useState(false);
 
   // Add cache ref
   const dataCache = React.useRef<Record<CohortId, CachedData>>({
-    "1": { data: data as ProcessedData, timestamp: 0 },
-    "2": { data: data as ProcessedData, timestamp: 0 },
+    '1': { data: data as ProcessedData, timestamp: 0 },
+    '2': { data: data as ProcessedData, timestamp: 0 },
   });
 
   const loadCohortDataWithCache = async (cohortId: CohortId) => {
@@ -58,7 +58,7 @@ export function DashboardSystemProvider({
     const now = Date.now();
 
     if (cached && now - cached.timestamp < CACHE_DURATION) {
-      trackCohortUsage(cohortId, "view", {
+      trackCohortUsage(cohortId, 'view', {
         activeContributors: cached.data.activeContributors,
         totalContributions: cached.data.totalContributions,
         engagementRate: cached.data.programHealth.engagementRate,
@@ -83,7 +83,7 @@ export function DashboardSystemProvider({
             };
 
             // Track cohort data load
-            trackCohortUsage(cohortId, "refresh", {
+            trackCohortUsage(cohortId, 'refresh', {
               activeContributors: processedData.activeContributors,
               totalContributions: processedData.totalContributions,
               engagementRate: processedData.programHealth.engagementRate,
@@ -92,7 +92,7 @@ export function DashboardSystemProvider({
             resolve(processedData);
           },
           error: (error: Error) => {
-            console.error("CSV parsing error:", error);
+            console.error('CSV parsing error:', error);
             reject(error);
           },
         });
@@ -114,10 +114,10 @@ export function DashboardSystemProvider({
       setLastUpdated(new Date().toISOString());
       setIsError(false);
     } catch (error) {
-      console.error("Error refreshing data:", error);
+      console.error('Error refreshing data:', error);
       setIsError(true);
       setError(
-        error instanceof Error ? error.message : "Failed to refresh data",
+        error instanceof Error ? error.message : 'Failed to refresh data'
       );
     } finally {
       setIsLoading(false);
@@ -126,7 +126,7 @@ export function DashboardSystemProvider({
 
   // Track cohort switches
   const handleCohortChange = (newCohortId: CohortId) => {
-    trackCohortUsage(newCohortId, "switch");
+    trackCohortUsage(newCohortId, 'switch');
     setSelectedCohort(newCohortId);
   };
 
@@ -158,7 +158,7 @@ export function useDashboardSystemContext() {
   const context = React.useContext(DashboardSystemContext);
   if (!context) {
     throw new Error(
-      "useDashboardSystemContext must be used within a DashboardSystemProvider",
+      'useDashboardSystemContext must be used within a DashboardSystemProvider'
     );
   }
   return context;

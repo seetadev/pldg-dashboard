@@ -1,11 +1,11 @@
-import { GitHubData } from "@/types/dashboard";
-import useSWR from "swr";
+import { GitHubData } from '@/types/dashboard';
+import useSWR from 'swr';
 
 const fetcher = async (): Promise<GitHubData> => {
-  const response = await fetch("/api/github");
+  const response = await fetch('/api/github');
 
   if (!response.ok) {
-    console.error("GitHub API error:", {
+    console.error('GitHub API error:', {
       status: response.status,
       statusText: response.statusText,
       timestamp: new Date().toISOString(),
@@ -16,12 +16,12 @@ const fetcher = async (): Promise<GitHubData> => {
   const rawData = await response.json();
 
   if (!rawData || !rawData.statusGroups) {
-    console.error("Invalid GitHub response format:", {
+    console.error('Invalid GitHub response format:', {
       hasData: !!rawData,
       statusGroups: rawData?.statusGroups,
       timestamp: new Date().toISOString(),
     });
-    throw new Error("Invalid GitHub response format");
+    throw new Error('Invalid GitHub response format');
   }
 
   return {
@@ -42,7 +42,7 @@ const fetcher = async (): Promise<GitHubData> => {
 
 export function useGitHubData() {
   const { data, error, isValidating, mutate } = useSWR<GitHubData>(
-    "/api/github",
+    '/api/github',
     fetcher,
     {
       refreshInterval: 5 * 60 * 1000,
@@ -52,7 +52,7 @@ export function useGitHubData() {
         if (retryCount >= 3) return;
         setTimeout(() => revalidate({ retryCount }), 5000);
       },
-    },
+    }
   );
 
   return {

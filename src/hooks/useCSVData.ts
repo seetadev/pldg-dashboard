@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import Papa, { ParseResult, ParseConfig } from "papaparse";
-import { EngagementData } from "@/types/dashboard";
+import { useState, useEffect } from 'react';
+import Papa, { ParseResult, ParseConfig } from 'papaparse';
+import { EngagementData } from '@/types/dashboard';
 
 export function useCSVData() {
   const [data, setData] = useState<EngagementData[]>([]);
@@ -11,14 +11,14 @@ export function useCSVData() {
   useEffect(() => {
     async function fetchCSV() {
       try {
-        const response = await fetch("/data/weekly-engagement-data.csv", {
-          method: "GET",
+        const response = await fetch('/data/weekly-engagement-data.csv', {
+          method: 'GET',
           headers: {
-            Accept: "text/csv",
+            Accept: 'text/csv',
           },
         });
         if (!response.ok) {
-          throw new Error("Failed to fetch CSV: " + response.statusText);
+          throw new Error('Failed to fetch CSV: ' + response.statusText);
         }
 
         const csvText = await response.text();
@@ -29,7 +29,7 @@ export function useCSVData() {
           skipEmptyLines: true,
           complete: (results: ParseResult<EngagementData>) => {
             if (results.errors.length > 0) {
-              console.error("CSV parsing errors:", results.errors);
+              console.error('CSV parsing errors:', results.errors);
             }
 
             setData(results.data);
@@ -37,7 +37,7 @@ export function useCSVData() {
             setTimestamp(Date.now());
           },
           error: (error: Error) => {
-            console.error("CSV parsing error:", error);
+            console.error('CSV parsing error:', error);
             setIsError(true);
             setIsLoading(false);
           },
@@ -45,7 +45,7 @@ export function useCSVData() {
 
         Papa.parse(csvText, parseConfig);
       } catch (error) {
-        console.error("Error loading CSV:", error);
+        console.error('Error loading CSV:', error);
         setIsError(true);
         setIsLoading(false);
       }
@@ -58,14 +58,14 @@ export function useCSVData() {
     setIsLoading(true);
     setIsError(false);
     try {
-      const response = await fetch("/data/weekly-engagement-data.csv", {
-        method: "GET",
+      const response = await fetch('/data/weekly-engagement-data.csv', {
+        method: 'GET',
         headers: {
-          Accept: "text/csv",
+          Accept: 'text/csv',
         },
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch CSV: " + response.statusText);
+        throw new Error('Failed to fetch CSV: ' + response.statusText);
       }
       const csvText = await response.text();
 
@@ -74,7 +74,7 @@ export function useCSVData() {
         dynamicTyping: true,
         skipEmptyLines: true,
         complete: (results: ParseResult<EngagementData>) => {
-          console.log("CSV refresh parsing complete:", {
+          console.log('CSV refresh parsing complete:', {
             rows: results.data.length,
             fields: results.meta.fields,
             errors: results.errors,
@@ -84,7 +84,7 @@ export function useCSVData() {
           setTimestamp(Date.now());
         },
         error: (error: Error) => {
-          console.error("CSV parsing error:", error);
+          console.error('CSV parsing error:', error);
           setIsError(true);
           setIsLoading(false);
         },
@@ -92,7 +92,7 @@ export function useCSVData() {
 
       Papa.parse(csvText, parseConfig);
     } catch (error) {
-      console.error("Error refreshing CSV:", error);
+      console.error('Error refreshing CSV:', error);
       setIsError(true);
       setIsLoading(false);
     }

@@ -2,13 +2,13 @@ import {
   GitHubData,
   GitHubUserContribution,
   ValidatedContribution,
-} from "@/types/dashboard";
-import { VALIDATION_CONFIG, normalizeContributorName } from "./constants";
+} from '@/types/dashboard';
+import { VALIDATION_CONFIG, normalizeContributorName } from './constants';
 
 export interface AirtableRecord {
   fields: {
     Name: string;
-    "How many issues, PRs, or projects this week?": string;
+    'How many issues, PRs, or projects this week?': string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     [key: string]: any;
   };
@@ -21,7 +21,7 @@ export interface AirtableResponse {
 export function validateContributions(
   projectBoard: GitHubData,
   userContributions: Record<string, GitHubUserContribution>,
-  airtableData: AirtableResponse,
+  airtableData: AirtableResponse
 ): {
   validatedContributions: Record<string, ValidatedContribution>;
   discrepancies: Array<{ username: string; discrepancy: string }>;
@@ -30,7 +30,7 @@ export function validateContributions(
   const validatedContributions: Record<string, ValidatedContribution> = {};
 
   if (!projectBoard?.projectBoard?.issues) {
-    console.warn("No project board data available for validation");
+    console.warn('No project board data available for validation');
     return { validatedContributions, discrepancies };
   }
 
@@ -40,16 +40,16 @@ export function validateContributions(
 
     const githubUsername = normalizeContributorName(record.fields.Name);
     const reportedCount = parseInt(
-      record.fields["How many issues, PRs, or projects this week?"] || "0",
-      10,
+      record.fields['How many issues, PRs, or projects this week?'] || '0',
+      10
     );
 
     const projectBoardCount = countUserProjectBoardItems(
       projectBoard,
-      githubUsername,
+      githubUsername
     );
     const githubCount = countUserGithubContributions(
-      userContributions[githubUsername],
+      userContributions[githubUsername]
     );
 
     // Primary validation against project board
@@ -90,7 +90,7 @@ export function validateContributions(
 
 export function countUserProjectBoardItems(
   projectBoard: GitHubData,
-  username: string,
+  username: string
 ): number {
   return (
     projectBoard.projectBoard?.issues ||
@@ -100,7 +100,7 @@ export function countUserProjectBoardItems(
 }
 
 export function countUserGithubContributions(
-  contribution?: GitHubUserContribution,
+  contribution?: GitHubUserContribution
 ): number {
   if (!contribution) return 0;
   return (

@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { cache } from "@/lib/cache";
+import { NextResponse } from 'next/server';
+import { cache } from '@/lib/cache';
 
 export async function POST() {
   try {
-    console.log("Refreshing Airtable data...");
+    console.log('Refreshing Airtable data...');
 
     // Clear the cache
-    cache.delete("airtable_data");
+    cache.delete('airtable_data');
 
     // Fetch fresh data
     const response = await fetch(
@@ -14,9 +14,9 @@ export async function POST() {
       {
         headers: {
           Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -26,19 +26,19 @@ export async function POST() {
     const data = await response.json();
 
     cache.set(
-      "airtable_data",
+      'airtable_data',
       JSON.stringify({
         data: data.records,
         timestamp: Date.now(),
-      }),
+      })
     );
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Airtable refresh error:", error);
+    console.error('Airtable refresh error:', error);
     return NextResponse.json(
-      { error: "Failed to refresh Airtable data" },
-      { status: 500 },
+      { error: 'Failed to refresh Airtable data' },
+      { status: 500 }
     );
   }
 }

@@ -1,11 +1,15 @@
-import _ from "lodash";
+import _ from 'lodash';
 import {
-  EngagementData, ProcessedData,
-  TechPartnerPerformance, ActionItem,
-  GitHubData, IssueMetrics, EngagementTrend
+  EngagementData,
+  ProcessedData,
+  TechPartnerPerformance,
+  ActionItem,
+  GitHubData,
+  IssueMetrics,
+  EngagementTrend,
 } from '@/types/dashboard';
 import { CohortId } from '@/types/cohort';
-import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
+import { getCohortDataPath, COHORT_DATA } from '@/types/cohort';
 
 // This may be useful. leaving it commented out.
 // interface WeeklyEngagementEntry {
@@ -79,26 +83,26 @@ function parseTechPartners(techPartner: string | string[]): string[] {
   if (Array.isArray(techPartner)) {
     return techPartner;
   }
-  return techPartner?.split(",").map((p) => p.trim()) ?? [];
+  return techPartner?.split(',').map((p) => p.trim()) ?? [];
 }
 
 function parseWeekNumber(week: string): number {
-  const match = week.match(/Week (\d+):/i)
+  const match = week.match(/Week (\d+):/i);
   if (!match) {
-    console.warn(`Invalid week format: ${week}`)
-    return 0
+    console.warn(`Invalid week format: ${week}`);
+    return 0;
   }
-  return parseInt(match[1])
+  return parseInt(match[1]);
 }
 
 function formatWeekString(week: string): string {
-  const match = week.match(/Week \d+/i)
-  return match ? match[0] : week
+  const match = week.match(/Week \d+/i);
+  return match ? match[0] : week;
 }
 // Add helper function to safely handle string or string[] fields
 function getStringValue(value: string | string[] | undefined): string {
-  if (!value) return "";
-  return Array.isArray(value) ? value[0] || "" : value;
+  if (!value) return '';
+  return Array.isArray(value) ? value[0] || '' : value;
 }
 
 // Calculate NPS Score
@@ -107,9 +111,9 @@ function calculateNPSScore(data: EngagementData[]): number {
     .map((entry) =>
       parseInt(
         getStringValue(
-          entry["How likely are you to recommend the PLDG to others?"],
-        ) || "0",
-      ),
+          entry['How likely are you to recommend the PLDG to others?']
+        ) || '0'
+      )
     )
     .filter((score) => score > 0);
 
@@ -128,8 +132,8 @@ function calculateEngagementRate(data: EngagementData[]): number {
 
   const activeEntries = data.filter(
     (entry) =>
-      entry["Engagement Participation "]?.includes("3 -") ||
-      entry["Engagement Participation "]?.includes("2 -"),
+      entry['Engagement Participation ']?.includes('3 -') ||
+      entry['Engagement Participation ']?.includes('2 -')
   ).length;
 
   return Math.round((activeEntries / totalEntries) * 100);
@@ -137,28 +141,31 @@ function calculateEngagementRate(data: EngagementData[]): number {
 
 function calculateWeeklyChange(data: EngagementData[]): number {
   if (!data || data.length === 0) {
-    console.log("No data available for weekly change calculation");
+    console.log('No data available for weekly change calculation');
     return 0;
   }
 
-  const weekGroups = data.reduce((groups, entry) => {
-    const weekText = entry["Program Week"];
-    if (!weekText) return groups;
+  const weekGroups = data.reduce(
+    (groups, entry) => {
+      const weekText = entry['Program Week'];
+      if (!weekText) return groups;
 
-    const weekNumber = parseWeekNumber(weekText);
-    if (!weekNumber) return groups;
+      const weekNumber = parseWeekNumber(weekText);
+      if (!weekNumber) return groups;
 
-    if (!groups[weekNumber]) groups[weekNumber] = [];
-    groups[weekNumber].push(entry);
-    return groups;
-  }, {} as Record<number, EngagementData[]>);
+      if (!groups[weekNumber]) groups[weekNumber] = [];
+      groups[weekNumber].push(entry);
+      return groups;
+    },
+    {} as Record<number, EngagementData[]>
+  );
 
   const weekNumbers = Object.keys(weekGroups)
     .map(Number)
     .sort((a, b) => a - b);
 
   if (weekNumbers.length < 2) {
-    console.log("Not enough weeks for comparison:", weekNumbers);
+    console.log('Not enough weeks for comparison:', weekNumbers);
     return 0;
   }
 
@@ -168,23 +175,27 @@ function calculateWeeklyChange(data: EngagementData[]): number {
   const currentWeek = weekGroups[currentWeekNum];
   const previousWeek = weekGroups[previousWeekNum];
 
-  console.log(`Comparing Week ${currentWeekNum} (${currentWeek.length} entries) vs Week ${previousWeekNum} (${previousWeek.length} entries)`);
+  console.log(
+    `Comparing Week ${currentWeekNum} (${currentWeek.length} entries) vs Week ${previousWeekNum} (${previousWeek.length} entries)`
+  );
 
   const currentTotal = currentWeek.reduce((sum, entry) => {
     const value = parseInt(
-      entry["How many issues, PRs, or projects this week?"] || "0",
+      entry['How many issues, PRs, or projects this week?'] || '0'
     );
     return sum + (isNaN(value) ? 0 : value);
   }, 0);
 
   const previousTotal = previousWeek.reduce((sum, entry) => {
     const value = parseInt(
-      entry["How many issues, PRs, or projects this week?"] || "0",
+      entry['How many issues, PRs, or projects this week?'] || '0'
     );
     return sum + (isNaN(value) ? 0 : value);
   }, 0);
 
-  console.log(`Totals: Current Week ${currentTotal}, Previous Week ${previousTotal}`);
+  console.log(
+    `Totals: Current Week ${currentTotal}, Previous Week ${previousTotal}`
+  );
 
   if (previousTotal === 0) return currentTotal > 0 ? 100 : 0;
   return Math.round(((currentTotal - previousTotal) / previousTotal) * 100);
@@ -193,10 +204,10 @@ function calculateWeeklyChange(data: EngagementData[]): number {
 // Calculate Positive Feedback
 function calculatePositiveFeedback(data: EngagementData[]): number {
   return data.filter((entry) => {
-    const feedback = getStringValue(entry["PLDG Feedback"]);
+    const feedback = getStringValue(entry['PLDG Feedback']);
     return (
-      feedback.toLowerCase().includes("great") ||
-      feedback.toLowerCase().includes("good")
+      feedback.toLowerCase().includes('great') ||
+      feedback.toLowerCase().includes('good')
     );
   }).length;
 }
@@ -204,37 +215,37 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
 // Calculate Top Performers
 function calculateTopPerformers(data: EngagementData[]) {
   return _(data)
-    .groupBy("Github Username")
+    .groupBy('Github Username')
     .map((entries, name) => ({
       name,
       totalIssues: _.sumBy(entries, (e) => {
-        const value = e["How many issues, PRs, or projects this week?"];
-        return value === "4+" ? 4 : parseInt(value || "0");
+        const value = e['How many issues, PRs, or projects this week?'];
+        return value === '4+' ? 4 : parseInt(value || '0');
       }),
       avgEngagement: _.meanBy(entries, (e) => {
-        const participation = e["Engagement Participation "]?.trim() || "";
-        return participation.startsWith("3")
+        const participation = e['Engagement Participation ']?.trim() || '';
+        return participation.startsWith('3')
           ? 3
-          : participation.startsWith("2")
+          : participation.startsWith('2')
             ? 2
-            : participation.startsWith("1")
+            : participation.startsWith('1')
               ? 1
               : 0;
       }),
     }))
-    .orderBy(["totalIssues", "avgEngagement"], ["desc", "desc"])
+    .orderBy(['totalIssues', 'avgEngagement'], ['desc', 'desc'])
     .value();
 }
 
 // Calculate Tech Partner Metrics
 function calculateTechPartnerMetrics(data: EngagementData[]) {
   return _(data)
-    .groupBy("Which Tech Partner")
+    .groupBy('Which Tech Partner')
     .map((items, partner) => ({
       partner,
       totalIssues: _.sumBy(items, (item) => {
-        const value = item["How many issues, PRs, or projects this week?"];
-        return value === "4+" ? 4 : parseInt(value || "0");
+        const value = item['How many issues, PRs, or projects this week?'];
+        return value === '4+' ? 4 : parseInt(value || '0');
       }),
       activeContributors: new Set(items.map((item) => item.Name)).size,
       avgIssuesPerContributor: 0,
@@ -425,11 +436,11 @@ function calculateActionItems(data: EngagementData[]): ActionItem[] {
   const actionItems: ActionItem[] = [];
 
   // Check for engagement drops
-  const weeklyEngagement = Object.entries(_.groupBy(data, "Program Week"))
+  const weeklyEngagement = Object.entries(_.groupBy(data, 'Program Week'))
     .map(([week, entries]) => ({
       week,
       highEngagement: entries.filter((e) =>
-        e["Engagement Participation "]?.includes("3 -"),
+        e['Engagement Participation ']?.includes('3 -')
       ).length,
     }))
     .sort((a, b) => a.week.localeCompare(b.week));
@@ -438,36 +449,36 @@ function calculateActionItems(data: EngagementData[]): ActionItem[] {
     const lastTwo = weeklyEngagement.slice(-2);
     if (lastTwo[1].highEngagement < lastTwo[0].highEngagement) {
       actionItems.push({
-        type: "warning",
-        title: "Engagement Drop Detected",
-        description: "High engagement decreased from last week",
-        action: "Review recent program changes and gather feedback",
+        type: 'warning',
+        title: 'Engagement Drop Detected',
+        description: 'High engagement decreased from last week',
+        action: 'Review recent program changes and gather feedback',
       });
     }
   }
 
   // Process tech partners
   const techPartners = new Set(
-    data.flatMap((entry) => parseTechPartners(entry["Which Tech Partner"])),
+    data.flatMap((entry) => parseTechPartners(entry['Which Tech Partner']))
   );
 
   const activeTechPartners = new Set(
     data
-      .filter((e) => e["Tech Partner Collaboration?"] === "Yes")
-      .flatMap((entry) => parseTechPartners(entry["Which Tech Partner"])),
+      .filter((e) => e['Tech Partner Collaboration?'] === 'Yes')
+      .flatMap((entry) => parseTechPartners(entry['Which Tech Partner']))
   );
 
   // Fix Set iteration by converting to Array first
   const inactivePartners = Array.from(techPartners).filter(
-    (partner) => !activeTechPartners.has(partner),
+    (partner) => !activeTechPartners.has(partner)
   );
 
   if (inactivePartners.length > 0) {
     actionItems.push({
-      type: "opportunity",
-      title: "Partner Engagement Opportunity",
+      type: 'opportunity',
+      title: 'Partner Engagement Opportunity',
       description: `${inactivePartners.length} tech partners need attention`,
-      action: "Schedule check-ins with inactive partners",
+      action: 'Schedule check-ins with inactive partners',
     });
   }
 
@@ -476,22 +487,22 @@ function calculateActionItems(data: EngagementData[]): ActionItem[] {
 
 // Process Raw Issue Metrics
 function processRawIssueMetrics(entries: EngagementData[]): IssueMetrics[] {
-  const weeklyMetrics = _.groupBy(entries, "Program Week");
+  const weeklyMetrics = _.groupBy(entries, 'Program Week');
 
   return Object.entries(weeklyMetrics).map(([week, weekEntries]) => {
     const totalIssues = weekEntries.reduce((sum, entry) => {
-      const value = entry["How many issues, PRs, or projects this week?"];
-      return sum + (value === "4+" ? 4 : parseInt(value || "0"));
+      const value = entry['How many issues, PRs, or projects this week?'];
+      return sum + (value === '4+' ? 4 : parseInt(value || '0'));
     }, 0);
 
-    const hasGitHubLink = weekEntries.some((entry) => entry["Issue Link 1"]);
+    const hasGitHubLink = weekEntries.some((entry) => entry['Issue Link 1']);
     const closedIssues = hasGitHubLink
-      ? weekEntries.filter((entry) => entry["Issue Link 1"]?.includes("closed"))
+      ? weekEntries.filter((entry) => entry['Issue Link 1']?.includes('closed'))
           .length
       : Math.round(totalIssues * 0.7);
 
     return {
-      week: week.replace(/\(.*?\)/, "").trim(),
+      week: week.replace(/\(.*?\)/, '').trim(),
       open: totalIssues - closedIssues,
       closed: closedIssues,
       total: totalIssues,
@@ -527,12 +538,12 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
   >();
 
   csvData.forEach((row) => {
-    if (row["Tech Partner Collaboration?"] !== "Yes") return;
+    if (row['Tech Partner Collaboration?'] !== 'Yes') return;
 
     // Handle multiple tech partners
-    const partners: TechPartner[] = (row["Which Tech Partner"] || "")
+    const partners: TechPartner[] = (row['Which Tech Partner'] || '')
       .toString()
-      .split(",")
+      .split(',')
       .map((p: string): string => p.trim())
       .filter(Boolean);
 
@@ -546,7 +557,7 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
 
       const data = partnerData.get(partner)!;
       // Keep the original week format from CSV
-      const week = row["Program Week"];
+      const week = row['Program Week'];
 
       if (!data.weeklyData.has(week)) {
         data.weeklyData.set(week, {
@@ -562,10 +573,10 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
 
       // Process issues
       const issueCount =
-        row["How many issues, PRs, or projects this week?"] === "4+"
+        row['How many issues, PRs, or projects this week?'] === '4+'
           ? 4
           : parseInt(
-              row["How many issues, PRs, or projects this week?"] || "0",
+              row['How many issues, PRs, or projects this week?'] || '0'
             );
       weekData.issueCount += issueCount;
 
@@ -577,7 +588,7 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
           weekData.issues.push({
             title,
             url,
-            status: "open",
+            status: 'open',
             lastUpdated: new Date().toISOString(),
             contributor: row.Name,
           });
@@ -589,23 +600,23 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
         data.contributors.set(row.Name, {
           issuesCompleted: 0,
           engagementScore: 0,
-          githubUsername: row["Github Username"] || "",
+          githubUsername: row['Github Username'] || '',
         });
       }
 
       const contributor = data.contributors.get(row.Name)!;
       contributor.issuesCompleted += issueCount;
 
-      const engagement = row["Engagement Participation "]?.includes("3 -")
+      const engagement = row['Engagement Participation ']?.includes('3 -')
         ? 3
-        : row["Engagement Participation "]?.includes("2 -")
+        : row['Engagement Participation ']?.includes('2 -')
           ? 2
-          : row["Engagement Participation "]?.includes("1 -")
+          : row['Engagement Participation ']?.includes('1 -')
             ? 1
             : 0;
       contributor.engagementScore = Math.max(
         contributor.engagementScore,
-        engagement,
+        engagement
       );
       weekData.engagementLevel = Math.max(weekData.engagementLevel, engagement);
     });
@@ -630,11 +641,11 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
         githubUsername: details.githubUsername,
         issuesCompleted: details.issuesCompleted,
         engagementScore: details.engagementScore,
-      }),
+      })
     ),
     issues: Array.from(data.contributors.values()).reduce(
       (sum, c) => sum + c.issuesCompleted,
-      0,
+      0
     ),
   }));
   return result;
@@ -644,8 +655,8 @@ function processCSVData(csvData: any[]): TechPartnerPerformance[] {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function calculateTotalContributions(csvData: any[]): number {
   return csvData.reduce((sum, row) => {
-    const count = row["How many issues, PRs, or projects this week?"];
-    return sum + (count === "4+" ? 4 : parseInt(count || "0"));
+    const count = row['How many issues, PRs, or projects this week?'];
+    return sum + (count === '4+' ? 4 : parseInt(count || '0'));
   }, 0);
 }
 
@@ -654,31 +665,31 @@ function calculateTotalContributions(csvData: any[]): number {
 export function processData(
   csvData: any[],
   githubData?: GitHubData | null,
-  cohortId?: CohortId,
+  cohortId?: CohortId
 ): ProcessedData {
   const techPartnerPerformance = processCSVData(csvData);
   // Calculate core metrics with validation
   const activeContributors = new Set(
     csvData
-      .filter((row) => row["Github Username"])
-      .map((row) => row["Github Username"]),
+      .filter((row) => row['Github Username'])
+      .map((row) => row['Github Username'])
   ).size;
   const totalContributions = calculateTotalContributions(csvData);
 
   // Calculate tech partners
   const techPartners = new Set(
     csvData.flatMap((row) =>
-      (row["Which Tech Partner"] || "")
+      (row['Which Tech Partner'] || '')
         .toString()
-        .split(",")
+        .split(',')
         .map((p: string) => p.trim())
-        .filter(Boolean),
-    ),
+        .filter(Boolean)
+    )
   );
 
   // Add cohort metadata to processed data
   const cohortInfo = cohortId ? COHORT_DATA[cohortId] : null;
-  
+
   return {
     weeklyChange: calculateWeeklyChange(csvData),
     activeContributors,
@@ -698,10 +709,7 @@ export function processData(
     techPartnerMetrics: calculateTechPartnerMetrics(csvData),
     techPartnerPerformance,
     engagementTrends: calculateEngagementTrends(csvData),
-    technicalProgress: calculateTechnicalProgress(
-      csvData,
-      githubData,
-    ),
+    technicalProgress: calculateTechnicalProgress(csvData, githubData),
     issueMetrics: processRawIssueMetrics(csvData),
     actionItems: calculateActionItems(csvData),
     feedbackSentiment: {
@@ -711,14 +719,14 @@ export function processData(
     },
     contributorGrowth: [
       {
-        week: new Date().toISOString().split("T")[0],
+        week: new Date().toISOString().split('T')[0],
         newContributors: activeContributors,
         returningContributors: 0,
         totalActive: activeContributors,
       },
     ],
     rawEngagementData: csvData,
-    cohortId: cohortId || "",
+    cohortId: cohortId || '',
     cohortInfo: cohortInfo
       ? {
           id: cohortInfo.id,
@@ -735,48 +743,48 @@ export function processData(
 function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
   // First, get all unique weeks and sort them
   const allWeeks = Array.from(
-    new Set(csvData.map((row) => row["Program Week"])),
+    new Set(csvData.map((row) => row['Program Week']))
   ).sort((a, b) => parseWeekNumber(a) - parseWeekNumber(b));
 
   // Create a map of week data
-  const weeklyData = _.groupBy(csvData, "Program Week");
+  const weeklyData = _.groupBy(csvData, 'Program Week');
 
   // Process each week
   return allWeeks.map((week) => {
     const entries = weeklyData[week] || [];
 
     // Count unique contributors for this week
-    const activeContributors = new Set(entries.map((e) => e["Github Username"]))
+    const activeContributors = new Set(entries.map((e) => e['Github Username']))
       .size;
 
     return {
       week: `Week ${parseWeekNumber(week)}`,
       total: activeContributors,
       // Add zero values for backward compatibility
-      "High Engagement": 0,
-      "Medium Engagement": 0,
-      "Low Engagement": 0,
+      'High Engagement': 0,
+      'Medium Engagement': 0,
+      'Low Engagement': 0,
     };
   });
 }
 
 function calculateTechnicalProgress(
   csvData: any[],
-  githubData?: GitHubData | null,
+  githubData?: GitHubData | null
 ) {
-  return Object.entries(_.groupBy(csvData, "Program Week"))
+  return Object.entries(_.groupBy(csvData, 'Program Week'))
     .sort((a, b) => parseWeekNumber(a[0]) - parseWeekNumber(b[0]))
     .map(([week, entries]) => ({
       week: formatWeekString(week),
-      "Total Issues": entries.reduce(
+      'Total Issues': entries.reduce(
         (sum, entry) =>
           sum +
           parseInt(
-            entry["How many issues, PRs, or projects this week?"] || "0",
+            entry['How many issues, PRs, or projects this week?'] || '0'
           ),
-        0,
+        0
       ),
-      "In Progress": githubData?.statusGroups?.inProgress || 0,
+      'In Progress': githubData?.statusGroups?.inProgress || 0,
       Done: githubData?.statusGroups?.done || 0,
     }));
 }
@@ -901,7 +909,7 @@ export async function loadCohortData(cohortId: CohortId) {
     const response = await fetch(path);
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch CSV for cohort ${cohortId}: ${response.statusText}`,
+        `Failed to fetch CSV for cohort ${cohortId}: ${response.statusText}`
       );
     }
 

@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { CohortId } from '@/types/cohort';
-import { EngagementData, ProcessedData,FeedbackEntry } from '@/types/dashboard';
+import {
+  EngagementData,
+  ProcessedData,
+  FeedbackEntry,
+} from '@/types/dashboard';
 import normalizeEngagementData from '@/lib/formatDbData';
 
 interface CohortCache {
@@ -12,8 +16,18 @@ interface CohortCache {
 
 export function useCohortData(selectedCohort: CohortId) {
   const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
-    "1": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
-    "2": { rawData: [], processedData: null, partnerFeedbackData: [], lastUpdated: 0 },
+    '1': {
+      rawData: [],
+      processedData: null,
+      partnerFeedbackData: [],
+      lastUpdated: 0,
+    },
+    '2': {
+      rawData: [],
+      processedData: null,
+      partnerFeedbackData: [],
+      lastUpdated: 0,
+    },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +52,9 @@ export function useCohortData(selectedCohort: CohortId) {
         // Fetch the CSV data from the API
         const response = await fetch(`/api/cohort?id=${selectedCohort}`);
 
-        const partnerFeedbackResponse = await fetch(`/api/cohort-feedback?id=${selectedCohort}`);
+        const partnerFeedbackResponse = await fetch(
+          `/api/cohort-feedback?id=${selectedCohort}`
+        );
 
         const partnerResponse = await partnerFeedbackResponse.json();
 
@@ -46,26 +62,26 @@ export function useCohortData(selectedCohort: CohortId) {
 
         const rawData: Record<string, EngagementData>[] = await response.json();
 
-         // Normalize each entry
-        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
+        // Normalize each entry
+        const cleanedData: EngagementData[] = rawData.map(
+          normalizeEngagementData
+        );
 
-        setCache(prev => ({
+        setCache((prev) => ({
           ...prev,
           [selectedCohort]: {
             rawData: cleanedData,
             partnerFeedbackData: partnerResponse,
             processedData: null, // Will be processed on demand
-            lastUpdated: Date.now()
-          }
+            lastUpdated: Date.now(),
+          },
         }));
-        
+
         setIsLoading(false);
-
-
       } catch (error) {
-        console.error("Failed to load cohort data:", error);
+        console.error('Failed to load cohort data:', error);
         setError(
-          error instanceof Error ? error.message : "Failed to load data",
+          error instanceof Error ? error.message : 'Failed to load data'
         );
         setIsLoading(false);
       }

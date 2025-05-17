@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -10,11 +10,11 @@ export async function POST(request: Request) {
     const { query, data } = await request.json();
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-haiku-20241022",
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 1000,
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: `You are analyzing PLDG (Protocol Labs Developer Guild) engagement data. 
         Please answer the following question based on the data provided:
 
@@ -37,8 +37,8 @@ export async function POST(request: Request) {
 
     // Type guard to check if the content is text
     const textContent = response.content[0];
-    if (!("text" in textContent)) {
-      throw new Error("Unexpected response format from Claude");
+    if (!('text' in textContent)) {
+      throw new Error('Unexpected response format from Claude');
     }
 
     return NextResponse.json({
@@ -46,15 +46,15 @@ export async function POST(request: Request) {
       success: true,
     });
   } catch (error) {
-    console.error("Error generating search results:", error);
+    console.error('Error generating search results:', error);
     return NextResponse.json(
       {
-        error: "Failed to process search",
+        error: 'Failed to process search',
         success: false,
       },
       {
         status: 500,
-      },
+      }
     );
   }
 }

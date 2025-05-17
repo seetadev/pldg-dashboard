@@ -1,13 +1,13 @@
 export function LoadingIndicator({
-  type = "overlay",
-  message = "Updating...",
+  type = 'overlay',
+  message = 'Updating...',
   showStale = false,
 }: {
-  type?: "overlay" | "inline";
+  type?: 'overlay' | 'inline';
   message?: string;
   showStale?: boolean;
 }) {
-  if (type === "inline") {
+  if (type === 'inline') {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />

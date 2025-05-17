@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { TechnicalProgress } from "@/types/dashboard";
+import * as React from 'react';
+import { TechnicalProgress } from '@/types/dashboard';
 import {
   LineChart,
   Line,
@@ -11,16 +11,16 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-} from "recharts";
+} from 'recharts';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardDescription,
-} from "../ui/card";
-import { ExternalLink } from "lucide-react";
-import { Button } from "../ui/button";
+} from '../ui/card';
+import { ExternalLink } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface Props {
   data: TechnicalProgress[];
@@ -31,9 +31,9 @@ interface Props {
 }
 
 const GITHUB_LINKS = {
-  board: "https://github.com/users/kt-wawro/projects/7/views/1",
+  board: 'https://github.com/users/kt-wawro/projects/7/views/1',
   issues:
-    "https://github.com/users/kt-wawro/projects/7/views/1?filterQuery=is%3Aissue",
+    'https://github.com/users/kt-wawro/projects/7/views/1?filterQuery=is%3Aissue',
 };
 
 export default function TechnicalProgressChart({ data, githubData }: Props) {
@@ -43,8 +43,8 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
     // Data is already sorted in processData function
     return data.map((weekData) => ({
       week: weekData.week,
-      "New Issues": weekData["Total Issues"],
-      "In Progress": githubData?.inProgress || 0,
+      'New Issues': weekData['Total Issues'],
+      'In Progress': githubData?.inProgress || 0,
       Completed: githubData?.done || 0,
     }));
   }, [data, githubData]);
@@ -75,7 +75,7 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(GITHUB_LINKS.board, "_blank")}
+              onClick={() => window.open(GITHUB_LINKS.board, '_blank')}
               className="flex items-center gap-1"
             >
               <ExternalLink className="w-4 h-4" />
@@ -84,7 +84,7 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(GITHUB_LINKS.issues, "_blank")}
+              onClick={() => window.open(GITHUB_LINKS.issues, '_blank')}
               className="flex items-center gap-1"
             >
               <ExternalLink className="w-4 h-4" />
@@ -102,16 +102,16 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
             <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
             <XAxis dataKey="week" tick={{ fontSize: 12 }} tickMargin={10} />
             <YAxis
-              domain={[0, "auto"]}
+              domain={[0, 'auto']}
               tick={{ fontSize: 12 }}
               tickMargin={10}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                borderRadius: "6px",
-                padding: "8px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: '6px',
+                padding: '8px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             />
             <Legend />
