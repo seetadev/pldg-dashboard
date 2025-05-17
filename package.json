@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "next lint --fix && prettier --write . --config ./.prettier.json",
-    "format:check": "prettier --check .",
+    "format:check": "prettier --check . --config ./.prettier.json",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
