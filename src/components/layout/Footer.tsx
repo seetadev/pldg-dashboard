@@ -29,7 +29,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/jbarnes850/pldg-dashboard/tree/main"
+                  href="https://github.com/seetadev/pldg-dashboard/tree/main"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
