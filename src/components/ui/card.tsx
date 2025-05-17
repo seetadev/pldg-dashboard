@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -46,11 +46,11 @@ export function CardContent({ className, ...props }: CardContentProps) {
   return <div className={cn("p-6 pt-0", className)} {...props} />;
 }
 
-interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+interface CardDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {}
 
 export function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
     <p className={cn("text-sm text-muted-foreground", className)} {...props} />
   );
 }
-  

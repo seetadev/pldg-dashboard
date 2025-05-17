@@ -1,18 +1,20 @@
-export function LoadingIndicator({ 
-  type = 'overlay',
-  message = 'Updating...',
-  showStale = false
-}: { 
-  type?: 'overlay' | 'inline';
+export function LoadingIndicator({
+  type = "overlay",
+  message = "Updating...",
+  showStale = false,
+}: {
+  type?: "overlay" | "inline";
   message?: string;
   showStale?: boolean;
 }) {
-  if (type === 'inline') {
+  if (type === "inline") {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
         <span>{message}</span>
-        {showStale && <span className="text-yellow-500">(showing cached data)</span>}
+        {showStale && (
+          <span className="text-yellow-500">(showing cached data)</span>
+        )}
       </div>
     );
   }
@@ -25,4 +27,4 @@ export function LoadingIndicator({
       </div>
     </div>
   );
-} 
+}

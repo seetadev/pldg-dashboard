@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from 'react';
-import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
+import * as React from "react";
+import { DashboardSystemProvider } from "@/context/DashboardSystemContext";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Use a stable ref to prevent re-renders
@@ -18,4 +18,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
       </TooltipProvider>
     </DashboardSystemProvider>
   );
-} 
+}

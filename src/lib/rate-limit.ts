@@ -12,25 +12,30 @@ export function rateLimit(options: RateLimiterOptions) {
   const tokenCache = new Map<string, number[]>();
 
   return {
-    check: async (limit: number, token: string): Promise<RateLimiterResponse> => {
+    check: async (
+      limit: number,
+      token: string
+    ): Promise<RateLimiterResponse> => {
       const now = Date.now();
       const windowStart = now - options.interval;
-      
+
       const tokenKey = `${token}_${Math.floor(now / options.interval)}`;
-      
+
       const timestamps = tokenCache.get(tokenKey) || [];
-      const validTimestamps = timestamps.filter(timestamp => timestamp > windowStart);
-      
+      const validTimestamps = timestamps.filter(
+        (timestamp) => timestamp > windowStart
+      );
+
       if (validTimestamps.length >= limit) {
         const oldestTimestamp = validTimestamps[0];
         const reset = oldestTimestamp + options.interval;
-        
+
         return {
           remaining: 0,
-          reset
+          reset,
         };
       }
-      
+
       validTimestamps.push(now);
       tokenCache.set(tokenKey, validTimestamps);
 
@@ -40,11 +45,11 @@ export function rateLimit(options: RateLimiterOptions) {
           tokenCache.delete(key);
         }
       }
-      
+
       return {
         remaining: limit - validTimestamps.length,
-        reset: now + options.interval
+        reset: now + options.interval,
       };
-    }
+    },
   };
-} 
+}

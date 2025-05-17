@@ -1,34 +1,35 @@
-import { EngagementData } from '@/types/dashboard';
-import useSWR from 'swr';
+import { EngagementData } from "@/types/dashboard";
+import useSWR from "swr";
 
 export function useAirtableData() {
   const { data, error, isValidating, mutate } = useSWR<EngagementData[]>(
-    '/api/airtable',
+    "/api/airtable",
     async () => {
-      console.log('Fetching Airtable data...');
-      const response = await fetch('/api/airtable');
+      console.log("Fetching Airtable data...");
+      const response = await fetch("/api/airtable");
 
       if (!response.ok) {
-        console.error('Airtable API error:', response.statusText);
+        console.error("Airtable API error:", response.statusText);
         throw new Error(`Airtable API error: ${response.statusText}`);
       }
 
       const rawData = await response.json();
-      console.log('Airtable raw response:', {
+      console.log("Airtable raw response:", {
         hasData: Array.isArray(rawData),
         recordCount: Array.isArray(rawData) ? rawData.length : 0,
-        sampleRecord: Array.isArray(rawData) && rawData.length > 0 ? rawData[0] : null
+        sampleRecord:
+          Array.isArray(rawData) && rawData.length > 0 ? rawData[0] : null,
       });
 
       if (!Array.isArray(rawData)) {
-        console.error('Invalid Airtable response format:', rawData);
-        throw new Error('Invalid Airtable response format');
+        console.error("Invalid Airtable response format:", rawData);
+        throw new Error("Invalid Airtable response format");
       }
 
-      console.log('Airtable data received:', {
+      console.log("Airtable data received:", {
         recordCount: rawData.length,
         sampleRecord: rawData[0],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return rawData;
@@ -38,8 +39,8 @@ export function useAirtableData() {
       revalidateOnFocus: true,
       dedupingInterval: 10000,
       onError: (err) => {
-        console.error('Airtable data fetch error:', err);
-      }
+        console.error("Airtable data fetch error:", err);
+      },
     }
   );
 
@@ -48,16 +49,16 @@ export function useAirtableData() {
     isLoading: !error && !data && isValidating,
     isError: !!error,
     mutate,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
-  console.log('Airtable Hook Result:', {
+  console.log("Airtable Hook Result:", {
     hasData: !!result.data?.length,
     recordCount: result.data?.length || 0,
     sampleRecord: result.data?.[0],
     isLoading: result.isLoading,
     isError: result.isError,
-    timestamp: new Date(result.timestamp).toISOString()
+    timestamp: new Date(result.timestamp).toISOString(),
   });
 
   return result;

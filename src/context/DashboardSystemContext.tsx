@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from 'react';
-import { ProcessedData } from '@/types/dashboard';
-import { useDashboardSystem } from '@/lib/system';
+import * as React from "react";
+import { ProcessedData } from "@/types/dashboard";
+import { useDashboardSystem } from "@/lib/system";
 
 interface DashboardSystemContextType {
   data: ProcessedData | null;
@@ -14,9 +14,15 @@ interface DashboardSystemContextType {
   refresh: () => Promise<void>;
 }
 
-const DashboardSystemContext = React.createContext<DashboardSystemContextType | undefined>(undefined);
+const DashboardSystemContext = React.createContext<
+  DashboardSystemContextType | undefined
+>(undefined);
 
-export function DashboardSystemProvider({ children }: { children: React.ReactNode }) {
+export function DashboardSystemProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const systemData = useDashboardSystem();
 
   return (
@@ -29,7 +35,9 @@ export function DashboardSystemProvider({ children }: { children: React.ReactNod
 export function useDashboardSystemContext() {
   const context = React.useContext(DashboardSystemContext);
   if (!context) {
-    throw new Error('useDashboardSystemContext must be used within a DashboardSystemProvider');
+    throw new Error(
+      "useDashboardSystemContext must be used within a DashboardSystemProvider"
+    );
   }
   return context;
 }

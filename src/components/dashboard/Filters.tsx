@@ -1,12 +1,16 @@
-import * as React from 'react';
-import { Calendar, Filter, X } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { DateRange } from 'react-day-picker';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { Calendar, Filter, X } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface FiltersProps {
   onDateRangeChange: (range: DateRange | undefined) => void;
@@ -21,7 +25,7 @@ export function Filters({
   onTechPartnerChange,
   dateRange,
   selectedPartners,
-  availablePartners
+  availablePartners,
 }: FiltersProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -32,7 +36,7 @@ export function Filters({
 
   const togglePartner = (partner: string) => {
     if (selectedPartners.includes(partner)) {
-      onTechPartnerChange(selectedPartners.filter(p => p !== partner));
+      onTechPartnerChange(selectedPartners.filter((p) => p !== partner));
     } else {
       onTechPartnerChange([...selectedPartners, partner]);
     }
@@ -46,7 +50,7 @@ export function Filters({
           onDateChange={onDateRangeChange}
           className="min-w-[240px]"
         />
-        
+
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -56,7 +60,10 @@ export function Filters({
               <Filter className="h-4 w-4" />
               Tech Partners
               {selectedPartners.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 bg-primary/10 text-primary"
+                >
                   {selectedPartners.length}
                 </Badge>
               )}
@@ -64,13 +71,14 @@ export function Filters({
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2" align="start">
             <div className="space-y-1">
-              {availablePartners.map(partner => (
+              {availablePartners.map((partner) => (
                 <Button
                   key={partner}
                   variant="ghost"
                   className={cn(
                     "w-full justify-start text-sm font-normal",
-                    selectedPartners.includes(partner) && "bg-primary/10 text-primary"
+                    selectedPartners.includes(partner) &&
+                      "bg-primary/10 text-primary"
                   )}
                   onClick={() => togglePartner(partner)}
                 >
@@ -95,4 +103,4 @@ export function Filters({
       </div>
     </div>
   );
-} 
+}
