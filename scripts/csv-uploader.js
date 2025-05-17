@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const uri = process.env.MONGO_URI;
+const uri = process.env.MONGO_URI || "mongodb://pldg:password@localhost:27017/pldg-dashboard?authSource=admin";
 const client = new MongoClient(uri);
 
 const cohort1CSVPath = '../public/data/cohort-1/Weekly Engagement Survey Breakdown (4).csv';
