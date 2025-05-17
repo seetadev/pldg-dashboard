@@ -17,12 +17,13 @@ export interface FeedbackEntry {
 
 export interface EngagementData {
   Name: string;
+  Cohort: CohortId; // New field
   "Github Username"?: string;
-  "Program Week": string;
-  "Engagement Participation "?: string;
+  "Program Week": string; // Now consistently formatted
+  "Engagement Participation ": string; // Now without leading numbers
+  "How many issues, PRs, or projects this week?": string; // Now "4+" becomes "4"
+  "Which Tech Partner": string[]; // Always array
   "Tech Partner Collaboration?": string;
-  "Which Tech Partner": string | string[];
-  "How many issues, PRs, or projects this week?": string;
   "Issue Title 1"?: string | string[];
   "Issue Link 1"?: string | string[];
   "Issue Title 2"?: string | string[];
