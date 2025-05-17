@@ -1,5 +1,5 @@
 export function AirtableIcon({
-  className = "w-4 h-4",
+  className = 'w-4 h-4',
 }: {
   className?: string;
 }) {

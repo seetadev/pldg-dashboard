@@ -1,5 +1,5 @@
-import { ProcessedData } from "@/types/dashboard";
-import { KPICard } from "./KPICard";
+import { ProcessedData } from '@/types/dashboard';
+import { KPICard } from './KPICard';
 
 export function PerformanceIndicators({ data }: { data: ProcessedData }) {
   const latestIssueMetrics = data.issueMetrics[data.issueMetrics.length - 1];

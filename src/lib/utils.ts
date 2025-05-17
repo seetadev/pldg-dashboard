@@ -1,6 +1,6 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-import _ from "lodash";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import _ from 'lodash';
 import {
   IssueMetrics,
   RawIssueMetric,
@@ -10,9 +10,9 @@ import {
   EnhancedTechPartnerData,
   TechPartnerPerformance,
   ContributorDetails,
-} from "../types/dashboard";
-import { processDataWithAI } from "./ai";
-import { COHORT_DATA, CohortId } from "@/types/cohort";
+} from '../types/dashboard';
+import { processDataWithAI } from './ai';
+import { COHORT_DATA, CohortId } from '@/types/cohort';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -20,10 +20,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function processEngagementData(
   rawData: EngagementData[],
-  cohortId: CohortId,
+  cohortId: CohortId
 ): Promise<EnhancedProcessedData> {
-  const sortedData = _.sortBy(rawData, "Program Week");
-  const engagementByWeek = _.groupBy(sortedData, "Program Week");
+  const sortedData = _.sortBy(rawData, 'Program Week');
+  const engagementByWeek = _.groupBy(sortedData, 'Program Week');
 
   // Calculate NPS score
   const npsScore = calculateNPSScore(sortedData);
@@ -31,27 +31,27 @@ export async function processEngagementData(
   // Process engagement trends
   const engagementTrends = Object.entries(engagementByWeek).map(
     ([week, entries]) => ({
-      week: week.replace(/\(.*?\)/, "").trim(),
-      "High Engagement": entries.filter((e) =>
-        e["Engagement Participation "]?.includes("3 -"),
+      week: week.replace(/\(.*?\)/, '').trim(),
+      'High Engagement': entries.filter((e) =>
+        e['Engagement Participation ']?.includes('3 -')
       ).length,
-      "Medium Engagement": entries.filter((e) =>
-        e["Engagement Participation "]?.includes("2 -"),
+      'Medium Engagement': entries.filter((e) =>
+        e['Engagement Participation ']?.includes('2 -')
       ).length,
-      "Low Engagement": entries.filter((e) =>
-        e["Engagement Participation "]?.includes("1 -"),
+      'Low Engagement': entries.filter((e) =>
+        e['Engagement Participation ']?.includes('1 -')
       ).length,
       total: entries.length,
-    }),
+    })
   );
 
   // Process tech partner performance
   const techPartnerPerformance = Array.from(
-    new Set(sortedData.map((item) => item["Which Tech Partner"])),
+    new Set(sortedData.map((item) => item['Which Tech Partner']))
   ).map((partner) => {
     const partnerStr = Array.isArray(partner) ? partner[0] : partner;
     const partnerData = sortedData.filter((item) => {
-      const techPartner = item["Which Tech Partner"];
+      const techPartner = item['Which Tech Partner'];
       return Array.isArray(techPartner)
         ? techPartner[0] === partnerStr
         : techPartner === partnerStr;
@@ -61,8 +61,8 @@ export async function processEngagementData(
       issues: partnerData.reduce(
         (sum, item) =>
           sum +
-          parseInt(item["How many issues, PRs, or projects this week?"] || "0"),
-        0,
+          parseInt(item['How many issues, PRs, or projects this week?'] || '0'),
+        0
       ),
       timeSeriesData: [], // Will be populated later in enhanceTechPartnerData
       contributorDetails: [], // Will be populated later in enhanceTechPartnerData
@@ -71,11 +71,11 @@ export async function processEngagementData(
 
   // Process tech partner metrics
   const techPartnerMetrics = _(sortedData)
-    .groupBy("Which Tech Partner")
+    .groupBy('Which Tech Partner')
     .map((items, partner) => ({
       partner,
       totalIssues: _.sumBy(items, (item) =>
-        parseInt(item["How many issues, PRs, or projects this week?"] || "0"),
+        parseInt(item['How many issues, PRs, or projects this week?'] || '0')
       ),
       activeContributors: new Set(items.map((item) => item.Name)).size,
       avgIssuesPerContributor: 0,
@@ -86,30 +86,30 @@ export async function processEngagementData(
   // Process feedback sentiment
   const feedbackSentiment = {
     positive: sortedData.filter((e) => {
-      const feedback = e["PLDG Feedback"];
+      const feedback = e['PLDG Feedback'];
       const feedbackStr = Array.isArray(feedback) ? feedback[0] : feedback;
       return (
-        typeof feedbackStr === "string" &&
-        (feedbackStr.toLowerCase().includes("great") ||
-          feedbackStr.toLowerCase().includes("good"))
+        typeof feedbackStr === 'string' &&
+        (feedbackStr.toLowerCase().includes('great') ||
+          feedbackStr.toLowerCase().includes('good'))
       );
     }).length,
     neutral: sortedData.filter((e) => {
-      const feedback = e["PLDG Feedback"];
+      const feedback = e['PLDG Feedback'];
       const feedbackStr = Array.isArray(feedback) ? feedback[0] : feedback;
       return (
-        typeof feedbackStr === "string" &&
-        !feedbackStr.toLowerCase().includes("great") &&
-        !feedbackStr.toLowerCase().includes("good") &&
-        !feedbackStr.toLowerCase().includes("bad")
+        typeof feedbackStr === 'string' &&
+        !feedbackStr.toLowerCase().includes('great') &&
+        !feedbackStr.toLowerCase().includes('good') &&
+        !feedbackStr.toLowerCase().includes('bad')
       );
     }).length,
     negative: sortedData.filter((e) => {
-      const feedback = e["PLDG Feedback"];
+      const feedback = e['PLDG Feedback'];
       const feedbackStr = Array.isArray(feedback) ? feedback[0] : feedback;
       return (
-        typeof feedbackStr === "string" &&
-        feedbackStr.toLowerCase().includes("bad")
+        typeof feedbackStr === 'string' &&
+        feedbackStr.toLowerCase().includes('bad')
       );
     }).length,
   };
@@ -117,34 +117,34 @@ export async function processEngagementData(
   // Process technical progress
   const technicalProgress = Object.entries(engagementByWeek).map(
     ([week, entries]) => ({
-      week: week.replace(/\(.*?\)/, "").trim(),
-      "Total Issues": _.sumBy(entries, (entry) =>
-        parseInt(entry["How many issues, PRs, or projects this week?"] || "0"),
+      week: week.replace(/\(.*?\)/, '').trim(),
+      'Total Issues': _.sumBy(entries, (entry) =>
+        parseInt(entry['How many issues, PRs, or projects this week?'] || '0')
       ),
-    }),
+    })
   );
 
   // Calculate top performers
   const topPerformers = _(sortedData)
-    .groupBy("Name")
+    .groupBy('Name')
     .map((entries, name) => ({
       name,
       totalIssues: _.sumBy(entries, (e) =>
-        parseInt(e["How many issues, PRs, or projects this week?"] || "0"),
+        parseInt(e['How many issues, PRs, or projects this week?'] || '0')
       ),
       avgEngagement: _.meanBy(entries, (e) => {
-        const participation = e["Engagement Participation "]?.trim() || "";
-        return participation.startsWith("3")
+        const participation = e['Engagement Participation ']?.trim() || '';
+        return participation.startsWith('3')
           ? 3
-          : participation.startsWith("2")
+          : participation.startsWith('2')
             ? 2
-            : participation.startsWith("1")
+            : participation.startsWith('1')
               ? 1
               : 0;
       }),
     }))
     .filter((p) => p.totalIssues > 0)
-    .orderBy(["totalIssues", "avgEngagement"], ["desc", "desc"])
+    .orderBy(['totalIssues', 'avgEngagement'], ['desc', 'desc'])
     .value();
 
   // Process issue metrics
@@ -153,12 +153,12 @@ export async function processEngagementData(
   // Calculate program health metrics
   const techPartnerSet = new Set(
     sortedData.flatMap((entry) =>
-      Array.isArray(entry["Which Tech Partner"])
-        ? entry["Which Tech Partner"]
-        : ((entry["Which Tech Partner"] as string)
-            ?.split(",")
-            .map((p: string) => p.trim()) ?? []),
-    ),
+      Array.isArray(entry['Which Tech Partner'])
+        ? entry['Which Tech Partner']
+        : ((entry['Which Tech Partner'] as string)
+            ?.split(',')
+            .map((p: string) => p.trim()) ?? [])
+    )
   );
 
   const programHealth = {
@@ -173,62 +173,62 @@ export async function processEngagementData(
 
   const activeTechPartnersSet = new Set(
     sortedData.flatMap((entry) =>
-      Array.isArray(entry["Which Tech Partner"])
-        ? entry["Which Tech Partner"]
-        : ((entry["Which Tech Partner"] as string)
-            ?.split(",")
-            .map((p: string) => p.trim()) ?? []),
-    ),
+      Array.isArray(entry['Which Tech Partner'])
+        ? entry['Which Tech Partner']
+        : ((entry['Which Tech Partner'] as string)
+            ?.split(',')
+            .map((p: string) => p.trim()) ?? [])
+    )
   );
   const activeTechPartners = Array.from(activeTechPartnersSet).length;
 
   const totalContributions = sortedData.reduce(
     (sum, entry) =>
       sum +
-      parseInt(entry["How many issues, PRs, or projects this week?"] || "0"),
-    0,
+      parseInt(entry['How many issues, PRs, or projects this week?'] || '0'),
+    0
   );
 
   const positiveFeedback = sortedData.filter((entry) => {
-    const feedback = entry["PLDG Feedback"];
+    const feedback = entry['PLDG Feedback'];
     const feedbackStr = Array.isArray(feedback) ? feedback[0] : feedback;
     return (
-      typeof feedbackStr === "string" &&
-      (feedbackStr.toLowerCase().includes("great") ||
-        feedbackStr.toLowerCase().includes("good"))
+      typeof feedbackStr === 'string' &&
+      (feedbackStr.toLowerCase().includes('great') ||
+        feedbackStr.toLowerCase().includes('good'))
     );
   }).length;
 
   // Calculate weekly change
   const currentWeekData = sortedData.filter(
     (entry) =>
-      entry["Program Week"] ===
-      sortedData[sortedData.length - 1]["Program Week"],
+      entry['Program Week'] ===
+      sortedData[sortedData.length - 1]['Program Week']
   );
   const previousWeekData = sortedData.filter(
     (entry) =>
-      entry["Program Week"] ===
-      sortedData[sortedData.length - 2]?.["Program Week"],
+      entry['Program Week'] ===
+      sortedData[sortedData.length - 2]?.['Program Week']
   );
 
   const currentWeekContributions = currentWeekData.reduce(
     (sum, entry) =>
       sum +
-      parseInt(entry["How many issues, PRs, or projects this week?"] || "0"),
-    0,
+      parseInt(entry['How many issues, PRs, or projects this week?'] || '0'),
+    0
   );
   const previousWeekContributions = previousWeekData.reduce(
     (sum, entry) =>
       sum +
-      parseInt(entry["How many issues, PRs, or projects this week?"] || "0"),
-    0,
+      parseInt(entry['How many issues, PRs, or projects this week?'] || '0'),
+    0
   );
 
   const weeklyChange = previousWeekContributions
     ? Math.round(
         ((currentWeekContributions - previousWeekContributions) /
           previousWeekContributions) *
-          100,
+          100
       )
     : 0;
 
@@ -279,7 +279,7 @@ export async function processEngagementData(
       },
     };
   } catch (error) {
-    console.error("AI processing error:", error);
+    console.error('AI processing error:', error);
     // Return with default insights
     return {
       ...baseProcessedData,
@@ -310,7 +310,7 @@ export function calculateTechnicalProgress(data: ProcessedData): number {
 // Convert raw metrics to IssueMetrics format
 function processIssueMetrics(rawMetrics: RawIssueMetric[]): IssueMetrics[] {
   const currentDate = new Date();
-  const weekStr = currentDate.toISOString().split("T")[0];
+  const weekStr = currentDate.toISOString().split('T')[0];
 
   return rawMetrics.map((metric) => ({
     week: weekStr,
@@ -331,10 +331,10 @@ export function processData(rawData: any, cohortId: CohortId): ProcessedData {
     activeContributors: rawData.activeContributors || 0,
     totalContributions: rawData.totalContributions || 0,
     keyHighlights: rawData.keyHighlights || {
-      activeContributorsAcrossTechPartners: "0 across 0",
-      totalContributions: "0 total",
-      positiveFeedback: "0 positive",
-      weeklyContributions: "0% change",
+      activeContributorsAcrossTechPartners: '0 across 0',
+      totalContributions: '0 total',
+      positiveFeedback: '0 positive',
+      weeklyContributions: '0% change',
     },
     actionItems: rawData.actionItems || [],
     engagementTrends: rawData.engagementTrends || [],
@@ -363,7 +363,7 @@ export function processData(rawData: any, cohortId: CohortId): ProcessedData {
 // Helper function to combine and prioritize insights
 export function combineAndPrioritize(
   insights1: string[] = [],
-  insights2: string[] = [],
+  insights2: string[] = []
 ): string[] {
   const uniqueInsights = new Set([...insights1, ...insights2]);
   const combined = Array.from(uniqueInsights);
@@ -377,7 +377,7 @@ export function calculateEngagementScore(data: ProcessedData): number {
     data.engagementTrends[data.engagementTrends.length - 1];
 
   if (!recentEngagement) {
-    console.warn("No engagement data available for score calculation");
+    console.warn('No engagement data available for score calculation');
     return 0;
   }
 
@@ -392,7 +392,6 @@ export function calculateEngagementScore(data: ProcessedData): number {
   // Combine with NPS score for overall health metric
   const score = Math.round((engagementRate + data.programHealth.npsScore) / 2);
 
-
   return score;
 }
 
@@ -406,12 +405,12 @@ export function calculateCollaborationIndex(data: ProcessedData): number {
 
 // Helper function to fetch and process insights
 export async function generateEnhancedInsights(
-  data: ProcessedData,
+  data: ProcessedData
 ): Promise<EnhancedProcessedData> {
   try {
-    const metricsResponse = await fetch("/api/insights", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const metricsResponse = await fetch('/api/insights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         engagementMetrics: {
           trends: data.engagementTrends,
@@ -429,9 +428,9 @@ export async function generateEnhancedInsights(
 
     const [metricsResult, programResult] = await Promise.all([
       metricsResponse.json(),
-      fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       }).then((res) => res.json()),
     ]);
@@ -442,15 +441,15 @@ export async function generateEnhancedInsights(
         keyTrends: metricsResult.insights?.keyTrends || [],
         areasOfConcern: combineAndPrioritize(
           metricsResult.insights?.areasOfConcern || [],
-          programResult.insights?.riskFactors || [],
+          programResult.insights?.riskFactors || []
         ),
         recommendations: combineAndPrioritize(
           metricsResult.insights?.recommendations || [],
-          programResult.insights?.strategicRecommendations || [],
+          programResult.insights?.strategicRecommendations || []
         ),
         achievements: combineAndPrioritize(
           metricsResult.insights?.achievements || [],
-          programResult.insights?.successStories || [],
+          programResult.insights?.successStories || []
         ),
         metrics: {
           engagementScore: calculateEngagementScore(data),
@@ -462,7 +461,7 @@ export async function generateEnhancedInsights(
 
     return enhancedData;
   } catch (error) {
-    console.error("Error generating enhanced insights:", error);
+    console.error('Error generating enhanced insights:', error);
     // Return with default insights structure
     return {
       ...data,
@@ -499,25 +498,25 @@ export function isValidInsights(insights: any): insights is {
 // Fix the issue metrics processing
 function processRawIssueMetrics(entries: EngagementData[]): IssueMetrics[] {
   const currentDate = new Date();
-  const weekStr = currentDate.toISOString().split("T")[0];
+  const weekStr = currentDate.toISOString().split('T')[0];
 
   const metrics = _(entries)
     .flatMap((entry) => {
-      if (!entry["Issue Title 1"]) return [];
+      if (!entry['Issue Title 1']) return [];
       return [
         {
           week: weekStr,
-          open: entry["Issue Link 1"]?.includes("closed") ? 0 : 1,
-          closed: entry["Issue Link 1"]?.includes("closed") ? 1 : 0,
+          open: entry['Issue Link 1']?.includes('closed') ? 0 : 1,
+          closed: entry['Issue Link 1']?.includes('closed') ? 1 : 0,
           total: 1,
         },
       ];
     })
-    .groupBy("week")
+    .groupBy('week')
     .map((items, week) => ({
       week,
-      open: _.sumBy(items, "open"),
-      closed: _.sumBy(items, "closed"),
+      open: _.sumBy(items, 'open'),
+      closed: _.sumBy(items, 'closed'),
       total: items.length,
     }))
     .value();
@@ -529,7 +528,7 @@ export function formatMetricName(key: string): string {
   return key
     .split(/(?=[A-Z])/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    .join(' ');
 }
 
 export function parseWeekNumber(weekString: string): number {
@@ -572,7 +571,7 @@ Date.prototype.getWeek = function (): number {
       ((date.getTime() - week1.getTime()) / 86400000 -
         3 +
         ((week1.getDay() + 6) % 7)) /
-        7,
+        7
     )
   );
 };
@@ -584,8 +583,8 @@ function calculateEngagementRate(data: EngagementData[]): number {
 
   const activeEntries = data.filter(
     (entry) =>
-      entry["Engagement Participation "]?.includes("3 -") ||
-      entry["Engagement Participation "]?.includes("2 -"),
+      entry['Engagement Participation ']?.includes('3 -') ||
+      entry['Engagement Participation ']?.includes('2 -')
   ).length;
 
   return Math.round((activeEntries / totalEntries) * 100);
@@ -595,8 +594,8 @@ function calculateNPSScore(data: EngagementData[]): number {
   const scores = data
     .map((entry) => {
       const score =
-        entry["How likely are you to recommend the PLDG to others?"];
-      return parseInt(Array.isArray(score) ? score[0] || "0" : score || "0");
+        entry['How likely are you to recommend the PLDG to others?'];
+      return parseInt(Array.isArray(score) ? score[0] || '0' : score || '0');
     })
     .filter((score) => score > 0);
 
@@ -648,13 +647,13 @@ function calculateNPSScore(data: EngagementData[]): number {
 //   );
 // }
 
-type IssueStatus = "open" | "closed";
+type IssueStatus = 'open' | 'closed';
 
 // Helper functions for enhanced tech partner data processing
 function processTimeSeriesData(
-  engagementData: EngagementData[],
-): EnhancedTechPartnerData["timeSeriesData"] {
-  const weeklyData = _.groupBy(engagementData, "Program Week");
+  engagementData: EngagementData[]
+): EnhancedTechPartnerData['timeSeriesData'] {
+  const weeklyData = _.groupBy(engagementData, 'Program Week');
 
   return Object.entries(weeklyData)
     .map(([week, entries]) => {
@@ -663,28 +662,26 @@ function processTimeSeriesData(
         week,
         weekEndDate: new Date().toISOString(), // This is just for type satisfaction
         issueCount: _.sumBy(entries, (entry) =>
-          parseInt(
-            entry["How many issues, PRs, or projects this week?"] || "0",
-          ),
+          parseInt(entry['How many issues, PRs, or projects this week?'] || '0')
         ),
         contributors: Array.from(new Set(entries.map((entry) => entry.Name))),
         engagementLevel: _.meanBy(entries, (entry) => {
           const participation =
-            entry["Engagement Participation "]?.trim() || "";
-          return participation.includes("3 -")
+            entry['Engagement Participation ']?.trim() || '';
+          return participation.includes('3 -')
             ? 3
-            : participation.includes("2 -")
+            : participation.includes('2 -')
               ? 2
-              : participation.includes("1 -")
+              : participation.includes('1 -')
                 ? 1
                 : 0;
         }),
         issues: entries
-          .filter((entry) => entry["Issue Title 1"] && entry["Issue Link 1"])
+          .filter((entry) => entry['Issue Title 1'] && entry['Issue Link 1'])
           .map((entry) => ({
-            title: String(entry["Issue Title 1"]),
-            url: String(entry["Issue Link 1"]),
-            status: "open" as IssueStatus, // Explicitly type the status
+            title: String(entry['Issue Title 1']),
+            url: String(entry['Issue Link 1']),
+            status: 'open' as IssueStatus, // Explicitly type the status
             lastUpdated: new Date().toISOString(),
             contributor: entry.Name,
           })),
@@ -692,14 +689,14 @@ function processTimeSeriesData(
     })
     .sort((a, b) => {
       // Sort by week number
-      const weekA = parseInt(a.week.match(/Week (\d+)/)?.[1] || "0");
-      const weekB = parseInt(b.week.match(/Week (\d+)/)?.[1] || "0");
+      const weekA = parseInt(a.week.match(/Week (\d+)/)?.[1] || '0');
+      const weekB = parseInt(b.week.match(/Week (\d+)/)?.[1] || '0');
       return weekA - weekB;
     });
 }
 
 function processContributorDetails(
-  engagementData: EngagementData[],
+  engagementData: EngagementData[]
 ): ContributorDetails[] {
   const contributorMap = new Map<string, EngagementData[]>();
 
@@ -710,28 +707,28 @@ function processContributorDetails(
   });
 
   return Array.from(contributorMap.entries()).map(([name, entries]) => {
-    const email = entries[0]["Email Address"];
+    const email = entries[0]['Email Address'];
     const emailStr = Array.isArray(email) ? email[0] : email;
 
     // Calculate issues completed
     const issuesCompleted = entries.reduce((sum: number, entry) => {
-      const issueCount = entry["How many issues, PRs, or projects this week?"];
+      const issueCount = entry['How many issues, PRs, or projects this week?'];
       return (
-        sum + (typeof issueCount === "string" ? parseInt(issueCount || "0") : 0)
+        sum + (typeof issueCount === 'string' ? parseInt(issueCount || '0') : 0)
       );
     }, 0);
 
     // Calculate engagement score
     const engagementScore =
       entries.reduce((sum: number, entry) => {
-        const participation = entry["Engagement Participation "]?.trim() || "";
+        const participation = entry['Engagement Participation ']?.trim() || '';
         return (
           sum +
-          (participation.startsWith("3")
+          (participation.startsWith('3')
             ? 3
-            : participation.startsWith("2")
+            : participation.startsWith('2')
               ? 2
-              : participation.startsWith("1")
+              : participation.startsWith('1')
                 ? 1
                 : 0)
         );
@@ -740,27 +737,27 @@ function processContributorDetails(
     // Process recent issues
     const recentIssues = entries
       .filter(
-        (entry) => entry["GitHub Issue Title"] && entry["GitHub Issue URL"],
+        (entry) => entry['GitHub Issue Title'] && entry['GitHub Issue URL']
       )
       .map((entry) => {
-        const title = entry["GitHub Issue Title"];
-        const link = entry["GitHub Issue URL"];
-        const description = entry["Describe your work with the tech partner"];
+        const title = entry['GitHub Issue Title'];
+        const link = entry['GitHub Issue URL'];
+        const description = entry['Describe your work with the tech partner'];
         return {
-          title: Array.isArray(title) ? title[0] || "" : title || "",
+          title: Array.isArray(title) ? title[0] || '' : title || '',
           link: Array.isArray(link) ? link[0] : link,
           description: Array.isArray(description)
-            ? description[0] || ""
-            : description || "",
+            ? description[0] || ''
+            : description || '',
         };
       });
 
     return {
       name,
       githubUsername:
-        entries[0]["Github Username"] ||
-        name.toLowerCase().replace(/\s+/g, "-"),
-      email: emailStr || "",
+        entries[0]['Github Username'] ||
+        name.toLowerCase().replace(/\s+/g, '-'),
+      email: emailStr || '',
       issuesCompleted,
       engagementScore,
       recentIssues,
@@ -770,32 +767,32 @@ function processContributorDetails(
 
 export function enhanceTechPartnerData(
   baseData: TechPartnerPerformance[] | undefined,
-  engagementData: EngagementData[] | undefined,
+  engagementData: EngagementData[] | undefined
 ): EnhancedTechPartnerData[] {
   if (!baseData || !engagementData) return [];
 
   return baseData.map((partner) => {
     if (!partner.partner) {
-      console.log("enhanceTechPartnerData: Partner missing name", partner);
+      console.log('enhanceTechPartnerData: Partner missing name', partner);
       return {
         ...partner,
         timeSeriesData: [],
         contributorDetails: [],
         issueTracking: [],
-        mostActiveIssue: { title: "", url: "" },
-        staleIssue: { title: "", url: "" },
+        mostActiveIssue: { title: '', url: '' },
+        staleIssue: { title: '', url: '' },
       };
     }
 
     const partnerEngagements = engagementData.filter(
       (entry) =>
-        entry["Which Tech Partner"] &&
-        (Array.isArray(entry["Which Tech Partner"])
-          ? entry["Which Tech Partner"].includes(partner.partner)
-          : (entry["Which Tech Partner"] as string)
-              ?.split(",")
+        entry['Which Tech Partner'] &&
+        (Array.isArray(entry['Which Tech Partner'])
+          ? entry['Which Tech Partner'].includes(partner.partner)
+          : (entry['Which Tech Partner'] as string)
+              ?.split(',')
               .map((p: string) => p.trim())
-              .includes(partner.partner)),
+              .includes(partner.partner))
     );
 
     const timeSeriesData = processTimeSeriesData(partnerEngagements);
@@ -803,16 +800,16 @@ export function enhanceTechPartnerData(
       .flatMap((week) => week.issues)
       .sort(
         (a, b) =>
-          new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
+          new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
       )[0];
 
     const staleIssues = timeSeriesData
       .flatMap((week) => week.issues)
       .filter(
         (issue) =>
-          issue.status === "open" &&
+          issue.status === 'open' &&
           new Date(issue.lastUpdated) <
-            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       );
 
     const result: EnhancedTechPartnerData = {
@@ -827,14 +824,14 @@ export function enhanceTechPartnerData(
           engagement: 0,
           week: week.week,
           contributor: issue.contributor,
-        })),
+        }))
       ),
       mostActiveIssue: mostRecentIssue
         ? { title: mostRecentIssue.title, url: mostRecentIssue.url }
-        : { title: "", url: "" },
+        : { title: '', url: '' },
       staleIssue: staleIssues[0]
         ? { title: staleIssues[0].title, url: staleIssues[0].url }
-        : { title: "", url: "" },
+        : { title: '', url: '' },
     };
 
     return result;

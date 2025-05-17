@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { EngagementTrend } from "@/types/dashboard";
+import * as React from 'react';
+import { EngagementTrend } from '@/types/dashboard';
 import {
   BarChart,
   Bar,
@@ -11,14 +11,14 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
+} from 'recharts';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardDescription,
-} from "../ui/card";
+} from '../ui/card';
 
 interface Props {
   data: EngagementTrend[];
@@ -31,10 +31,10 @@ export default function EngagementChart({ data }: Props) {
     // Process and clean the data - now just counting total active contributors
     const processed = data.map((week) => ({
       name: week.week,
-      "Active Contributors": week.total || 0, // Use the total field directly
+      'Active Contributors': week.total || 0, // Use the total field directly
     }));
 
-    console.log("Processed contributor data:", processed);
+    console.log('Processed contributor data:', processed);
     return processed;
   }, [data]);
 
@@ -68,21 +68,21 @@ export default function EngagementChart({ data }: Props) {
               tick={{ fontSize: 12 }}
               tickMargin={10}
               label={{
-                value: "Contributors",
+                value: 'Contributors',
                 angle: -90,
-                position: "insideLeft",
-                style: { textAnchor: "middle" },
+                position: 'insideLeft',
+                style: { textAnchor: 'middle' },
               }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                borderRadius: "6px",
-                padding: "8px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: '6px',
+                padding: '8px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             />
-            <Legend wrapperStyle={{ paddingTop: "20px" }} />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
             <Bar
               dataKey="Active Contributors"
               fill="url(#activeContributors)"

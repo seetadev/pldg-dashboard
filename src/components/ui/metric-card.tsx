@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface MetricCardProps {
   title: string;
@@ -14,7 +14,7 @@ interface MetricCardProps {
 
 export function MetricCard({ title, items, className }: MetricCardProps) {
   return (
-    <Card className={cn("h-full", className)}>
+    <Card className={cn('h-full', className)}>
       <CardContent className="pt-6">
         <h3 className="font-semibold mb-4 text-lg">{title}</h3>
         <div className="space-y-4">

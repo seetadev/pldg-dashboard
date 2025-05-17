@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "next lint --fix && prettier --write .",
+    "format": "next lint --fix && prettier --write . --config ./.prettier.json",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "jest",

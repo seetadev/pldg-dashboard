@@ -1,6 +1,6 @@
-import * as React from "react";
-import { Github } from "lucide-react";
-import Image from "next/image";
+import * as React from 'react';
+import { Github } from 'lucide-react';
+import Image from 'next/image';
 
 export function Footer() {
   return (

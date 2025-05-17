@@ -1,24 +1,24 @@
-import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
-import Papa from "papaparse";
-import { EngagementData } from "@/types/dashboard";
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
+import Papa from 'papaparse';
+import { EngagementData } from '@/types/dashboard';
 
 export async function GET() {
   try {
     // Check if we should use local CSV data
-    const useLocalData = process.env.USE_LOCAL_DATA === "true";
+    const useLocalData = process.env.USE_LOCAL_DATA === 'true';
 
     if (useLocalData) {
       try {
         // Read the CSV file from the public directory
         const csvPath = path.join(
           process.cwd(),
-          "public",
-          "data",
-          "Weekly Engagement Survey Breakdown (4).csv",
+          'public',
+          'data',
+          'Weekly Engagement Survey Breakdown (4).csv'
         );
-        const csvData = await fs.readFile(csvPath, "utf-8");
+        const csvData = await fs.readFile(csvPath, 'utf-8');
 
         // Parse CSV data
         const parsedData = Papa.parse<EngagementData>(csvData, {
@@ -28,16 +28,15 @@ export async function GET() {
         });
 
         if (parsedData.errors.length > 0) {
-          console.warn("CSV parsing warnings:", parsedData.errors);
+          console.warn('CSV parsing warnings:', parsedData.errors);
         }
 
         return NextResponse.json(parsedData.data);
       } catch (error) {
-        console.error("Error loading CSV:", error);
-        throw new Error("Failed to load CSV data");
+        console.error('Error loading CSV:', error);
+        throw new Error('Failed to load CSV data');
       }
     }
-
 
     // Validate environment variables
     const baseId = process.env.AIRTABLE_BASE_ID;
@@ -45,10 +44,10 @@ export async function GET() {
     const tableName = process.env.AIRTABLE_TABLE_NAME;
 
     if (!baseId || !apiKey || !tableName) {
-      console.error("Missing required Airtable environment variables");
+      console.error('Missing required Airtable environment variables');
       return NextResponse.json(
-        { error: "Airtable configuration missing" },
-        { status: 500 },
+        { error: 'Airtable configuration missing' },
+        { status: 500 }
       );
     }
 
@@ -58,15 +57,15 @@ export async function GET() {
       {
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        cache: "no-store",
-      },
+        cache: 'no-store',
+      }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Airtable API error:", {
+      console.error('Airtable API error:', {
         status: response.status,
         statusText: response.statusText,
         error: errorText,
@@ -80,38 +79,38 @@ export async function GET() {
     const data = await response.json();
 
     if (!data.records || !Array.isArray(data.records)) {
-      console.error("Invalid Airtable response format:", data);
-      throw new Error("Invalid Airtable response format");
+      console.error('Invalid Airtable response format:', data);
+      throw new Error('Invalid Airtable response format');
     }
 
     /* eslint-disable @typescript-eslint/no-explicit-any */ // disabling this for now
     const transformedData = data.records.map((record: any) => ({
-      "Program Week": record.fields["Program Week"] || "",
-      Name: record.fields["Name"] || "",
-      "Engagement Participation ":
-        record.fields["Engagement Participation "] || "",
-      "Tech Partner Collaboration?":
-        record.fields["Tech Partner Collaboration?"] || "No",
-      "Which Tech Partner": parseTechPartners(
-        record.fields["Which Tech Partner"] || [],
+      'Program Week': record.fields['Program Week'] || '',
+      Name: record.fields['Name'] || '',
+      'Engagement Participation ':
+        record.fields['Engagement Participation '] || '',
+      'Tech Partner Collaboration?':
+        record.fields['Tech Partner Collaboration?'] || 'No',
+      'Which Tech Partner': parseTechPartners(
+        record.fields['Which Tech Partner'] || []
       ),
-      "How many issues, PRs, or projects this week?":
-        record.fields["How many issues, PRs, or projects this week?"] || "0",
-      "How likely are you to recommend the PLDG to others?":
-        record.fields["How likely are you to recommend the PLDG to others?"] ||
-        "0",
-      "PLDG Feedback": record.fields["PLDG Feedback"] || "",
-      "GitHub Issue Title": record.fields["GitHub Issue Title"] || "",
-      "GitHub Issue URL": record.fields["GitHub Issue URL"] || "",
-      Created: record.fields["Created"] || record.createdTime || "",
+      'How many issues, PRs, or projects this week?':
+        record.fields['How many issues, PRs, or projects this week?'] || '0',
+      'How likely are you to recommend the PLDG to others?':
+        record.fields['How likely are you to recommend the PLDG to others?'] ||
+        '0',
+      'PLDG Feedback': record.fields['PLDG Feedback'] || '',
+      'GitHub Issue Title': record.fields['GitHub Issue Title'] || '',
+      'GitHub Issue URL': record.fields['GitHub Issue URL'] || '',
+      Created: record.fields['Created'] || record.createdTime || '',
     }));
 
     return NextResponse.json(transformedData);
   } catch (error) {
-    console.error("Airtable API error:", error);
+    console.error('Airtable API error:', error);
     return NextResponse.json(
-      { error: "Failed to fetch Airtable data" },
-      { status: 500 },
+      { error: 'Failed to fetch Airtable data' },
+      { status: 500 }
     );
   }
 }
@@ -120,5 +119,5 @@ function parseTechPartners(techPartner: string | string[]): string[] {
   if (Array.isArray(techPartner)) {
     return techPartner;
   }
-  return techPartner?.split(",").map((p) => p.trim()) ?? [];
+  return techPartner?.split(',').map((p) => p.trim()) ?? [];
 }

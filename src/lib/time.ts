@@ -1,7 +1,7 @@
 export function formatLastUpdated(date: Date): string {
-  return new Intl.RelativeTimeFormat("en", { numeric: "auto" }).format(
+  return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
     Math.round((date.getTime() - Date.now()) / (1000 * 60)),
-    "minute",
+    'minute'
   );
 }
 

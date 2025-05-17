@@ -15,9 +15,16 @@ export async function GET(req: NextRequest) {
 
   try {
     await client.connect();
-    const data = await client.db(dbName).collection(collectionName).find({}).toArray();
+    const data = await client
+      .db(dbName)
+      .collection(collectionName)
+      .find({})
+      .toArray();
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json({ error: 'Failed to fetch cohort data' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch cohort data' },
+      { status: 500 }
+    );
   }
 }

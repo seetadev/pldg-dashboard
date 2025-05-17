@@ -36,17 +36,21 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  const processedData = React.useMemo(() => 
-    csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
+  const processedData = React.useMemo(
+    () =>
+      csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = React.useMemo(() =>
-    processedData?.techPartnerPerformance && processedData?.rawEngagementData
-      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
-      : [],
+  const enhancedTechPartnerData = React.useMemo(
+    () =>
+      processedData?.techPartnerPerformance && processedData?.rawEngagementData
+        ? enhanceTechPartnerData(
+            processedData.techPartnerPerformance,
+            processedData.rawEngagementData
+          )
+        : [],
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-
   );
 
   const handleCohortChange = (cohortId: CohortId) => {
@@ -58,7 +62,7 @@ export default function DeveloperEngagementDashboard() {
   }
 
   if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || "No data available"}</div>;
+    return <div>Error: {errorCSV || 'No data available'}</div>;
   }
 
   if (!processedData && isLoadingCSV) {
@@ -102,28 +106,28 @@ export default function DeveloperEngagementDashboard() {
             </p>
           </div>
           <div className="flex flex-col justify-start w-full md:w-max lg:flex-row items-center gap-4">
-            <div className='flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4'>
-            <CohortSelector
-              selectedCohort={selectedCohort}
-              onCohortChange={handleCohortChange}
-            />
-            <span className="text-sm text-indigo-200">
-              Last updated: {new Date(lastUpdated).toLocaleString()}
-            </span>
-            </div>
-            <div className='flex w-full lg:w-max justify-end'>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refresh}
-              disabled={isFetching}
-              className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+            <div className="flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4">
+              <CohortSelector
+                selectedCohort={selectedCohort}
+                onCohortChange={handleCohortChange}
               />
-              <p className='w-full  text-xs'>Refresh Data</p>
-            </Button>
+              <span className="text-sm text-indigo-200">
+                Last updated: {new Date(lastUpdated).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex w-full lg:w-max justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refresh}
+                disabled={isFetching}
+                className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`}
+                />
+                <p className="w-full  text-xs">Refresh Data</p>
+              </Button>
             </div>
           </div>
         </div>
@@ -143,7 +147,6 @@ export default function DeveloperEngagementDashboard() {
       <div className="mb-8">
         <PartnerFeedbackMatrix data={partnerFeedbackData} />
       </div>
-      
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
