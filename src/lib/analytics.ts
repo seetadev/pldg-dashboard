@@ -1,9 +1,9 @@
-import { CohortId } from "@/types/cohort";
+import { CohortId } from '@/types/cohort';
 
 interface CohortAnalytics {
   cohortId: CohortId;
   timestamp: string;
-  action: "view" | "switch" | "refresh";
+  action: 'view' | 'switch' | 'refresh';
   metrics?: {
     activeContributors?: number;
     totalContributions?: number;
@@ -15,8 +15,8 @@ const analyticsQueue: CohortAnalytics[] = [];
 
 export function trackCohortUsage(
   cohortId: CohortId,
-  action: CohortAnalytics["action"],
-  metrics?: CohortAnalytics["metrics"],
+  action: CohortAnalytics['action'],
+  metrics?: CohortAnalytics['metrics']
 ) {
   const event: CohortAnalytics = {
     cohortId,

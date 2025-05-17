@@ -2,7 +2,6 @@
 import * as React from "react";
 
 import { EnhancedTechPartnerData } from "@/types/dashboard";
-
 import {
   Table,
   TableBody,
@@ -13,7 +12,6 @@ import {
 } from "@/components/ui/table";
 
 import { ExternalLink, GitPullRequest } from "lucide-react";
-
 import {
   Tooltip,
   TooltipContent,
@@ -65,13 +63,13 @@ export function ContributorView({ data }: ContributorViewProps) {
         weekData.contributors.forEach((name) => {
           if (!contributorMap.has(name)) {
             const details = partner.contributorDetails.find(
-              (d) => d.name === name,
+              (d) => d.name === name
             );
             contributorMap.set(name, {
               name,
               githubUsername:
                 details?.githubUsername ||
-                name.toLowerCase().replace(/\s+/g, "-"),
+                name.toLowerCase().replace(/\s+/g, '-'),
               techPartners: new Set(),
               totalIssues: 0,
               engagement: 0,
@@ -84,13 +82,13 @@ export function ContributorView({ data }: ContributorViewProps) {
           const uniqueIssuesThisWeek = new Set(
             weekData.issues
               .filter((issue) => issue.contributor === name)
-              .map((issue) => issue.url),
+              .map((issue) => issue.url)
           ).size;
           contributor.totalIssues += uniqueIssuesThisWeek;
 
           contributor.engagement = Math.max(
             contributor.engagement,
-            weekData.engagementLevel,
+            weekData.engagementLevel
           );
 
           weekData.issues.forEach((issue) => {
@@ -110,7 +108,7 @@ export function ContributorView({ data }: ContributorViewProps) {
     });
 
     return Array.from(contributorMap.values()).sort(
-      (a, b) => b.totalIssues - a.totalIssues,
+      (a, b) => b.totalIssues - a.totalIssues
     );
   }, [data]);
 

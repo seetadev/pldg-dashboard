@@ -2,7 +2,7 @@ import {
   ProcessedData,
   EnhancedProcessedData,
   AIInsights,
-} from "@/types/dashboard";
+} from '@/types/dashboard';
 
 export function calculateEngagementScore(data: ProcessedData): number {
   const {
@@ -22,7 +22,7 @@ export function calculateEngagementScore(data: ProcessedData): number {
     normalizedEngagement * 0.4 +
       normalizedNPS * 0.3 +
       contributorScore * 0.2 +
-      contributionScore * 0.1,
+      contributionScore * 0.1
   );
 }
 
@@ -34,12 +34,12 @@ export function calculateTechnicalProgress(data: ProcessedData): number {
     (latestIssues.closed / (latestIssues.total || 1)) * 100;
   const partnerDiversity = Math.min(
     (techPartnerMetrics.length / 10) * 100,
-    100,
+    100
   ); // Cap at 10 partners
   const growthScore = weeklyChange > 0 ? Math.min(weeklyChange, 100) : 0;
 
   return Math.round(
-    issueCompletionRate * 0.4 + partnerDiversity * 0.3 + growthScore * 0.3,
+    issueCompletionRate * 0.4 + partnerDiversity * 0.3 + growthScore * 0.3
   );
 }
 
@@ -60,7 +60,7 @@ export function calculateCollaborationIndex(data: ProcessedData): number {
     ((contributorGrowth[contributorGrowth.length - 1]?.newContributors || 0) /
       5) *
       100,
-    100,
+    100
   );
 
   return Math.round(partnerScore * 0.4 + issueScore * 0.3 + growthScore * 0.3);
@@ -82,14 +82,14 @@ export function generateAIInsights(data: ProcessedData): AIInsights {
   // Analyze engagement trends
   if (data.weeklyChange > 10) {
     achievements.push(
-      `Strong growth with ${Math.round(data.weeklyChange)}% increase in contributions`,
+      `Strong growth with ${Math.round(data.weeklyChange)}% increase in contributions`
     );
   } else if (data.weeklyChange < -10) {
     areasOfConcern.push(
-      `Declining engagement with ${Math.abs(Math.round(data.weeklyChange))}% decrease in contributions`,
+      `Declining engagement with ${Math.abs(Math.round(data.weeklyChange))}% decrease in contributions`
     );
     recommendations.push(
-      "Schedule community engagement sessions to boost participation",
+      'Schedule community engagement sessions to boost participation'
     );
   }
 
@@ -99,25 +99,25 @@ export function generateAIInsights(data: ProcessedData): AIInsights {
     (latestIssues.closed / (latestIssues.total || 1)) * 100;
   if (completionRate > 70) {
     achievements.push(
-      `High issue completion rate at ${Math.round(completionRate)}%`,
+      `High issue completion rate at ${Math.round(completionRate)}%`
     );
   } else if (completionRate < 30) {
     areasOfConcern.push(
-      `Low issue completion rate at ${Math.round(completionRate)}%`,
+      `Low issue completion rate at ${Math.round(completionRate)}%`
     );
     recommendations.push(
-      "Review issue complexity and provide additional technical support",
+      'Review issue complexity and provide additional technical support'
     );
   }
 
   // Analyze collaboration
   if (data.programHealth.activeTechPartners > 3) {
     achievements.push(
-      `Strong partner diversity with ${data.programHealth.activeTechPartners} active tech partners`,
+      `Strong partner diversity with ${data.programHealth.activeTechPartners} active tech partners`
     );
   } else {
     recommendations.push(
-      "Expand tech partner outreach to increase collaboration opportunities",
+      'Expand tech partner outreach to increase collaboration opportunities'
     );
   }
 
@@ -131,7 +131,7 @@ export function generateAIInsights(data: ProcessedData): AIInsights {
 }
 
 export function enhanceProcessedData(
-  data: ProcessedData,
+  data: ProcessedData
 ): EnhancedProcessedData {
   return {
     ...data,
@@ -140,7 +140,7 @@ export function enhanceProcessedData(
 }
 
 export async function processDataWithAI(
-  data: ProcessedData,
+  data: ProcessedData
 ): Promise<EnhancedProcessedData> {
   return {
     ...data,

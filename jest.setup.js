@@ -1,11 +1,11 @@
-import "@testing-library/jest-dom";
+import '@testing-library/jest-dom';
 
 // Mock the fetch function
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({}),
-  }),
+  })
 );
 
 // Mock pointer capture API
@@ -26,7 +26,7 @@ class ResizeObserver {
 global.ResizeObserver = ResizeObserver;
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,

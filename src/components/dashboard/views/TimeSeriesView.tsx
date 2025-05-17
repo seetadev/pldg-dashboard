@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { EnhancedTechPartnerData } from "@/types/dashboard";
+import * as React from 'react';
+import { EnhancedTechPartnerData } from '@/types/dashboard';
 import {
   BarChart,
   Bar,
@@ -11,8 +11,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
-import { Card } from "@/components/ui/card";
+} from 'recharts';
+import { Card } from '@/components/ui/card';
 
 interface TimeSeriesViewProps {
   data: EnhancedTechPartnerData[];
@@ -30,7 +30,7 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length || !label) return null;
 
-  const weekNumber = label.replace(/Week Week/, "Week");
+  const weekNumber = label.replace(/Week Week/, 'Week');
 
   return (
     <Card className="p-3 bg-white/95 shadow-lg border-0">
@@ -44,8 +44,8 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
                 style={{ backgroundColor: entry.name }}
               />
               <span>
-                {entry.name}: {entry.value}{" "}
-                {entry.value === 1 ? "issue" : "issues"}
+                {entry.name}: {entry.value}{' '}
+                {entry.value === 1 ? 'issue' : 'issues'}
               </span>
             </div>
           ))}
@@ -73,8 +73,8 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
 
     // Sort weeks by number
     const sortedWeeks = Array.from(allWeeks).sort((a, b) => {
-      const weekA = parseInt(a.match(/\d+/)?.[1] || "0");
-      const weekB = parseInt(b.match(/\d+/)?.[1] || "0");
+      const weekA = parseInt(a.match(/\d+/)?.[1] || '0');
+      const weekB = parseInt(b.match(/\d+/)?.[1] || '0');
       return weekA - weekB;
     });
 
@@ -99,8 +99,6 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
     });
   }, [data]);
 
-
-
   if (!chartData.length) {
     return (
       <div className="h-[400px] w-full flex items-center justify-center text-gray-500">
@@ -110,13 +108,13 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
   }
 
   const COLORS = {
-    Libp2p: "#3B82F6",
-    IPFS: "#14B8A6",
-    "Fil-B": "#A855F7",
-    "Fil-Oz": "#6366F1",
-    "Coordination Network": "#F43F5E",
-    Storacha: "#F59E0B",
-    Drand: "#10B981",
+    Libp2p: '#3B82F6',
+    IPFS: '#14B8A6',
+    'Fil-B': '#A855F7',
+    'Fil-Oz': '#6366F1',
+    'Coordination Network': '#F43F5E',
+    Storacha: '#F59E0B',
+    Drand: '#10B981',
   };
 
   return (
@@ -128,10 +126,10 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
           <YAxis
             tick={{ fontSize: 12 }}
             label={{
-              value: "Issues",
+              value: 'Issues',
               angle: -90,
-              position: "insideLeft",
-              style: { textAnchor: "middle" },
+              position: 'insideLeft',
+              style: { textAnchor: 'middle' },
             }}
           />
           <Tooltip content={<CustomTooltip />} />

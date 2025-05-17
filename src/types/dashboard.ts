@@ -1,6 +1,6 @@
 import { CohortId, CohortMetadata } from './cohort';
 
-export type ActionItemType = "warning" | "opportunity" | "success";
+export type ActionItemType = 'warning' | 'opportunity' | 'success';
 
 export interface ActionItem {
   type: ActionItemType;
@@ -13,7 +13,7 @@ export interface FeedbackEntry {
   Address: string;
   Week: string;
   Feedback: string;
-};
+}
 
 export interface EngagementData {
   Name: string;
@@ -90,7 +90,7 @@ export interface TechPartnerPerformance {
     issues: Array<{
       title: string;
       url: string;
-      status: "open" | "closed";
+      status: 'open' | 'closed';
       lastUpdated: string;
       contributor: string;
     }>;
@@ -118,12 +118,12 @@ export interface ContributorDetails {
 }
 
 export interface TechPartnerFilter {
-  selectedPartner: string | "all";
+  selectedPartner: string | 'all';
   weeks: string[]; // Chronologically ordered weeks 1-12
 }
 
 export interface ActionableInsight {
-  type: "success" | "warning";
+  type: 'success' | 'warning';
   title: string;
   description: string;
   link?: string;
@@ -132,7 +132,7 @@ export interface ActionableInsight {
 export interface IssueTracking {
   title: string;
   link: string;
-  status: "open" | "closed";
+  status: 'open' | 'closed';
   engagement: number;
   week: string;
   contributor: string;
@@ -148,7 +148,7 @@ export interface EnhancedTechPartnerData extends TechPartnerPerformance {
     issues: Array<{
       title: string;
       url: string;
-      status: "open" | "closed";
+      status: 'open' | 'closed';
       lastUpdated: string;
       contributor: string;
     }>;
@@ -163,14 +163,14 @@ export interface EngagementTrend {
   week: string;
   total: number;
   // Optional fields for backward compatibility
-  "High Engagement"?: number;
-  "Medium Engagement"?: number;
-  "Low Engagement"?: number;
+  'High Engagement'?: number;
+  'Medium Engagement'?: number;
+  'Low Engagement'?: number;
 }
 
 export interface TechnicalProgress {
   week: string;
-  "Total Issues": number;
+  'Total Issues': number;
 }
 
 export interface ContributorGrowth {
@@ -209,13 +209,13 @@ export interface ProcessedData {
   rawEngagementData: EngagementData[];
 }
 
-export interface CohortInfo {     
-  id: CohortId;     
-  name: string;     
-  startDate: string;     
-  endDate: string;     
-  description?: string;   
-};
+export interface CohortInfo {
+  id: CohortId;
+  name: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+}
 
 export interface AIMetrics {
   engagementScore: number;

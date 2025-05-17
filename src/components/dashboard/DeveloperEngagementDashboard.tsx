@@ -36,17 +36,21 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
+
   const processedData = React.useMemo(() =>
     csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = React.useMemo(() =>
-    processedData?.techPartnerPerformance && processedData?.rawEngagementData
-      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
-      : [],
+  const enhancedTechPartnerData = React.useMemo(
+    () =>
+      processedData?.techPartnerPerformance && processedData?.rawEngagementData
+        ? enhanceTechPartnerData(
+            processedData.techPartnerPerformance,
+            processedData.rawEngagementData
+          )
+        : [],
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-
   );
 
   const handleCohortChange = (cohortId: CohortId) => {
@@ -61,7 +65,7 @@ export default function DeveloperEngagementDashboard() {
   }
 
   if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || "No data available"}</div>;
+    return <div>Error: {errorCSV || 'No data available'}</div>;
   }
 
   if (!processedData && isLoadingCSV) {
@@ -105,6 +109,7 @@ export default function DeveloperEngagementDashboard() {
             </p>
           </div>
           <div className="flex flex-col justify-start w-full md:w-max lg:flex-row items-center gap-4">
+
             <div className='flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4'>
               <CohortSelector
                 selectedCohort={selectedCohort}
@@ -114,6 +119,7 @@ export default function DeveloperEngagementDashboard() {
                 Last updated: {new Date(lastUpdated).toLocaleString()}
               </span>
             </div>
+
             <div className='flex w-full lg:w-max justify-end'>
               <Button
                 variant="outline"
@@ -146,7 +152,6 @@ export default function DeveloperEngagementDashboard() {
       <div className="mb-8">
         <PartnerFeedbackMatrix data={partnerFeedbackData} />
       </div>
-
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

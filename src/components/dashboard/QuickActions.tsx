@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Download, Mail, Calendar } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Download, Mail, Calendar } from 'lucide-react';
 
 export function QuickActions() {
   return (

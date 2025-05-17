@@ -3,7 +3,7 @@ import {
   GitHubUserContribution,
   DashboardMetrics,
   ValidatedContribution,
-} from "@/types/dashboard";
+} from '@/types/dashboard';
 
 export function calculateMetrics({
   projectBoard,
@@ -25,11 +25,11 @@ export function calculateMetrics({
   // Basic metrics with safe access
   const totalContributions = Object.values(safeUserContributions).reduce(
     (acc, curr) => acc + (curr?.issues?.created || 0),
-    0,
+    0
   );
 
   const activeContributors = Object.values(safeUserContributions).filter(
-    (user) => (user?.issues?.created || 0) > 0,
+    (user) => (user?.issues?.created || 0) > 0
   ).length;
 
   const averageEngagement =
@@ -40,17 +40,17 @@ export function calculateMetrics({
     engagement: (safeProjectBoard.issues || []).map((issue) => ({
       week: new Date(issue.created_at || new Date())
         .toISOString()
-        .split("T")[0],
-      "High Engagement": 1,
-      "Medium Engagement": 1,
-      "Low Engagement": 1,
+        .split('T')[0],
+      'High Engagement': 1,
+      'Medium Engagement': 1,
+      'Low Engagement': 1,
       total: 3,
     })),
     technical: (safeProjectBoard.issues || []).map((issue) => ({
       week: new Date(issue.created_at || new Date())
         .toISOString()
-        .split("T")[0],
-      "Total Issues": 1,
+        .split('T')[0],
+      'Total Issues': 1,
     })),
     techPartner: [],
     techPartnerPerformance: Object.entries(safeValidatedContributions).map(
@@ -59,18 +59,17 @@ export function calculateMetrics({
         issues: contrib?.github || 0,
         timeSeriesData: [], // Add required property
         contributorDetails: [], // Add required property
-      }),
+      })
     ),
     contributorGrowth: [
       {
-        week: new Date().toISOString().split("T")[0],
+        week: new Date().toISOString().split('T')[0],
         newContributors: Object.keys(safeUserContributions).length,
         returningContributors: 0,
         totalActive: Object.keys(safeUserContributions).length,
       },
     ],
   };
-
 
   return {
     totalContributions,
@@ -84,7 +83,7 @@ export function calculateMetrics({
 
 export function calculateInitialMetrics(
   projectBoard: GitHubData,
-  userContributions: Record<string, GitHubUserContribution>,
+  userContributions: Record<string, GitHubUserContribution>
 ): DashboardMetrics {
   return calculateMetrics({
     projectBoard,
@@ -108,17 +107,17 @@ export function generateTrendData(data: {
     engagement: (projectBoard.issues || []).map((issue) => ({
       week: new Date(issue.created_at || new Date())
         .toISOString()
-        .split("T")[0],
-      "High Engagement": 0,
-      "Medium Engagement": 0,
-      "Low Engagement": 0,
+        .split('T')[0],
+      'High Engagement': 0,
+      'Medium Engagement': 0,
+      'Low Engagement': 0,
       total: 0,
     })),
     technical: (projectBoard.issues || []).map((issue) => ({
       week: new Date(issue.created_at || new Date())
         .toISOString()
-        .split("T")[0],
-      "Total Issues": 1,
+        .split('T')[0],
+      'Total Issues': 1,
     })),
     techPartner: [],
     techPartnerPerformance: Object.entries(validatedContributions).map(
@@ -127,11 +126,11 @@ export function generateTrendData(data: {
         issues: contrib?.github || 0,
         timeSeriesData: [], // Add required property
         contributorDetails: [], // Add required property
-      }),
+      })
     ),
     contributorGrowth: [
       {
-        week: new Date().toISOString().split("T")[0],
+        week: new Date().toISOString().split('T')[0],
         newContributors: Object.keys(userContributions).length,
         returningContributors: 0,
         totalActive: Object.keys(userContributions).length,
