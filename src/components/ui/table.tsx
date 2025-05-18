@@ -19,6 +19,7 @@ const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
     </div>
   )
 );
+
 Table.displayName = 'Table';
 
 const TableHeader = forwardRef<
