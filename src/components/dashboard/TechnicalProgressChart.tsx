@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useMemo } from 'react';
 import { TechnicalProgress } from '@/types/dashboard';
 import {
   LineChart,
@@ -37,7 +37,7 @@ const GITHUB_LINKS = {
 };
 
 export default function TechnicalProgressChart({ data, githubData }: Props) {
-  const combinedData = React.useMemo(() => {
+  const combinedData = useMemo(() => {
     if (!data?.length) return [];
 
     // Data is already sorted in processData function

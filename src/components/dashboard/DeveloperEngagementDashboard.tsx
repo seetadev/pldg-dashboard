@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useMemo } from 'react';
 import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
 import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
@@ -36,13 +36,13 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  const processedData = React.useMemo(
+  const processedData = useMemo(
     () =>
       csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = React.useMemo(
+  const enhancedTechPartnerData = useMemo(
     () =>
       processedData?.techPartnerPerformance && processedData?.rawEngagementData
         ? enhanceTechPartnerData(

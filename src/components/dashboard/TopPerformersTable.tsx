@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useMemo } from 'react';
 import { TopPerformer } from '@/types/dashboard';
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function TopPerformersTable({ data }: Props) {
-  const normalizedPerformers = React.useMemo(() => {
+  const normalizedPerformers = useMemo(() => {
     const nameMap = new Map<string, TopPerformer>();
     data.forEach((performer) => {
       const normalizedName = performer.name.toLowerCase().trim();

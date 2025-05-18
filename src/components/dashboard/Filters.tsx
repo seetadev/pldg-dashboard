@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +26,7 @@ export function Filters({
   selectedPartners,
   availablePartners,
 }: FiltersProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const clearFilters = () => {
     onDateRangeChange(undefined);
