@@ -18,6 +18,8 @@ import { CohortSelector } from './CohortSelector';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { useCohortData } from '@/hooks/useCohortData';
 import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
+import { AlertSettings } from './AlertSettings';
+import { AlertsPanel } from './AlertsPanel';
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -59,8 +61,7 @@ export default function DeveloperEngagementDashboard() {
 
   if (isLoadingCSV) {
     return <div className='flex flex-col items-center justify-center h-[60vh]'>
-      <Loader2Icon className='animate-spin' />
-      Loading CSV data
+      <LoadingSpinner message='Loading CSV data...' />
     </div>;
   }
 
@@ -72,7 +73,7 @@ export default function DeveloperEngagementDashboard() {
     return (
       <div className="container mx-auto p-4">
         <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingSpinner />
+          <LoadingSpinner message='Loading data...' />
         </div>
       </div>
     );
@@ -141,6 +142,11 @@ export default function DeveloperEngagementDashboard() {
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
         <ExecutiveSummary data={processedData} />
+      </div>
+
+      <div className="mb-6 bg-white rounded-lg shadow-md">
+
+        <AlertsPanel />
       </div>
 
       {/* Action Items Section */}
