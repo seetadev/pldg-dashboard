@@ -8,7 +8,7 @@ import EngagementChart from './EngagementChart';
 import TechnicalProgressChart from './TechnicalProgressChart';
 import { TechPartnerChart } from './TechPartnerChart';
 import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner, LoadingCSVSpinner } from '../ui/loading';
+import { LoadingSpinner } from '../ui/loading';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -58,13 +58,7 @@ export default function DeveloperEngagementDashboard() {
   };
 
   if (isLoadingCSV) {
-    return (
-      <div className="container mx-auto p-4">
-        <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingCSVSpinner />
-        </div>
-      </div>
-    );
+    return <div>Loading CSV data...</div>;
   }
 
   if (errorCSV || !processedData) {
