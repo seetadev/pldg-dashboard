@@ -1,4 +1,4 @@
-export function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
+export function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
