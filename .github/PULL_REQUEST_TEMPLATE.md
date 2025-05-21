@@ -2,7 +2,6 @@
 
 Please include a summary of the changes and the related issue. Provide enough context for reviewers to understand what the PR is doing.
 
-- What is the motivation for this change?
 - What problem does it solve?
 
 Fixes #[issue-number] (if applicable)
