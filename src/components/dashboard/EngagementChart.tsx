@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useMemo } from 'react';
 import { EngagementTrend } from '@/types/dashboard';
 import {
   BarChart,
@@ -25,7 +25,7 @@ interface Props {
 }
 
 export default function EngagementChart({ data }: Props) {
-  const chartData = React.useMemo(() => {
+  const chartData = useMemo(() => {
     if (!data?.length) return [];
 
     // Process and clean the data - now just counting total active contributors
