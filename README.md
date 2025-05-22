@@ -60,6 +60,21 @@ Set up environment variables:
 cp .env.example .env.local
 ```
 
+Start the Docker containers for local MongoDB (optional):
+
+```bash
+docker compose up
+```
+
+Run the initialization script to upload the data to MongoDB (optional):
+
+```bash
+cd scripts
+cp .env.example .env
+npm install
+npm start
+```
+
 Start the development server:
 
 ```bash
