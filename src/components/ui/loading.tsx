@@ -1,10 +1,14 @@
 'use client';
 
-export function LoadingSpinner() {
+import * as React from "react";
+import { Loader2Icon } from "lucide-react";
+
+export function LoadingSpinner({ message }: { message?: string }) {
+
   return (
     <div className="flex items-center justify-center gap-3">
-      <div className="animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent" />
-      <span className="text-indigo-600 font-medium">Loading dashboard...</span>
+      <Loader2Icon className="animate-spin" />
+      <span className="text-indigo-600 font-medium">{message || "Loading dashboard..."}</span>
     </div>
   );
 }

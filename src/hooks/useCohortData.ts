@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { CohortId } from '@/types/cohort';
+import { useState, useEffect } from "react";
+import { CohortId } from "@/types/cohort";
 import {
   EngagementData,
   ProcessedData,
   FeedbackEntry,
-} from '@/types/dashboard';
-import normalizeEngagementData from '@/lib/formatDbData';
+} from "@/types/dashboard";
+import normalizeEngagementData from "@/lib/formatDbData";
 
 interface CohortCache {
   rawData: EngagementData[];
@@ -16,13 +16,13 @@ interface CohortCache {
 
 export function useCohortData(selectedCohort: CohortId) {
   const [cache, setCache] = useState<Record<CohortId, CohortCache>>({
-    '1': {
+    "1": {
       rawData: [],
       processedData: null,
       partnerFeedbackData: [],
       lastUpdated: 0,
     },
-    '2': {
+    "2": {
       rawData: [],
       processedData: null,
       partnerFeedbackData: [],
@@ -58,7 +58,7 @@ export function useCohortData(selectedCohort: CohortId) {
 
         const partnerResponse = await partnerFeedbackResponse.json();
 
-        console.log('Partner Feedback Data:', partnerResponse);
+        console.log("Partner Feedback Data:", partnerResponse);
 
         const rawData: Record<string, EngagementData>[] = await response.json();
 
@@ -79,9 +79,9 @@ export function useCohortData(selectedCohort: CohortId) {
 
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to load cohort data:', error);
+        console.error("Failed to load cohort data:", error);
         setError(
-          error instanceof Error ? error.message : 'Failed to load data'
+          error instanceof Error ? error.message : "Failed to load data"
         );
         setIsLoading(false);
       }
