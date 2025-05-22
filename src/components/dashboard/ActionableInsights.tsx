@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import {
   Card,
   CardHeader,
@@ -18,7 +18,7 @@ interface ActionableInsight {
 }
 
 export function ActionableInsights({ data }: { data: ProcessedData }) {
-  const insights: ActionableInsight[] = React.useMemo(() => {
+  const insights: ActionableInsight[] = useMemo(() => {
     const insights: ActionableInsight[] = [];
 
     // Get the last 4 weeks of data for trend analysis

@@ -1,7 +1,7 @@
-import * as React from 'react';
+import { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-type CardProps = React.HTMLAttributes<HTMLDivElement>;
+type CardProps = HTMLAttributes<HTMLDivElement>;
 
 export function Card({ className, ...props }: CardProps) {
   return (
@@ -15,7 +15,7 @@ export function Card({ className, ...props }: CardProps) {
   );
 }
 
-type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+type CardHeaderProps = HTMLAttributes<HTMLDivElement>;
 
 export function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
@@ -26,7 +26,7 @@ export function CardHeader({ className, ...props }: CardHeaderProps) {
   );
 }
 
-type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+type CardTitleProps = HTMLAttributes<HTMLHeadingElement>;
 
 export function CardTitle({ className, ...props }: CardTitleProps) {
   return (
@@ -40,13 +40,13 @@ export function CardTitle({ className, ...props }: CardTitleProps) {
   );
 }
 
-type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
+type CardContentProps = HTMLAttributes<HTMLDivElement>;
 
 export function CardContent({ className, ...props }: CardContentProps) {
   return <div className={cn('p-6 pt-0', className)} {...props} />;
 }
 
-type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+type CardDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
 
 export function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (

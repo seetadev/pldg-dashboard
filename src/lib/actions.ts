@@ -115,7 +115,8 @@ export async function exportDashboardAction(data: ProcessedData) {
     // Generate buffer with error handling
     let buffer: Buffer;
     try {
-      buffer = (await workbook.xlsx.writeBuffer()) as Buffer;
+      const excelBuffer = await workbook.xlsx.writeBuffer();
+      buffer = Buffer.from(excelBuffer);
     } catch (bufferError) {
       console.error('Buffer creation failed:', bufferError);
       throw new Error('Failed to generate Excel file');
@@ -127,7 +128,7 @@ export async function exportDashboardAction(data: ProcessedData) {
     }
 
     // Convert buffer to base64 with validation
-    const base64 = Buffer.from(buffer).toString('base64');
+    const base64 = buffer.toString('base64');
     if (!base64) {
       throw new Error('Base64 conversion failed');
     }

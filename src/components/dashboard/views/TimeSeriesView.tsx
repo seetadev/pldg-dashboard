@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useMemo } from 'react';
 import { EnhancedTechPartnerData } from '@/types/dashboard';
 import {
   BarChart,
@@ -56,7 +56,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export function TimeSeriesView({ data }: TimeSeriesViewProps) {
-  const chartData = React.useMemo(() => {
+  const chartData = useMemo(() => {
     if (!data?.length) return [];
 
     // Get all unique weeks and format them

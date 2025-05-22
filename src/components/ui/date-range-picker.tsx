@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
@@ -62,8 +61,8 @@ export function DateRangePicker({
             className="rounded-md border shadow-sm"
             disabled={{ before: new Date(2024, 0, 1) }}
             captionLayout="dropdown"
-            fromYear={2024}
-            toYear={new Date().getFullYear()}
+            startMonth={new Date(2024, 0)}
+            endMonth={new Date(new Date().getFullYear(), new Date().getMonth())}
           />
         </PopoverContent>
       </Popover>
