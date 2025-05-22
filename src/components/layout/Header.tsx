@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import Link from 'next/link';
-import { Github } from 'lucide-react';
-import Image from 'next/image';
+import * as React from "react";
+import Link from "next/link";
+import { Github } from "lucide-react";
+import Image from "next/image";
 
 export function Header() {
   return (
