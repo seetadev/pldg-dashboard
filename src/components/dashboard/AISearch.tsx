@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useState, ChangeEvent, KeyboardEvent } from 'react';
 import { Search, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,9 +14,9 @@ interface AISearchProps {
 }
 
 export function AISearch({ data, onDateRangeChange }: AISearchProps) {
-  const [query, setQuery] = React.useState('');
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [result, setResult] = React.useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!query.trim() || !data) return;
@@ -60,10 +60,10 @@ export function AISearch({ data, onDateRangeChange }: AISearchProps) {
             <Input
               placeholder="Ask about contributors, trends, or specific metrics..."
               value={query}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setQuery(e.target.value)
               }
-              onKeyDown={(e: React.KeyboardEvent) =>
+              onKeyDown={(e: KeyboardEvent) =>
                 e.key === 'Enter' && handleSearch()
               }
               className="w-full"

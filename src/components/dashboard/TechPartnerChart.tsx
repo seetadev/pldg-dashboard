@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -189,7 +188,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
     return insights;
   };
 
-  const filteredData = React.useMemo(() => {
+  const filteredData = useMemo(() => {
     return selectedPartner === 'all'
       ? data
       : data.filter((item) => item.partner === selectedPartner);

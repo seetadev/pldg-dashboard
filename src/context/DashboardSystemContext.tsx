@@ -1,8 +1,15 @@
 'use client';
 
-import * as React from 'react';
 import { ProcessedData, EngagementData } from '@/types/dashboard';
-import { createContext, useState, useEffect, useCallback } from 'react';
+import {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useContext,
+  ReactNode,
+} from 'react';
 import { CohortId } from '@/types/cohort';
 import { loadCohortData, processData } from '@/lib/data-processing';
 import { trackCohortUsage } from '@/lib/analytics';
@@ -32,11 +39,7 @@ export const DashboardSystemContext = createContext<
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
-export function DashboardSystemProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function DashboardSystemProvider({ children }: { children: ReactNode }) {
   const [selectedCohort, setSelectedCohort] = useState<CohortId>('2');
   const [data, setData] = useState<ProcessedData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +51,7 @@ export function DashboardSystemProvider({
   const [isFetching, setIsFetching] = useState(false);
 
   // Add cache ref
-  const dataCache = React.useRef<Record<CohortId, CachedData>>({
+  const dataCache = useRef<Record<CohortId, CachedData>>({
     '1': { data: data as ProcessedData, timestamp: 0 },
     '2': { data: data as ProcessedData, timestamp: 0 },
   });
@@ -155,7 +158,7 @@ export function DashboardSystemProvider({
 }
 
 export function useDashboardSystemContext() {
-  const context = React.useContext(DashboardSystemContext);
+  const context = useContext(DashboardSystemContext);
   if (!context) {
     throw new Error(
       'useDashboardSystemContext must be used within a DashboardSystemProvider'

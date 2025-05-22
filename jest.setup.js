@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import jest from 'next/jest';
 
 // Mock the fetch function
 global.fetch = jest.fn(() =>

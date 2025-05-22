@@ -1,5 +1,7 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
+
+import type { ReactNode } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Providers } from '@/components/providers/Providers';
@@ -14,11 +16,7 @@ export const metadata = {
     'Track developer engagement, technical progress, and collaboration metrics',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>

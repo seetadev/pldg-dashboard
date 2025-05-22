@@ -38,7 +38,7 @@ export function CohortSelector({
         <SelectContent>
           {Object.values(COHORT_DATA).map((cohort) => (
             <SelectItem key={cohort.id} value={cohort.id}>
-              {cohort.name} {cohort.id === '2' ? '(Current)' : ''}
+              {cohort.name}
             </SelectItem>
           ))}
         </SelectContent>
