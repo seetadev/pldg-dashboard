@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
+import { Timeline } from './Timeline';
 
 export default function DeveloperEngagementDashboard() {
   const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
@@ -169,6 +170,10 @@ export default function DeveloperEngagementDashboard() {
             done: processedData.issueMetrics[0]?.closed || 0
           }}
         />
+      </div>
+
+      <div className="mb-8">
+        <Timeline />
       </div>
 
       {/* Full Width Sections */}
