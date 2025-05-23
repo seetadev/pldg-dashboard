@@ -36,3 +36,7 @@ next-env.d.ts
 
 # ignore the csv files for now
 *.csv
+bun.lock
+# ignore the lock files for now
+# yarn.lock
+# pnpm-lock.yaml

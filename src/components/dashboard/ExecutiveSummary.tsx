@@ -153,7 +153,7 @@ export default function ExecutiveSummary({ data }: Props) {
             <Download
               className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`}
             />
-            <p className="w-full  text-xs"> Export Report</p>
+            <p className='w-full  text-xs'>Export Report</p>
           </Button>
         </div>
       </CardHeader>

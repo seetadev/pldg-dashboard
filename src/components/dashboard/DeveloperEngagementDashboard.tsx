@@ -1,23 +1,25 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
-import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
-import ExecutiveSummary from './ExecutiveSummary';
-import { ActionableInsights } from './ActionableInsights';
-import EngagementChart from './EngagementChart';
-import TechnicalProgressChart from './TechnicalProgressChart';
-import { TechPartnerChart } from './TechPartnerChart';
-import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner } from '../ui/loading';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { RefreshCw } from 'lucide-react';
-import { enhanceTechPartnerData } from '@/lib/utils';
-import { processData } from '@/lib/data-processing';
-import { CohortSelector } from './CohortSelector';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { useCohortData } from '@/hooks/useCohortData';
-import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
+import * as React from "react";
+import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
+import ExecutiveSummary from "./ExecutiveSummary";
+import { ActionableInsights } from "./ActionableInsights";
+import EngagementChart from "./EngagementChart";
+import TechnicalProgressChart from "./TechnicalProgressChart";
+import { TechPartnerChart } from "./TechPartnerChart";
+import TopPerformersTable from "./TopPerformersTable";
+import { LoadingSpinner } from "../ui/loading";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
+import { RefreshCw } from "lucide-react";
+import { enhanceTechPartnerData } from "@/lib/utils";
+import { processData } from "@/lib/data-processing";
+import { CohortSelector } from "./CohortSelector";
+import { CohortId, COHORT_DATA } from "@/types/cohort";
+import { useCohortData } from "@/hooks/useCohortData";
+import PartnerFeedbackMatrix from "./PartnerFeedbackMatrix";
+import { AlertsPanel } from "./AlertsPanel";
+
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -58,18 +60,22 @@ export default function DeveloperEngagementDashboard() {
   };
 
   if (isLoadingCSV) {
-    return <div>Loading CSV data...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <LoadingSpinner message="Loading CSV data..." />
+      </div>
+    );
   }
 
   if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
+    return <div>Error: {errorCSV || "No data available"}</div>;
   }
 
   if (!processedData && isLoadingCSV) {
     return (
       <div className="container mx-auto p-4">
         <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingSpinner />
+          <LoadingSpinner message="Loading data..." />
         </div>
       </div>
     );
@@ -115,6 +121,7 @@ export default function DeveloperEngagementDashboard() {
                 Last updated: {new Date(lastUpdated).toLocaleString()}
               </span>
             </div>
+
             <div className="flex w-full lg:w-max justify-end">
               <Button
                 variant="outline"
@@ -124,7 +131,7 @@ export default function DeveloperEngagementDashboard() {
                 className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
               >
                 <RefreshCw
-                  className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`}
+                  className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
                 />
                 <p className="w-full  text-xs">Refresh Data</p>
               </Button>
@@ -136,6 +143,10 @@ export default function DeveloperEngagementDashboard() {
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
         <ExecutiveSummary data={processedData} />
+      </div>
+
+      <div className="mb-6 bg-white rounded-lg shadow-md">
+        <AlertsPanel />
       </div>
 
       {/* Action Items Section */}
