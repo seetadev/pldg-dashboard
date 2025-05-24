@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useMemo } from 'react';
 import { TechnicalProgress } from '@/types/dashboard';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
@@ -21,7 +21,7 @@ const GITHUB_LINKS = {
 };
 
 export default function TechnicalProgressChart({ data, githubData }: Props) {
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('TechnicalProgress data:', {
       dataPoints: data.length,
       githubData,
@@ -43,7 +43,7 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
     );
   }
 
-  const combinedData = React.useMemo(() => {
+  const combinedData = useMemo(() => {
     if (!data?.length) return [];
 
     // Data is already sorted in processData function

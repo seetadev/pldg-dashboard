@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useMemo } from 'react';
 import { EnhancedTechPartnerData } from '@/types/dashboard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
@@ -43,7 +43,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export function TimeSeriesView({ data }: TimeSeriesViewProps) {
-  const chartData = React.useMemo(() => {
+  const chartData = useMemo(() => {
     if (!data?.length) return [];
 
     // Get all unique weeks and format them
@@ -87,7 +87,7 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
   }, [data]);
 
   // Debug logging
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('Chart Data:', chartData);
   }, [chartData]);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useMemo } from 'react';
 import { EnhancedTechPartnerData } from '@/types/dashboard';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ExternalLink, GitPullRequest } from 'lucide-react';
@@ -11,7 +11,7 @@ interface ContributorViewProps {
 }
 
 export function ContributorView({ data }: ContributorViewProps) {
-  const contributors = React.useMemo(() => {
+  const contributors = useMemo(() => {
     if (!data?.length) return [];
 
     const contributorMap = new Map<string, {

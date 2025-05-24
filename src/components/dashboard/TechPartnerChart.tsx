@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -71,7 +70,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
   const [view, setView] = useState<ViewType>('timeline');
 
   // Add debug logging
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('TechPartnerChart processing data:', {
       totalPartners: data.length,
       partners: data.map(p => ({
@@ -142,7 +141,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
     return insights;
   };
 
-  const filteredData = React.useMemo(() => {
+  const filteredData = useMemo(() => {
     // Add debug logging
     console.log('TechPartnerChart Data:', {
       allData: data,

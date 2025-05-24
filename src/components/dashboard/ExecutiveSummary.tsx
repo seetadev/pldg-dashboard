@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { ProcessedData } from '@/types/dashboard';
 import { 
@@ -34,9 +34,9 @@ const METRIC_EXPLANATIONS = {
 };
 
 export default function ExecutiveSummary({ data }: Props) {
-  const [isExporting, setIsExporting] = React.useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
-  const insights = React.useMemo(() => ({
+  const insights = useMemo(() => ({
     weeklyChange: {
       issues: data.weeklyChange,
       contributors: data.activeContributors,

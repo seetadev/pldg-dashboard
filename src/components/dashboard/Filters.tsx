@@ -1,6 +1,5 @@
-import * as React from 'react';
-import { Calendar, Filter, X } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DateRange } from 'react-day-picker';
@@ -23,7 +22,7 @@ export function Filters({
   selectedPartners,
   availablePartners
 }: FiltersProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const clearFilters = () => {
     onDateRangeChange(undefined);
