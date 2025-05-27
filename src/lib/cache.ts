@@ -18,17 +18,17 @@ class Cache {
     if (!entry) return undefined;
 
     if (Date.now() - entry.timestamp > this.TTL) {
-      console.log("Cache entry expired:", key);
+      console.log('Cache entry expired:', key);
       this.delete(key);
       return undefined;
     }
 
-    console.log("Cache hit:", key);
+    console.log('Cache hit:', key);
     return entry;
   }
 
   set(key: string, value: string): void {
-    console.log("Cache set:", key);
+    console.log('Cache set:', key);
     this.store.set(key, {
       data: value,
       timestamp: Date.now(),
@@ -36,12 +36,12 @@ class Cache {
   }
 
   delete(key: string): void {
-    console.log("Cache delete:", key);
+    console.log('Cache delete:', key);
     this.store.delete(key);
   }
 
   clear(): void {
-    console.log("Cache clear");
+    console.log('Cache clear');
     this.store.clear();
   }
 }

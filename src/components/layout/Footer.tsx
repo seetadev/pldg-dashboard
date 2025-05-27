@@ -1,6 +1,5 @@
-import * as React from "react";
-import { Github } from "lucide-react";
-import Image from "next/image";
+import Image from 'next/image';
+import { GithubIcon } from '@/components/icons/GithubIcon';
 
 export function Footer() {
   return (
@@ -29,12 +28,12 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/jbarnes850/pldg-dashboard/tree/main"
+                  href="https://github.com/seetadev/pldg-dashboard/tree/main"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
                 >
-                  <Github className="w-4 h-4 group-hover:text-indigo-900 transition-colors" />
+                  <GithubIcon className="w-4 h-4 group-hover:text-indigo-900 transition-colors" />
                   <span>Source Code (GitHub)</span>
                 </a>
               </li>

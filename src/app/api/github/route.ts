@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
-import { GitHubData } from "@/types/dashboard";
+import { NextResponse } from 'next/server';
+import { GitHubData } from '@/types/dashboard';
 
-const PROJECT_ID = "7";
-const USERNAME = "kt-wawro";
+const PROJECT_ID = '7';
+const USERNAME = 'kt-wawro';
 
 const COLUMN_STATUS = {
-  "In Progress": "In Progress",
-  "In Review": "In Progress",
-  Done: "Done",
-  Backlog: "Todo",
-  Tirage: "Todo",
+  'In Progress': 'In Progress',
+  'In Review': 'In Progress',
+  Done: 'Done',
+  Backlog: 'Todo',
+  Tirage: 'Todo',
 } as const;
 
 interface ProjectItem {
@@ -36,15 +36,15 @@ interface ProjectItem {
 export async function GET() {
   try {
     if (!process.env.GITHUB_TOKEN) {
-      throw new Error("GitHub token not found");
+      throw new Error('GitHub token not found');
     }
 
     const headers = {
       Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-      "Content-Type": "application/json",
-      Accept: "application/vnd.github.v3+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "PLDG-Dashboard",
+      'Content-Type': 'application/json',
+      Accept: 'application/vnd.github.v3+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'PLDG-Dashboard',
     };
 
     const projectQuery = {
@@ -99,14 +99,14 @@ export async function GET() {
       `,
     };
 
-    const response = await fetch("https://api.github.com/graphql", {
-      method: "POST",
+    const response = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
       headers,
       body: JSON.stringify(projectQuery),
     });
 
     if (!response.ok) {
-      console.error("GitHub API Error:", {
+      console.error('GitHub API Error:', {
         status: response.status,
         statusText: response.statusText,
       });
@@ -116,20 +116,20 @@ export async function GET() {
     const rawData = await response.json();
 
     if (!rawData?.data?.user?.projectV2?.items?.nodes) {
-      console.error("Invalid GitHub response structure:", rawData);
-      throw new Error("Invalid response structure from GitHub");
+      console.error('Invalid GitHub response structure:', rawData);
+      throw new Error('Invalid response structure from GitHub');
     }
 
     const items = rawData.data.user.projectV2.items.nodes as ProjectItem[];
 
     // Add type annotation for item parameters
     const statusCounts = {
-      todo: items.filter((item: ProjectItem) => getItemStatus(item) === "Todo")
+      todo: items.filter((item: ProjectItem) => getItemStatus(item) === 'Todo')
         .length,
       inProgress: items.filter(
-        (item: ProjectItem) => getItemStatus(item) === "In Progress",
+        (item: ProjectItem) => getItemStatus(item) === 'In Progress'
       ).length,
-      done: items.filter((item: ProjectItem) => getItemStatus(item) === "Done")
+      done: items.filter((item: ProjectItem) => getItemStatus(item) === 'Done')
         .length,
     };
 
@@ -137,9 +137,9 @@ export async function GET() {
       project: rawData.data,
       issues: items.map((item: ProjectItem) => ({
         id: item.id,
-        title: item.content?.title || "",
-        state: item.content?.state || "",
-        created_at: item.content?.createdAt || "",
+        title: item.content?.title || '',
+        state: item.content?.state || '',
+        created_at: item.content?.createdAt || '',
         closed_at: item.content?.closedAt || null,
         status: getItemStatus(item),
         assignee: item.content?.assignees?.nodes[0] || undefined,
@@ -150,10 +150,10 @@ export async function GET() {
 
     return NextResponse.json(responseData);
   } catch (error) {
-    console.error("GitHub API error:", {
+    console.error('GitHub API error:', {
       error,
       timestamp: new Date().toISOString(),
-      message: error instanceof Error ? error.message : "Unknown error",
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
 
     // Return a properly structured empty response
@@ -181,21 +181,21 @@ export async function GET() {
 function getItemStatus(item: ProjectItem): string {
   try {
     const statusField = item.fieldValues.nodes.find(
-      (node) => node.field?.name?.toLowerCase() === "status",
+      (node) => node.field?.name?.toLowerCase() === 'status'
     );
     const columnStatus = statusField?.name;
 
     if (!columnStatus) {
-      console.warn("No status found for item:", item.id);
-      return "Todo";
+      console.warn('No status found for item:', item.id);
+      return 'Todo';
     }
 
-    return COLUMN_STATUS[columnStatus as keyof typeof COLUMN_STATUS] || "Todo";
+    return COLUMN_STATUS[columnStatus as keyof typeof COLUMN_STATUS] || 'Todo';
   } catch (error) {
-    console.error("Error getting item status:", {
+    console.error('Error getting item status:', {
       itemId: item.id,
       error,
     });
-    return "Todo";
+    return 'Todo';
   }
 }

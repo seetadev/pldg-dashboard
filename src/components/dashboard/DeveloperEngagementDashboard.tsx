@@ -1,23 +1,25 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
-import ExecutiveSummary from './ExecutiveSummary';
-import { ActionableInsights } from './ActionableInsights';
-import EngagementChart from './EngagementChart';
-import TechnicalProgressChart from './TechnicalProgressChart';
-import { TechPartnerChart } from './TechPartnerChart';
-import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner } from '../ui/loading';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import { RefreshCw } from 'lucide-react';
-import { enhanceTechPartnerData } from '@/lib/utils';
-import { processData } from '@/lib/data-processing';
-import { CohortSelector } from './CohortSelector';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { useCohortData } from '@/hooks/useCohortData';
-import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
+import * as React from "react";
+import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
+import ExecutiveSummary from "./ExecutiveSummary";
+import { ActionableInsights } from "./ActionableInsights";
+import EngagementChart from "./EngagementChart";
+import TechnicalProgressChart from "./TechnicalProgressChart";
+import { TechPartnerChart } from "./TechPartnerChart";
+import TopPerformersTable from "./TopPerformersTable";
+import { LoadingSpinner } from "../ui/loading";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
+import { RefreshCw } from "lucide-react";
+import { enhanceTechPartnerData } from "@/lib/utils";
+import { processData } from "@/lib/data-processing";
+import { CohortSelector } from "./CohortSelector";
+import { CohortId, COHORT_DATA } from "@/types/cohort";
+import { useCohortData } from "@/hooks/useCohortData";
+import PartnerFeedbackMatrix from "./PartnerFeedbackMatrix";
+import { AlertsPanel } from "./AlertsPanel";
+
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -36,17 +38,21 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  const processedData = React.useMemo(() => 
-    csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
+  const processedData = useMemo(
+    () =>
+      csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = React.useMemo(() =>
-    processedData?.techPartnerPerformance && processedData?.rawEngagementData
-      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
-      : [],
+  const enhancedTechPartnerData = useMemo(
+    () =>
+      processedData?.techPartnerPerformance && processedData?.rawEngagementData
+        ? enhanceTechPartnerData(
+            processedData.techPartnerPerformance,
+            processedData.rawEngagementData
+          )
+        : [],
     [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-
   );
 
   const handleCohortChange = (cohortId: CohortId) => {
@@ -54,7 +60,11 @@ export default function DeveloperEngagementDashboard() {
   };
 
   if (isLoadingCSV) {
-    return <div>Loading CSV data...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <LoadingSpinner message="Loading CSV data..." />
+      </div>
+    );
   }
 
   if (errorCSV || !processedData) {
@@ -65,7 +75,7 @@ export default function DeveloperEngagementDashboard() {
     return (
       <div className="container mx-auto p-4">
         <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingSpinner />
+          <LoadingSpinner message="Loading data..." />
         </div>
       </div>
     );
@@ -102,28 +112,29 @@ export default function DeveloperEngagementDashboard() {
             </p>
           </div>
           <div className="flex flex-col justify-start w-full md:w-max lg:flex-row items-center gap-4">
-            <div className='flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4'>
-            <CohortSelector
-              selectedCohort={selectedCohort}
-              onCohortChange={handleCohortChange}
-            />
-            <span className="text-sm text-indigo-200">
-              Last updated: {new Date(lastUpdated).toLocaleString()}
-            </span>
-            </div>
-            <div className='flex w-full lg:w-max justify-end'>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refresh}
-              disabled={isFetching}
-              className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+            <div className="flex flex-col lg:flex-row justify-start w-full md:w-max items-center gap-4">
+              <CohortSelector
+                selectedCohort={selectedCohort}
+                onCohortChange={handleCohortChange}
               />
-              <p className='w-full  text-xs'>Refresh Data</p>
-            </Button>
+              <span className="text-sm text-indigo-200">
+                Last updated: {new Date(lastUpdated).toLocaleString()}
+              </span>
+            </div>
+
+            <div className="flex w-full lg:w-max justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refresh}
+                disabled={isFetching}
+                className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+                />
+                <p className="w-full  text-xs">Refresh Data</p>
+              </Button>
             </div>
           </div>
         </div>
@@ -132,6 +143,10 @@ export default function DeveloperEngagementDashboard() {
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
         <ExecutiveSummary data={processedData} />
+      </div>
+
+      <div className="mb-6 bg-white rounded-lg shadow-md">
+        <AlertsPanel />
       </div>
 
       {/* Action Items Section */}
@@ -143,7 +158,6 @@ export default function DeveloperEngagementDashboard() {
       <div className="mb-8">
         <PartnerFeedbackMatrix data={partnerFeedbackData} />
       </div>
-      
 
       {/* Charts Section - Side by Side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

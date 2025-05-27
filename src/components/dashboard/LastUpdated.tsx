@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
-import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
+import { RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 
 export function LastUpdated() {
   const { lastUpdated, isStale, refresh, isFetching } =
@@ -14,14 +13,14 @@ export function LastUpdated() {
     try {
       await refresh();
       toast({
-        title: "Data refreshed",
-        description: "Dashboard data has been updated.",
+        title: 'Data refreshed',
+        description: 'Dashboard data has been updated.',
       });
     } catch (error) {
       toast({
-        title: "Refresh failed",
-        description: "Unable to refresh dashboard data. Please try again.",
-        variant: "destructive",
+        title: 'Refresh failed',
+        description: 'Unable to refresh dashboard data. Please try again.',
+        variant: 'destructive',
       });
       console.error(error);
     }
@@ -30,10 +29,10 @@ export function LastUpdated() {
   return (
     <div className="flex items-center gap-2">
       <span
-        className={`text-sm ${isStale ? "text-yellow-400" : "text-indigo-200"}`}
+        className={`text-sm ${isStale ? 'text-yellow-400' : 'text-indigo-200'}`}
       >
         {isStale
-          ? "Data is stale"
+          ? 'Data is stale'
           : `Last updated: ${new Date(lastUpdated).toLocaleTimeString()}`}
       </span>
       <Button
@@ -41,9 +40,9 @@ export function LastUpdated() {
         size="sm"
         onClick={handleRefresh}
         disabled={isFetching}
-        className={`${isStale ? "text-yellow-400 border-yellow-400" : ""}`}
+        className={`${isStale ? 'text-yellow-400 border-yellow-400' : ''}`}
       >
-        <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
+        <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
       </Button>
     </div>
   );

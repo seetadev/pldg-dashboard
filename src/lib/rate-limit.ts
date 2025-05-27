@@ -14,7 +14,7 @@ export function rateLimit(options: RateLimiterOptions) {
   return {
     check: async (
       limit: number,
-      token: string,
+      token: string
     ): Promise<RateLimiterResponse> => {
       const now = Date.now();
       const windowStart = now - options.interval;
@@ -23,7 +23,7 @@ export function rateLimit(options: RateLimiterOptions) {
 
       const timestamps = tokenCache.get(tokenKey) || [];
       const validTimestamps = timestamps.filter(
-        (timestamp) => timestamp > windowStart,
+        (timestamp) => timestamp > windowStart
       );
 
       if (validTimestamps.length >= limit) {

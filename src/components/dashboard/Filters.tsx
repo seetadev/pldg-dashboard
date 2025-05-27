@@ -1,15 +1,15 @@
-import * as React from "react";
-import { Filter, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Filter, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/popover';
+import { DateRange } from 'react-day-picker';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface FiltersProps {
   onDateRangeChange: (range: DateRange | undefined) => void;
@@ -26,7 +26,7 @@ export function Filters({
   selectedPartners,
   availablePartners,
 }: FiltersProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const clearFilters = () => {
     onDateRangeChange(undefined);
@@ -75,9 +75,9 @@ export function Filters({
                   key={partner}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-sm font-normal",
+                    'w-full justify-start text-sm font-normal',
                     selectedPartners.includes(partner) &&
-                      "bg-primary/10 text-primary",
+                      'bg-primary/10 text-primary'
                   )}
                   onClick={() => togglePartner(partner)}
                 >

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { ProcessedData } from "@/types/dashboard";
+import { useState, useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { ProcessedData } from '@/types/dashboard';
 import {
   Download,
   TrendingUp,
@@ -14,11 +14,11 @@ import {
   Activity,
   ThumbsUp,
   HelpCircle,
-} from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Button } from "../ui/button";
-import { exportDashboardAction } from "@/lib/actions";
-import { toast } from "../ui/use-toast";
+} from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { Button } from '../ui/button';
+import { exportDashboardAction } from '@/lib/actions';
+import { toast } from '../ui/use-toast';
 
 interface Props {
   data: ProcessedData;
@@ -26,23 +26,23 @@ interface Props {
 
 const METRIC_EXPLANATIONS = {
   weeklyChange:
-    "Percentage change in total contributions compared to last week. Calculated from both GitHub and Airtable data.",
+    'Percentage change in total contributions compared to last week. Calculated from both GitHub and Airtable data.',
   activeContributors:
-    "Number of unique contributors who submitted at least one contribution in the current week.",
+    'Number of unique contributors who submitted at least one contribution in the current week.',
   totalContributions:
-    "Total number of issues, PRs, and technical contributions across all tech partners.",
+    'Total number of issues, PRs, and technical contributions across all tech partners.',
   npsScore:
-    "Net Promoter Score (range: -100 to 100) calculated from weekly engagement surveys.",
+    'Net Promoter Score (range: -100 to 100) calculated from weekly engagement surveys.',
   engagementRate:
-    "Percentage of contributors actively participating in program activities and submissions.",
+    'Percentage of contributors actively participating in program activities and submissions.',
   activeTechPartners:
-    "Number of tech partners with at least one active contribution or engagement this week.",
+    'Number of tech partners with at least one active contribution or engagement this week.',
 };
 
 export default function ExecutiveSummary({ data }: Props) {
-  const [isExporting, setIsExporting] = React.useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
-  const insights = React.useMemo(
+  const insights = useMemo(
     () => ({
       weeklyChange: {
         issues: data.weeklyChange,
@@ -57,10 +57,10 @@ export default function ExecutiveSummary({ data }: Props) {
       keyHighlights: [
         `${data.activeContributors} active contributors across ${data.programHealth.activeTechPartners} tech partners`,
         `${data.feedbackSentiment.positive} positive feedback responses`,
-        `${Math.abs(data.weeklyChange)}% ${data.weeklyChange >= 0 ? "increase" : "decrease"} in weekly contributions`,
+        `${Math.abs(data.weeklyChange)}% ${data.weeklyChange >= 0 ? 'increase' : 'decrease'} in weekly contributions`,
       ],
     }),
-    [data],
+    [data]
   );
 
   const handleExport = async () => {
@@ -69,31 +69,31 @@ export default function ExecutiveSummary({ data }: Props) {
       const result = await exportDashboardAction(data);
 
       if (result.success && result.data) {
-        console.log("Export data received, creating blob...");
+        console.log('Export data received, creating blob...');
 
         try {
-          const buffer = Buffer.from(result.data, "base64");
+          const buffer = Buffer.from(result.data, 'base64');
           if (buffer.length === 0) {
-            throw new Error("Empty buffer received");
+            throw new Error('Empty buffer received');
           }
 
           const blob = new Blob([buffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           });
 
           if (blob.size === 0) {
-            throw new Error("Empty blob created");
+            throw new Error('Empty blob created');
           }
 
-          console.log("Blob created, initiating download...");
+          console.log('Blob created, initiating download...');
 
           // Create and trigger download
           const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
+          const a = document.createElement('a');
           a.href = url;
           a.download =
             result.filename ||
-            `PLDG_Dashboard_${new Date().toISOString().split("T")[0]}.xlsx`;
+            `PLDG_Dashboard_${new Date().toISOString().split('T')[0]}.xlsx`;
 
           // Append, click, and cleanup
           document.body.appendChild(a);
@@ -106,27 +106,27 @@ export default function ExecutiveSummary({ data }: Props) {
           }, 100);
 
           toast({
-            title: "Export successful",
-            description: "Dashboard data has been downloaded.",
+            title: 'Export successful',
+            description: 'Dashboard data has been downloaded.',
           });
 
-          console.log("Download initiated successfully");
+          console.log('Download initiated successfully');
         } catch (blobError) {
-          console.error("Blob creation/download failed:", blobError);
-          throw new Error("Failed to create downloadable file");
+          console.error('Blob creation/download failed:', blobError);
+          throw new Error('Failed to create downloadable file');
         }
       } else {
-        throw new Error(result.error || "Export failed");
+        throw new Error(result.error || 'Export failed');
       }
     } catch (error) {
-      console.error("Export error:", error);
+      console.error('Export error:', error);
       toast({
-        title: "Export failed",
+        title: 'Export failed',
         description:
           error instanceof Error
             ? error.message
-            : "Unable to export dashboard data.",
-        variant: "destructive",
+            : 'Unable to export dashboard data.',
+        variant: 'destructive',
       });
     } finally {
       setIsExporting(false);
@@ -151,11 +151,9 @@ export default function ExecutiveSummary({ data }: Props) {
             className="flex items-center xl:gap-2 max-lg:py-5 gap-2"
           >
             <Download
-              className={`w-4 h-4 ${isExporting ? "animate-spin" : ""}`}
+              className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`}
             />
-            <p className='w-full  text-xs'>          Export Report</p>
-
-
+            <p className='w-full  text-xs'>Export Report</p>
           </Button>
         </div>
       </CardHeader>

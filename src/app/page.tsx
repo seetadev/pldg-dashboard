@@ -1,4 +1,4 @@
-import DeveloperEngagementDashboard from "@/components/dashboard/DeveloperEngagementDashboard";
+import DeveloperEngagementDashboard from '@/components/dashboard/DeveloperEngagementDashboard';
 
 export default function Home() {
   return <DeveloperEngagementDashboard />;

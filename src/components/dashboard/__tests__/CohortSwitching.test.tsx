@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import DeveloperEngagementDashboard from "../DeveloperEngagementDashboard";
-import { DashboardSystemProvider } from "@/context/DashboardSystemContext";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import DeveloperEngagementDashboard from '../DeveloperEngagementDashboard';
+import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
 
 // Mock ResizeObserver
 class ResizeObserver {
@@ -15,11 +15,11 @@ class ResizeObserver {
 global.ResizeObserver = ResizeObserver;
 
 // Mock problematic modules
-jest.mock("uuid", () => ({
-  v4: () => "test-uuid",
+jest.mock('uuid', () => ({
+  v4: () => 'test-uuid',
 }));
 
-jest.mock("exceljs", () => ({
+jest.mock('exceljs', () => ({
   Workbook: jest.fn().mockImplementation(() => ({
     addWorksheet: jest.fn(),
     xlsx: {
@@ -30,7 +30,7 @@ jest.mock("exceljs", () => ({
 
 // Mock fetch for data loading
 global.fetch = jest.fn((url) => {
-  if (url.includes("cohort-1")) {
+  if (url.includes('cohort-1')) {
     return Promise.resolve({
       ok: true,
       text: () =>
@@ -39,7 +39,7 @@ Alice,alice123,alice@test.com,"Week 1 (2024-10-01)",Weekly Cohort Call,3 - Highl
 Bob,bob456,bob@test.com,"Week 1 (2024-10-01)",Weekly Cohort Call,2 - Participated occasionally,Good discussion,Yes,Libp2p,Code review,Yes,1`),
     });
   }
-  if (url.includes("cohort-2")) {
+  if (url.includes('cohort-2')) {
     return Promise.resolve({
       ok: true,
       text: () =>
@@ -50,14 +50,14 @@ Dave,dave101,dave@test.com,"Week 1 (2024-01-13)",Weekly Standup,3 - Highly engag
   }
   return Promise.resolve({
     ok: false,
-    text: () => Promise.reject(new Error("Not found")),
+    text: () => Promise.reject(new Error('Not found')),
   });
 }) as jest.Mock;
 
 // Mock the data processing functions
-jest.mock("@/lib/data-processing", () => ({
+jest.mock('@/lib/data-processing', () => ({
   processData: jest.fn((data) => {
-    const techPartners = new Set(data.map((d: any) => d["Which Tech Partner"]));
+    const techPartners = new Set(data.map((d: any) => d['Which Tech Partner']));
     return {
       weeklyChange: 0,
       activeContributors: data.length,
@@ -65,10 +65,10 @@ jest.mock("@/lib/data-processing", () => ({
         (acc: number, curr: any) =>
           acc +
           parseInt(
-            curr["How many issues, PRs, or projects this week?"] || "0",
-            10,
+            curr['How many issues, PRs, or projects this week?'] || '0',
+            10
           ),
-        0,
+        0
       ),
       programHealth: {
         activeTechPartners: techPartners.size,
@@ -77,9 +77,9 @@ jest.mock("@/lib/data-processing", () => ({
       },
       keyHighlights: {
         activeContributorsAcrossTechPartners: `${data.length} active contributors across ${techPartners.size} tech partners`,
-        totalContributions: `${data.reduce((acc: number, curr: any) => acc + parseInt(curr["How many issues, PRs, or projects this week?"] || "0", 10), 0)} total contributions`,
-        positiveFeedback: "0 positive feedback",
-        weeklyContributions: "0% increase in weekly contributions",
+        totalContributions: `${data.reduce((acc: number, curr: any) => acc + parseInt(curr['How many issues, PRs, or projects this week?'] || '0', 10), 0)} total contributions`,
+        positiveFeedback: '0 positive feedback',
+        weeklyContributions: '0% increase in weekly contributions',
       },
       feedbackSentiment: {
         positive: 0,
@@ -88,36 +88,36 @@ jest.mock("@/lib/data-processing", () => ({
       },
       engagementTrends: [
         {
-          week: "Week 1",
+          week: 'Week 1',
           total: data.length,
-          "High Engagement": data.filter((d: any) =>
-            d["Engagement Participation "]?.includes("3"),
+          'High Engagement': data.filter((d: any) =>
+            d['Engagement Participation ']?.includes('3')
           ).length,
-          "Medium Engagement": data.filter((d: any) =>
-            d["Engagement Participation "]?.includes("2"),
+          'Medium Engagement': data.filter((d: any) =>
+            d['Engagement Participation ']?.includes('2')
           ).length,
-          "Low Engagement": data.filter((d: any) =>
-            d["Engagement Participation "]?.includes("1"),
+          'Low Engagement': data.filter((d: any) =>
+            d['Engagement Participation ']?.includes('1')
           ).length,
         },
       ],
       technicalProgress: [
         {
-          week: "Week 1",
-          "Total Issues": data.reduce(
+          week: 'Week 1',
+          'Total Issues': data.reduce(
             (acc: number, curr: any) =>
               acc +
               parseInt(
-                curr["How many issues, PRs, or projects this week?"] || "0",
-                10,
+                curr['How many issues, PRs, or projects this week?'] || '0',
+                10
               ),
-            0,
+            0
           ),
         },
       ],
       issueMetrics: [
         {
-          week: "Week 1",
+          week: 'Week 1',
           open: 0,
           closed: 0,
           total: 0,
@@ -126,15 +126,15 @@ jest.mock("@/lib/data-processing", () => ({
       topPerformers: [],
       actionItems: [],
       techPartnerMetrics: data.map((d: any) => ({
-        partner: d["Which Tech Partner"],
+        partner: d['Which Tech Partner'],
         totalIssues: parseInt(
-          d["How many issues, PRs, or projects this week?"] || "0",
-          10,
+          d['How many issues, PRs, or projects this week?'] || '0',
+          10
         ),
         activeContributors: 1,
         avgIssuesPerContributor: parseInt(
-          d["How many issues, PRs, or projects this week?"] || "0",
-          10,
+          d['How many issues, PRs, or projects this week?'] || '0',
+          10
         ),
         collaborationScore: 0,
       })),
@@ -142,26 +142,26 @@ jest.mock("@/lib/data-processing", () => ({
         (partner) => ({
           partner,
           issues: data
-            .filter((d: any) => d["Which Tech Partner"] === partner)
+            .filter((d: any) => d['Which Tech Partner'] === partner)
             .reduce(
               (acc: number, curr: any) =>
                 acc +
                 parseInt(
-                  curr["How many issues, PRs, or projects this week?"] || "0",
-                  10,
+                  curr['How many issues, PRs, or projects this week?'] || '0',
+                  10
                 ),
-              0,
+              0
             ),
           contributors: data.filter(
-            (d: any) => d["Which Tech Partner"] === partner,
+            (d: any) => d['Which Tech Partner'] === partner
           ).length,
           engagement: 0,
           weeklyChange: 0,
-        }),
+        })
       ),
       contributorGrowth: [
         {
-          week: "Week 1",
+          week: 'Week 1',
           newContributors: data.length,
           returningContributors: 0,
           totalActive: data.length,
@@ -170,10 +170,10 @@ jest.mock("@/lib/data-processing", () => ({
       rawEngagementData: data,
     };
   }),
-  loadCohortData: jest.requireActual("@/lib/data-processing").loadCohortData,
+  loadCohortData: jest.requireActual('@/lib/data-processing').loadCohortData,
 }));
 
-describe("Cohort Switching", () => {
+describe('Cohort Switching', () => {
   // Helper functions for common setup and actions
   const renderDashboard = () => {
     return render(
@@ -181,26 +181,26 @@ describe("Cohort Switching", () => {
         <DashboardSystemProvider>
           <DeveloperEngagementDashboard />
         </DashboardSystemProvider>
-      </TooltipProvider>,
+      </TooltipProvider>
     );
   };
 
   const switchCohort = async (
     user: ReturnType<typeof userEvent.setup>,
-    targetCohort: string,
+    targetCohort: string
   ) => {
     // Find and click the cohort selector
-    const cohortSelector = screen.getByRole("combobox", {
+    const cohortSelector = screen.getByRole('combobox', {
       name: /cohort selector/i,
     });
     await user.click(cohortSelector);
 
     // Wait for the listbox to be visible and select the target cohort
     await waitFor(async () => {
-      const listbox = screen.getByRole("listbox");
+      const listbox = screen.getByRole('listbox');
       expect(listbox).toBeInTheDocument();
-      const option = within(listbox).getByRole("option", {
-        name: new RegExp(targetCohort, "i"),
+      const option = within(listbox).getByRole('option', {
+        name: new RegExp(targetCohort, 'i'),
       });
       await user.click(option);
     });
@@ -216,10 +216,10 @@ describe("Cohort Switching", () => {
     await waitFor(
       () => {
         expect(
-          screen.getByText(/active contributors across/i),
+          screen.getByText(/active contributors across/i)
         ).toBeInTheDocument();
       },
-      { timeout: 2000 },
+      { timeout: 2000 }
     );
   };
 
@@ -228,7 +228,7 @@ describe("Cohort Switching", () => {
     (global.fetch as jest.Mock).mockClear();
   });
 
-  it("should load and switch between cohorts", async () => {
+  it('should load and switch between cohorts', async () => {
     const user = userEvent.setup();
     renderDashboard();
 
@@ -236,41 +236,41 @@ describe("Cohort Switching", () => {
     await waitForDataLoad();
 
     // Verify we're on Cohort 2
-    const cohortSelector = screen.getByRole("combobox", {
+    const cohortSelector = screen.getByRole('combobox', {
       name: /cohort selector/i,
     });
     expect(cohortSelector).toHaveTextContent(/Cohort 2/i);
     expect(
-      screen.getByText(/2 active contributors across 2 tech partners/i),
+      screen.getByText(/2 active contributors across 2 tech partners/i)
     ).toBeInTheDocument();
 
     // Switch to Cohort 1
-    await switchCohort(user, "Cohort 1");
+    await switchCohort(user, 'Cohort 1');
     await waitForDataLoad();
 
     // Wait for and verify we're on Cohort 1
     await waitFor(() => {
-      const updatedSelector = screen.getByRole("combobox", {
+      const updatedSelector = screen.getByRole('combobox', {
         name: /cohort selector/i,
       });
       expect(updatedSelector).toHaveTextContent(/Cohort 1/i);
     });
     expect(
-      screen.getByText(/2 active contributors across 2 tech partners/i),
+      screen.getByText(/2 active contributors across 2 tech partners/i)
     ).toBeInTheDocument();
 
     // Verify fetch was called for each cohort
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("cohort-2"),
+      expect.stringContaining('cohort-2')
     );
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("cohort-1"),
+      expect.stringContaining('cohort-1')
     );
   });
 
-  it("should show error message when data loading fails", async () => {
+  it('should show error message when data loading fails', async () => {
     (global.fetch as jest.Mock).mockRejectedValueOnce(
-      new Error("Failed to load cohort data"),
+      new Error('Failed to load cohort data')
     );
     renderDashboard();
 
@@ -279,7 +279,7 @@ describe("Cohort Switching", () => {
     });
   });
 
-  it("should handle loading state during cohort switching", async () => {
+  it('should handle loading state during cohort switching', async () => {
     const user = userEvent.setup();
     renderDashboard();
 
@@ -287,12 +287,12 @@ describe("Cohort Switching", () => {
     await waitForDataLoad();
 
     // Switch cohorts and verify loading state
-    await switchCohort(user, "Cohort 1");
+    await switchCohort(user, 'Cohort 1');
     await waitForDataLoad();
 
     // Verify data was updated
     expect(
-      screen.getByText(/2 active contributors across 2 tech partners/i),
+      screen.getByText(/2 active contributors across 2 tech partners/i)
     ).toBeInTheDocument();
   });
 });

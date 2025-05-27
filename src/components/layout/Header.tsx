@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import Link from "next/link";
-import { Github } from "lucide-react";
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
+import { GithubIcon } from '@/components/icons/GithubIcon';
 
 export function Header() {
   return (
@@ -36,11 +35,11 @@ export function Header() {
             </Link>
 
             <Link
-              href="https://github.com/jbarnes850/pldg-dashboard/tree/main"
+              href="https://github.com/seetadev/pldg-dashboard/tree/main"
               target="_blank"
               className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
             >
-              <Github className="w-5 h-5 group-hover:text-indigo-900 transition-colors" />
+              <GithubIcon className="w-5 h-5 group-hover:text-indigo-900 transition-colors" />
               <span>GitHub</span>
             </Link>
 

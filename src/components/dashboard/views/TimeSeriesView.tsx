@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { EnhancedTechPartnerData } from "@/types/dashboard";
+import { useMemo } from 'react';
+import { EnhancedTechPartnerData } from '@/types/dashboard';
 import {
   BarChart,
   Bar,
@@ -87,7 +87,6 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 
 export function TimeSeriesView({ data }: TimeSeriesViewProps) {
-  
   const chartData = React.useMemo(() => {
     if (!data?.length) return [];
     // Get all unique weeks and format them
@@ -106,8 +105,8 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
 
     // Sort weeks by number
     const sortedWeeks = Array.from(allWeeks).sort((a, b) => {
-      const weekA = parseInt(a.match(/\d+/)?.[1] || "0");
-      const weekB = parseInt(b.match(/\d+/)?.[1] || "0");
+      const weekA = parseInt(a.match(/\d+/)?.[1] || '0');
+      const weekB = parseInt(b.match(/\d+/)?.[1] || '0');
       return weekA - weekB;
     });
 
@@ -154,13 +153,13 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
   }
 
   const COLORS = {
-    Libp2p: "#3B82F6",
-    IPFS: "#14B8A6",
-    "Fil-B": "#A855F7",
-    "Fil-Oz": "#6366F1",
-    "Coordination Network": "#F43F5E",
-    Storacha: "#F59E0B",
-    Drand: "#10B981",
+    Libp2p: '#3B82F6',
+    IPFS: '#14B8A6',
+    'Fil-B': '#A855F7',
+    'Fil-Oz': '#6366F1',
+    'Coordination Network': '#F43F5E',
+    Storacha: '#F59E0B',
+    Drand: '#10B981',
   };
 
   return (
@@ -172,10 +171,10 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
           <YAxis
             tick={{ fontSize: 12 }}
             label={{
-              value: "Issues",
+              value: 'Issues',
               angle: -90,
-              position: "insideLeft",
-              style: { textAnchor: "middle" },
+              position: 'insideLeft',
+              style: { textAnchor: 'middle' },
             }}
           />
           <Tooltip content={<CustomTooltip />} />

@@ -1,24 +1,23 @@
-"use client";
+'use client';
 
-import * as React from "react";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardDescription,
-} from "../ui/card";
-import { Brain } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { EnhancedProcessedData } from "@/types/dashboard";
+} from '../ui/card';
+import { Brain } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { EnhancedProcessedData } from '@/types/dashboard';
 
 const METRIC_EXPLANATIONS = {
   engagementScore:
-    "Overall community engagement based on participation, NPS, and contribution metrics",
+    'Overall community engagement based on participation, NPS, and contribution metrics',
   technicalProgress:
-    "Technical advancement measured through issue completion and partner diversity",
+    'Technical advancement measured through issue completion and partner diversity',
   collaborationIndex:
-    "Level of cross-partner collaboration and community growth",
+    'Level of cross-partner collaboration and community growth',
 };
 
 interface MetricCardProps {
@@ -34,7 +33,7 @@ function MetricCard({ title, value, explanation }: MetricCardProps) {
         <TooltipTrigger asChild>
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-muted-foreground capitalize">
-              {title.replace(/([A-Z])/g, " $1").trim()}
+              {title.replace(/([A-Z])/g, ' $1').trim()}
             </h4>
             <div className="text-2xl font-bold">{value}</div>
           </div>
