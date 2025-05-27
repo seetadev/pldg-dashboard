@@ -18,7 +18,6 @@ import { CohortSelector } from "./CohortSelector";
 import { CohortId, COHORT_DATA } from "@/types/cohort";
 import { useCohortData } from "@/hooks/useCohortData";
 import PartnerFeedbackMatrix from "./PartnerFeedbackMatrix";
-import { AlertsPanel } from "./AlertsPanel";
 
 
 export default function DeveloperEngagementDashboard() {
@@ -38,13 +37,13 @@ export default function DeveloperEngagementDashboard() {
     error: errorCSV,
   } = useCohortData(selectedCohort);
 
-  const processedData = useMemo(
+  const processedData = React.useMemo(
     () =>
       csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
     [csvData, selectedCohort]
   );
 
-  const enhancedTechPartnerData = useMemo(
+  const enhancedTechPartnerData = React.useMemo(
     () =>
       processedData?.techPartnerPerformance && processedData?.rawEngagementData
         ? enhanceTechPartnerData(
@@ -143,10 +142,6 @@ export default function DeveloperEngagementDashboard() {
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
         <ExecutiveSummary data={processedData} />
-      </div>
-
-      <div className="mb-6 bg-white rounded-lg shadow-md">
-        <AlertsPanel />
       </div>
 
       {/* Action Items Section */}
