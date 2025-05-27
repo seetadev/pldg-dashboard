@@ -17,41 +17,32 @@ import { useEffect, useState } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
+import normalizeEngagementData from '@/lib/formatDBData';
 
 export default function DeveloperEngagementDashboard() {
   const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
   const [csvData, setCsvData] = useState<EngagementData[]>([]);
   const [isLoadingCSV, setIsLoadingCSV] = useState(true);
   const [errorCSV, setErrorCSV] = useState<string | null>(null);
+  
+  
 
   useEffect(() => {
     async function loadCSVData() {
       try {
         console.log('Loading CSV data...');
-        const response = await fetch('/data/Weekly Engagement Survey Breakdown (4).csv');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch CSV: ${response.statusText}`);
-        }
-        const csvText = await response.text();
+        const response = await fetch('/api/cohort');
+
+
+        const rawData: Record<string, any>[] = await response.json();
+
+         // Normalize each entry
+        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
+        console.log('CSV Text:', cleanedData);
+
+        setCsvData(cleanedData);
+        setIsLoadingCSV(false)
         
-        Papa.parse<EngagementData>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: (header: string) => header.trim(),
-          complete: (results: ParseResult<EngagementData>) => {
-            console.log('CSV Parse Results:', {
-              weekRange: results.data.map(d => d['Program Week']),
-              totalRows: results.data.length,
-              errors: results.errors
-            });
-            setCsvData(results.data);
-            setIsLoadingCSV(false);
-          },
-          error: (error: ParseError): void => {
-            console.error('CSV parsing error:', error);
-            setErrorCSV(error.message);
-          }
-        } as ParseConfig<EngagementData>);
       } catch (error) {
         console.error('Failed to load CSV:', error);
         setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
@@ -66,17 +57,17 @@ export default function DeveloperEngagementDashboard() {
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
       ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
       : [],
-    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-  );
+  [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+);
 
   React.useEffect(() => {
     console.log('Dashboard State:', {
       hasData: !!processedData,
       metrics: processedData ? {
-        contributors: processedData.activeContributors,
-        techPartners: processedData.programHealth.activeTechPartners,
-        engagementTrends: processedData.engagementTrends.length,
-        technicalProgress: processedData.technicalProgress.length,
+            contributors: processedData.activeContributors,
+            techPartners: processedData.programHealth.activeTechPartners,
+            engagementTrends: processedData.engagementTrends.length,
+            technicalProgress: processedData.technicalProgress.length,
         techPartnerData: enhancedTechPartnerData
       } : null,
       isLoading,
