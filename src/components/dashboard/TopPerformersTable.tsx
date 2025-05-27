@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useMemo } from 'react';
 import { TopPerformer } from '@/types/dashboard';
 
 interface Props {
@@ -9,12 +9,12 @@ interface Props {
 
 export default function TopPerformersTable({ data }: Props) {
   // Add debug logging
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('Raw TopPerformers Data:', data);
   }, [data]);
 
   // Normalize and combine duplicate performers
-  const normalizedPerformers = React.useMemo(() => {
+  const normalizedPerformers = useMemo(() => {
     // Create a map to store normalized names
     const nameMap = new Map<string, TopPerformer>();
 

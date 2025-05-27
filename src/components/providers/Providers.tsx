@@ -1,13 +1,13 @@
 "use client";
 
-import * as React from 'react';
+import { useRef, useEffect } from 'react';
 import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Use a stable ref to prevent re-renders
-  const stableChildren = React.useRef(children);
-  React.useEffect(() => {
+  const stableChildren = useRef(children);
+  useEffect(() => {
     stableChildren.current = children;
   }, [children]);
 

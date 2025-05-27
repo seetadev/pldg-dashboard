@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
 import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
@@ -13,7 +13,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
 import { enhanceTechPartnerData } from '@/lib/utils';
-import { useEffect, useState } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
@@ -53,14 +52,14 @@ export default function DeveloperEngagementDashboard() {
 
   const processedData = csvData.length > 0 ? processData(csvData) : null;
 
-  const enhancedTechPartnerData = React.useMemo(() =>
+  const enhancedTechPartnerData = useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
       ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
       : [],
   [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
 );
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('Dashboard State:', {
       hasData: !!processedData,
       metrics: processedData ? {

@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
