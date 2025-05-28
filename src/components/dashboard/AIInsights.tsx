@@ -9,8 +9,11 @@ import {
   CardContent,
   CardDescription,
 } from '@/components/ui/card';
-import { TooltipRoot, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
+import {
+  TooltipRoot,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const METRIC_EXPLANATIONS = {
   engagementScore:

@@ -6,7 +6,7 @@ import {
   ComponentPropsWithoutRef,
   HTMLAttributes,
 } from 'react';
-import { Dialog } from "radix-ui"
+import { Dialog } from 'radix-ui';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

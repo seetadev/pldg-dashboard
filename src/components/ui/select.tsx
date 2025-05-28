@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, ElementRef, ComponentPropsWithoutRef } from 'react';
-import { Select } from "radix-ui";
+import { Select } from 'radix-ui';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

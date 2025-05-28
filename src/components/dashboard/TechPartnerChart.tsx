@@ -15,7 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ToggleGroupContent, ToggleGroupItem } from '@/components/ui/toggle-group';
+import {
+  ToggleGroupContent,
+  ToggleGroupItem,
+} from '@/components/ui/toggle-group';
 import { EnhancedTechPartnerData, ActionableInsight } from '@/types/dashboard';
 import { TimeSeriesView } from './views/TimeSeriesView';
 import { ContributorView } from './views/ContributorView';
@@ -218,7 +221,10 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
                   View Issues
                 </Button>
               )}
-            <SelectRoot value={selectedPartner} onValueChange={setSelectedPartner}>
+            <SelectRoot
+              value={selectedPartner}
+              onValueChange={setSelectedPartner}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Partner" />
               </SelectTrigger>
