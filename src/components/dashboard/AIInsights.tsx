@@ -1,15 +1,16 @@
 'use client';
 
+import type { EnhancedProcessedData } from '@/types/dashboard';
+import { Brain } from 'lucide-react';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardDescription,
-} from '../ui/card';
-import { Brain } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { EnhancedProcessedData } from '@/types/dashboard';
+} from '@/components/ui/card';
+import { TooltipRoot, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
 
 const METRIC_EXPLANATIONS = {
   engagementScore:
@@ -29,7 +30,7 @@ interface MetricCardProps {
 function MetricCard({ title, value, explanation }: MetricCardProps) {
   return (
     <div className="p-4 border rounded-lg">
-      <Tooltip>
+      <TooltipRoot>
         <TooltipTrigger asChild>
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-muted-foreground capitalize">
@@ -41,7 +42,7 @@ function MetricCard({ title, value, explanation }: MetricCardProps) {
         <TooltipContent side="bottom" className="max-w-xs">
           {explanation}
         </TooltipContent>
-      </Tooltip>
+      </TooltipRoot>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
+  DialogRoot,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -21,7 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Tooltip,
+  TooltipRoot,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
@@ -159,7 +159,7 @@ export function ContributorView({ data }: ContributorViewProps) {
                 {contributor.contributions
                   .slice(0, 3)
                   .map((contribution, idx) => (
-                    <Tooltip key={idx}>
+                    <TooltipRoot key={idx}>
                       <TooltipTrigger className="underline cursor-pointer text-blue-500">
                         {contribution.title.length > 20
                           ? `${contribution.title.slice(0, 20)}...`
@@ -179,7 +179,7 @@ export function ContributorView({ data }: ContributorViewProps) {
                           View on GitHub <ExternalLink className="h-3 w-3" />
                         </a>
                       </TooltipContent>
-                    </Tooltip>
+                    </TooltipRoot>
                   ))}
                 {contributor.contributions.length > 3 && (
                   <Button
@@ -201,7 +201,7 @@ export function ContributorView({ data }: ContributorViewProps) {
         </TableBody>
       </Table>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{dialogTitle}</DialogTitle>
@@ -239,7 +239,7 @@ export function ContributorView({ data }: ContributorViewProps) {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </DialogRoot>
     </TooltipProvider>
   );
 }

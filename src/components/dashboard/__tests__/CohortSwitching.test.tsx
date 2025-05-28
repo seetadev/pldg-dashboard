@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DeveloperEngagementDashboard from '../DeveloperEngagementDashboard';
 import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { Tooltip } from 'radix-ui';
 
 // Mock ResizeObserver
 class ResizeObserver {
@@ -177,11 +177,11 @@ describe('Cohort Switching', () => {
   // Helper functions for common setup and actions
   const renderDashboard = () => {
     return render(
-      <TooltipProvider>
+      <Tooltip.Provider>
         <DashboardSystemProvider>
           <DeveloperEngagementDashboard />
         </DashboardSystemProvider>
-      </TooltipProvider>
+      </Tooltip.Provider>
     );
   };
 

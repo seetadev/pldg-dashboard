@@ -22,7 +22,7 @@ export interface EngagementData {
   'Program Week': string; // Now consistently formatted
   'Engagement Participation ': string; // Now without leading numbers
   'How many issues, PRs, or projects this week?': string; // Now "4+" becomes "4"
-  'Which Tech Partner': string[]; // Always array
+  'Which Tech Partner': string[] | string; // Always array
   'Tech Partner Collaboration?': string;
   'Issue Title 1'?: string | string[];
   'Issue Link 1'?: string | string[];

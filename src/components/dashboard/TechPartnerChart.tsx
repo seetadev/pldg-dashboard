@@ -9,19 +9,19 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Select,
+  SelectRoot,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ToggleGroupContent, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { EnhancedTechPartnerData, ActionableInsight } from '@/types/dashboard';
 import { TimeSeriesView } from './views/TimeSeriesView';
 import { ContributorView } from './views/ContributorView';
 import { AlertCircle, CheckCircle, GitPullRequest } from 'lucide-react';
 import {
-  Tooltip,
+  TooltipRoot,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
@@ -218,7 +218,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
                   View Issues
                 </Button>
               )}
-            <Select value={selectedPartner} onValueChange={setSelectedPartner}>
+            <SelectRoot value={selectedPartner} onValueChange={setSelectedPartner}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Partner" />
               </SelectTrigger>
@@ -232,10 +232,10 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
                   )
                 )}
               </SelectContent>
-            </Select>
+            </SelectRoot>
           </div>
         </div>
-        <ToggleGroup
+        <ToggleGroupContent
           type="single"
           value={view}
           onValueChange={(value: string) => value && setView(value as ViewType)}
@@ -250,7 +250,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
           >
             Contributors
           </ToggleGroupItem>
-        </ToggleGroup>
+        </ToggleGroupContent>
 
         <div className="flex flex-wrap gap-4 mt-6">
           {filteredData.map((partner) => {
@@ -274,7 +274,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
                       <TooltipProvider
                         key={`${partner.partner}-${insight.title}-${index}`}
                       >
-                        <Tooltip>
+                        <TooltipRoot>
                           <TooltipTrigger asChild>
                             <a
                               href={insight.link}
@@ -297,7 +297,7 @@ export function TechPartnerChart({ data }: TechPartnerChartProps) {
                           <TooltipContent side="top" className="max-w-xs">
                             <p className="text-xs">{insight.description}</p>
                           </TooltipContent>
-                        </Tooltip>
+                        </TooltipRoot>
                       </TooltipProvider>
                     ))}
                   </div>

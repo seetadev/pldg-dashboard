@@ -1,6 +1,6 @@
 'use client';
 
-import { EnhancedTechPartnerData } from '@/types/dashboard';
+import type { EnhancedTechPartnerData } from '@/types/dashboard';
 import { useMemo } from 'react';
 import {
   BarChart,
