@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ExternalLink, GitPullRequest } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -26,7 +26,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 interface Contribution {
