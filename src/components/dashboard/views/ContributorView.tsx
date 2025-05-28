@@ -1,7 +1,6 @@
 "use client";
-import * as React from "react";
 
-
+import { useState, useMemo } from "react";
 import { EnhancedTechPartnerData } from "@/types/dashboard";
 import {
   Table,
@@ -52,11 +51,11 @@ interface ContributorViewProps {
 export function ContributorView({ data }: ContributorViewProps) {
 
   const [selectedContributorContributions, setSelectedContributorContributions] =
-    React.useState<Contribution[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [dialogTitle, setDialogTitle] = React.useState("");
+    useState<Contribution[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
 
-  const contributors = React.useMemo(() => {
+  const contributors = useMemo(() => {
 
     if (!data?.length) return [];
     const contributorMap = new Map<string, ContributorDetails>();
