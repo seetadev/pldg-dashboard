@@ -1,25 +1,9 @@
-"use client";
-import * as React from "react";
+'use client';
 
-
-import { EnhancedTechPartnerData } from "@/types/dashboard";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import { ExternalLink, GitPullRequest } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import { EnhancedTechPartnerData } from '@/types/dashboard';
+import { useMemo, useState } from 'react';
+import { ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -27,8 +11,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface Contribution {
   title: string;
@@ -50,14 +47,14 @@ interface ContributorViewProps {
 }
 
 export function ContributorView({ data }: ContributorViewProps) {
+  const [
+    selectedContributorContributions,
+    setSelectedContributorContributions,
+  ] = useState<Contribution[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState('');
 
-  const [selectedContributorContributions, setSelectedContributorContributions] =
-    React.useState<Contribution[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [dialogTitle, setDialogTitle] = React.useState("");
-
-  const contributors = React.useMemo(() => {
-
+  const contributors = useMemo(() => {
     if (!data?.length) return [];
     const contributorMap = new Map<string, ContributorDetails>();
 
@@ -159,29 +156,31 @@ export function ContributorView({ data }: ContributorViewProps) {
               <TableCell>{contributor.totalIssues}</TableCell>
               <TableCell>{contributor.engagement.toFixed(1)}</TableCell>
               <TableCell className="text-right">
-                {contributor.contributions.slice(0, 3).map((contribution, idx) => (
-                  <Tooltip key={idx}>
-                    <TooltipTrigger className="underline cursor-pointer text-blue-500">
-                      {contribution.title.length > 20
-                        ? `${contribution.title.slice(0, 20)}...`
-                        : contribution.title}
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-white border border-black">
-                      <p className="text-black">{contribution.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Week: {contribution.week}
-                      </p>
-                      <a
-                        href={contribution.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-green-600 hover:text-green-800 flex items-center gap-1"
-                      >
-                        View on GitHub <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
+                {contributor.contributions
+                  .slice(0, 3)
+                  .map((contribution, idx) => (
+                    <Tooltip key={idx}>
+                      <TooltipTrigger className="underline cursor-pointer text-blue-500">
+                        {contribution.title.length > 20
+                          ? `${contribution.title.slice(0, 20)}...`
+                          : contribution.title}
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-white border border-black">
+                        <p className="text-black">{contribution.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Week: {contribution.week}
+                        </p>
+                        <a
+                          href={contribution.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-green-600 hover:text-green-800 flex items-center gap-1"
+                        >
+                          View on GitHub <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
                 {contributor.contributions.length > 3 && (
                   <Button
                     size="sm"
@@ -192,7 +191,9 @@ export function ContributorView({ data }: ContributorViewProps) {
                   </Button>
                 )}
                 {contributor.contributions.length === 0 && (
-                  <span className="text-muted-foreground">No recent contributions</span>
+                  <span className="text-muted-foreground">
+                    No recent contributions
+                  </span>
                 )}
               </TableCell>
             </TableRow>
@@ -204,7 +205,9 @@ export function ContributorView({ data }: ContributorViewProps) {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{dialogTitle}</DialogTitle>
-            <DialogDescription>All contributions from this contributor.</DialogDescription>
+            <DialogDescription>
+              All contributions from this contributor.
+            </DialogDescription>
           </DialogHeader>
           <div className="max-h-[400px] overflow-y-auto">
             {selectedContributorContributions.length > 0 ? (
@@ -212,7 +215,9 @@ export function ContributorView({ data }: ContributorViewProps) {
                 {selectedContributorContributions.map((contribution, index) => (
                   <li key={index} className="border rounded-md p-2">
                     <p className="font-semibold">{contribution.title}</p>
-                    <p className="text-sm text-muted-foreground">Week: {contribution.week}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Week: {contribution.week}
+                    </p>
                     <a
                       href={contribution.url}
                       target="_blank"
