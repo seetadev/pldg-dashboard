@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, ReactNode } from 'react';
 import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { Tooltip } from 'radix-ui';
 
 export function Providers({ children }: { children: ReactNode }) {
   // Use a stable ref to prevent re-renders
@@ -13,9 +13,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <DashboardSystemProvider>
-      <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+      <Tooltip.Provider delayDuration={0} skipDelayDuration={0}>
         {stableChildren.current}
-      </TooltipProvider>
+      </Tooltip.Provider>
     </DashboardSystemProvider>
   );
 }

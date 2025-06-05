@@ -1,24 +1,23 @@
-"use client";
+'use client';
 
-import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
-import ExecutiveSummary from "./ExecutiveSummary";
-import { ActionableInsights } from "./ActionableInsights";
-import EngagementChart from "./EngagementChart";
-import TechnicalProgressChart from "./TechnicalProgressChart";
-import { TechPartnerChart } from "./TechPartnerChart";
-import TopPerformersTable from "./TopPerformersTable";
-import { LoadingSpinner } from "../ui/loading";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { RefreshCw } from "lucide-react";
-import { enhanceTechPartnerData } from "@/lib/utils";
-import { processData } from "@/lib/data-processing";
-import { CohortSelector } from "./CohortSelector";
-import { CohortId, COHORT_DATA } from "@/types/cohort";
-import { useCohortData } from "@/hooks/useCohortData";
-import PartnerFeedbackMatrix from "./PartnerFeedbackMatrix";
-import { useMemo } from "react";
-
+import { useMemo } from 'react';
+import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
+import ExecutiveSummary from './ExecutiveSummary';
+import { ActionableInsights } from './ActionableInsights';
+import EngagementChart from './EngagementChart';
+import TechnicalProgressChart from './TechnicalProgressChart';
+import { TechPartnerChart } from './TechPartnerChart';
+import TopPerformersTable from './TopPerformersTable';
+import { LoadingSpinner } from '../ui/loading';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { RefreshCw } from 'lucide-react';
+import { enhanceTechPartnerData } from '@/lib/utils';
+import { processData } from '@/lib/data-processing';
+import { CohortSelector } from './CohortSelector';
+import { CohortId, COHORT_DATA } from '@/types/cohort';
+import { useCohortData } from '@/hooks/useCohortData';
+import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -67,7 +66,7 @@ export default function DeveloperEngagementDashboard() {
   }
 
   if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || "No data available"}</div>;
+    return <div>Error: {errorCSV || 'No data available'}</div>;
   }
 
   if (!processedData && isLoadingCSV) {
@@ -130,7 +129,7 @@ export default function DeveloperEngagementDashboard() {
                 className="flex items-center gap-1 xl:gap-2 max-lg:py-5 bg-white/10 hover:bg-white/20 text-white border-white/20"
               >
                 <RefreshCw
-                  className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`}
+                  className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`}
                 />
                 <p className="w-full  text-xs">Refresh Data</p>
               </Button>

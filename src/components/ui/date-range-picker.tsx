@@ -1,16 +1,16 @@
 'use client';
 
+import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
-  Popover,
+  PopoverRoot,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 
 interface DateRangePickerProps {
   date?: DateRange;
@@ -25,7 +25,7 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   return (
     <div className={cn('grid gap-2', className)}>
-      <Popover>
+      <PopoverRoot>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -65,7 +65,7 @@ export function DateRangePicker({
             endMonth={new Date(new Date().getFullYear(), new Date().getMonth())}
           />
         </PopoverContent>
-      </Popover>
+      </PopoverRoot>
     </div>
   );
 }

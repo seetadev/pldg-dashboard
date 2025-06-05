@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  Popover,
+  PopoverRoot,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
@@ -50,7 +50,7 @@ export function Filters({
           className="min-w-[240px]"
         />
 
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -86,7 +86,7 @@ export function Filters({
               ))}
             </div>
           </PopoverContent>
-        </Popover>
+        </PopoverRoot>
 
         {(dateRange || selectedPartners.length > 0) && (
           <Button

@@ -42,6 +42,7 @@ export default function normalizeEngagementData(
       record['How likely are you to recommend the PLDG to others?'] || '',
     'PLDG Feedback': record['PLDG Feedback'] || '',
     'Email Address': record['Email Address'] || '',
+    Cohort: record['Cohort'],
   };
 
   // Clean all keys/values

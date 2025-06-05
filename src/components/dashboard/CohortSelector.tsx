@@ -1,10 +1,10 @@
 import {
-  Select,
+  SelectRoot,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
+} from '@/components/ui/select';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
 
 interface CohortSelectorProps {
@@ -21,7 +21,7 @@ export function CohortSelector({
       <span className="text-sm font-medium max-sm:w-full max-sm:text-start">
         Cohort:
       </span>
-      <Select
+      <SelectRoot
         value={selectedCohort}
         onValueChange={(value: CohortId) => onCohortChange(value)}
         name="cohort-selector"
@@ -42,7 +42,7 @@ export function CohortSelector({
             </SelectItem>
           ))}
         </SelectContent>
-      </Select>
+      </SelectRoot>
     </div>
   );
 }

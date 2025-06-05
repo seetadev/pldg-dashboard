@@ -1,8 +1,8 @@
 'use client';
 
+import type { ProcessedData } from '@/types/dashboard';
 import { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { ProcessedData } from '@/types/dashboard';
 import {
   Download,
   TrendingUp,
@@ -15,10 +15,14 @@ import {
   ThumbsUp,
   HelpCircle,
 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
+import {
+  TooltipRoot,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { toast } from '@/components/ui/use-toast';
 import { exportDashboardAction } from '@/lib/actions';
-import { toast } from '../ui/use-toast';
 
 interface Props {
   data: ProcessedData;
@@ -153,7 +157,7 @@ export default function ExecutiveSummary({ data }: Props) {
             <Download
               className={`w-4 h-4 ${isExporting ? 'animate-spin' : ''}`}
             />
-            <p className='w-full  text-xs'>Export Report</p>
+            <p className="w-full  text-xs">Export Report</p>
           </Button>
         </div>
       </CardHeader>
@@ -171,14 +175,14 @@ export default function ExecutiveSummary({ data }: Props) {
                     <TrendingDown className="text-red-500" size={20} />
                   )}
                   <span>{Math.abs(insights.weeklyChange.issues)}% WoW</span>
-                  <Tooltip>
+                  <TooltipRoot>
                     <TooltipTrigger>
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
                       {METRIC_EXPLANATIONS.weeklyChange}
                     </TooltipContent>
-                  </Tooltip>
+                  </TooltipRoot>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -205,14 +209,14 @@ export default function ExecutiveSummary({ data }: Props) {
                 <div className="flex items-center gap-2">
                   <Star className="text-yellow-500" size={20} />
                   <span>NPS Score: {insights.programHealth.nps}</span>
-                  <Tooltip>
+                  <TooltipRoot>
                     <TooltipTrigger>
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent>
                       {METRIC_EXPLANATIONS.npsScore}
                     </TooltipContent>
-                  </Tooltip>
+                  </TooltipRoot>
                 </div>
               </div>
               <div className="flex items-center gap-3">
