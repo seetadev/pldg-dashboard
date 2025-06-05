@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useDashboardSystemContext } from "@/context/DashboardSystemContext";
 import ExecutiveSummary from "./ExecutiveSummary";
 import { ActionableInsights } from "./ActionableInsights";
@@ -18,7 +17,7 @@ import { CohortSelector } from "./CohortSelector";
 import { CohortId, COHORT_DATA } from "@/types/cohort";
 import { useCohortData } from "@/hooks/useCohortData";
 import PartnerFeedbackMatrix from "./PartnerFeedbackMatrix";
-import { AlertsPanel } from "./AlertsPanel";
+import { useMemo } from "react";
 
 
 export default function DeveloperEngagementDashboard() {
@@ -143,10 +142,6 @@ export default function DeveloperEngagementDashboard() {
       {/* Top Section - Executive Summary */}
       <div className="mb-6 bg-white rounded-lg shadow-md">
         <ExecutiveSummary data={processedData} />
-      </div>
-
-      <div className="mb-6 bg-white rounded-lg shadow-md">
-        <AlertsPanel />
       </div>
 
       {/* Action Items Section */}

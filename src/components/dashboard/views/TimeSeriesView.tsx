@@ -87,7 +87,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 
 export function TimeSeriesView({ data }: TimeSeriesViewProps) {
-  const chartData = React.useMemo(() => {
+  const chartData = useMemo(() => {
     if (!data?.length) return [];
     // Get all unique weeks and format them
     const allWeeks = new Set<string>();
