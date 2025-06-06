@@ -69,7 +69,9 @@ export default function TechnicalProgressChart({ data, githubData }: Props) {
         <div className="flex justify-between items-start">
           <div>
             <CardTitle>Technical Progress</CardTitle>
-            <CardDescription className='pt-1'>Weekly contribution tracking</CardDescription>
+            <CardDescription className="pt-1">
+              Weekly contribution tracking
+            </CardDescription>
           </div>
           <div className="flex gap-2">
             <Button
