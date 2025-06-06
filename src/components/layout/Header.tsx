@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { AirtableIcon } from '@/components/icons/AirtableIcon';
+import { DiscordIcon } from '@/components/icons/DiscordIcon';
 import { GithubIcon } from '@/components/icons/GithubIcon';
 
 export function Header() {
@@ -23,14 +24,7 @@ export function Header() {
               target="_blank"
               className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
             >
-              <Image
-                src="/logos/Airtable Icon.png"
-                alt="Airtable"
-                width={20}
-                height={20}
-                className="group-hover:opacity-80 transition-opacity"
-                priority
-              />
+              <AirtableIcon />
               <span>Airtable</span>
             </Link>
 
@@ -48,14 +42,7 @@ export function Header() {
               target="_blank"
               className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
             >
-              <Image
-                src="/logos/Discord Icon.png"
-                alt="Discord"
-                width={20}
-                height={20}
-                className="group-hover:opacity-80 transition-opacity"
-                priority
-              />
+              <DiscordIcon />
               <span>Discord</span>
             </Link>
           </div>

@@ -1,4 +1,5 @@
-import Image from 'next/image';
+import { AirtableIcon } from '@/components/icons/AirtableIcon';
+import { DiscordIcon } from '@/components/icons/DiscordIcon';
 import { GithubIcon } from '@/components/icons/GithubIcon';
 
 export function Footer() {
@@ -16,13 +17,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
                 >
-                  <Image
-                    src="/logos/Airtable Icon.png"
-                    alt="Airtable"
-                    width={16}
-                    height={16}
-                    className="group-hover:opacity-80 transition-opacity"
-                  />
+                  <AirtableIcon />
                   <span>Engagement Data (Airtable)</span>
                 </a>
               </li>
@@ -44,13 +39,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
                 >
-                  <Image
-                    src="/logos/Discord Icon.png"
-                    alt="Discord"
-                    width={16}
-                    height={16}
-                    className="group-hover:opacity-80 transition-opacity"
-                  />
+                  <DiscordIcon />
                   <span>Community Discussion (Discord)</span>
                 </a>
               </li>
