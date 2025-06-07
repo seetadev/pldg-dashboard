@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import _ from 'lodash'
+import { nanoid as nanoIdPkg } from 'nanoid'
 import {
   IssueMetrics,
   RawIssueMetric,
@@ -14,9 +15,7 @@ import {
 } from '../types/dashboard'
 import { processDataWithAI } from './ai';
 
-export function nanoid(): string {
-  return Math.random().toString(36).substring(2, 11);
-}
+export const nanoid = nanoIdPkg;
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

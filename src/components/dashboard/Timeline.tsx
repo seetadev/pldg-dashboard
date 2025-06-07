@@ -5,7 +5,7 @@ import { TimelineEvent, TimelineSnapshot } from '@/types/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Bookmark, BookmarkCheck, Circle, FileText, GitPullRequest, Calendar, Save, ExternalLink } from 'lucide-react';
+import { Bookmark, BookmarkCheck, Circle, FileText, GitPullRequest, Calendar, Save } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Dialog,
@@ -316,18 +316,6 @@ function TimelineItem({ event }: TimelineItemProps) {
           <p className="text-sm text-gray-600 leading-relaxed">
             {event.description}
           </p>
-        )}
-
-        {event.url && (
-          <a 
-            href={event.url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
-          >
-            <ExternalLink className="h-4 w-4" />
-            View on GitHub
-          </a>
         )}
       </div>
     </div>
