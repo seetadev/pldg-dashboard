@@ -4,6 +4,7 @@
   "main": "csv-uploader.js",
   "type": "module",
   "dependencies": {
+    "@web3-storage/w3up-client": "^17.3.0",
     "bson": "^6.10.3",
     "csv-parser": "^3.2.0",
     "dotenv": "^16.5.0",
