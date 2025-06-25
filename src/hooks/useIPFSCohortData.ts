@@ -40,6 +40,7 @@ export function useIPFSCohortData(selectedCohort: '1' | '2') {
       } catch (error) {
         setIsError(true);
         setIsLoading(false);
+        console.error(error);
       }
 
       const feedbackUrl = FEEDBACK_CSV_URLS[selectedCohort];
@@ -59,6 +60,7 @@ export function useIPFSCohortData(selectedCohort: '1' | '2') {
           }
         } catch (e) {
           // Optionally handle feedback fetch error
+          console.error(e)
         }
       }
     }
