@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
 import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
@@ -16,12 +16,11 @@ import { enhanceTechPartnerData } from '@/lib/utils';
 import { processData } from '@/lib/data-processing';
 import { CohortSelector } from './CohortSelector';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { useCohortData } from '@/hooks/useCohortData';
+import { useIPFSCohortData } from '@/hooks/useIPFSCohortData';
 import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
 
 export default function DeveloperEngagementDashboard() {
   const {
-    isError,
     refresh,
     lastUpdated,
     isFetching,
@@ -29,17 +28,18 @@ export default function DeveloperEngagementDashboard() {
     setSelectedCohort,
   } = useDashboardSystemContext();
 
+  // Only use IPFS data source
   const {
-    data: csvData,
-    partnerFeedbackData,
-    isLoading: isLoadingCSV,
-    error: errorCSV,
-  } = useCohortData(selectedCohort);
+    data: ipfsCsvData,
+    feedbackData,
+    isLoading,
+    isError,
+  } = useIPFSCohortData(selectedCohort as '1' | '2');
 
   const processedData = useMemo(
     () =>
-      csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
-    [csvData, selectedCohort]
+      ipfsCsvData.length > 0 ? processData(ipfsCsvData, null, selectedCohort) : null,
+    [ipfsCsvData, selectedCohort]
   );
 
   const enhancedTechPartnerData = useMemo(
@@ -57,19 +57,19 @@ export default function DeveloperEngagementDashboard() {
     setSelectedCohort(cohortId);
   };
 
-  if (isLoadingCSV) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
-        <LoadingSpinner message="Loading CSV data..." />
+        <LoadingSpinner message="Loading data..." />
       </div>
     );
   }
 
-  if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
+  if (isError || !processedData) {
+    return <div>Error: {isError || 'No data available'}</div>;
   }
 
-  if (!processedData && isLoadingCSV) {
+  if (!processedData && isLoading) {
     return (
       <div className="container mx-auto p-4">
         <div className="h-[calc(100vh-200px)] flex items-center justify-center">
@@ -150,7 +150,7 @@ export default function DeveloperEngagementDashboard() {
 
       {/* Partners Feedback Section */}
       <div className="mb-8">
-        <PartnerFeedbackMatrix data={partnerFeedbackData} />
+        <PartnerFeedbackMatrix data={feedbackData} />
       </div>
 
       {/* Charts Section - Side by Side */}
