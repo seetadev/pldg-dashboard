@@ -86,7 +86,11 @@ function parseTechPartners(techPartner: string | string[]): string[] {
   return techPartner?.split(',').map((p) => p.trim()) ?? [];
 }
 
-function parseWeekNumber(week: string): number {
+function parseWeekNumber(week: string | undefined | null): number {
+  if (typeof week !== 'string') {
+    console.warn(`Invalid week value (not a string):`, week);
+    return 0;
+  }
   const match = week.match(/Week (\d+):/i);
   if (!match) {
     console.warn(`Invalid week format: ${week}`);
@@ -95,7 +99,8 @@ function parseWeekNumber(week: string): number {
   return parseInt(match[1]);
 }
 
-function formatWeekString(week: string): string {
+function formatWeekString(week: string | undefined | null): string {
+  if (typeof week !== 'string') return '';
   const match = week.match(/Week \d+/i);
   return match ? match[0] : week;
 }
