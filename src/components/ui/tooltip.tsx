@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, ElementRef, ComponentPropsWithoutRef } from 'react';
-import { Tooltip } from 'radix-ui';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { cn } from '@/lib/utils';
 
 const TooltipProvider = Tooltip.Provider;

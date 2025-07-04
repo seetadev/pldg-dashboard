@@ -6,7 +6,6 @@ import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
 import EngagementChart from './EngagementChart';
 import TechnicalProgressChart from './TechnicalProgressChart';
-import { TechPartnerChart } from './TechPartnerChart';
 import TopPerformersTable from './TopPerformersTable';
 import { LoadingSpinner } from '../ui/loading';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
@@ -18,6 +17,8 @@ import { CohortSelector } from './CohortSelector';
 import { CohortId, COHORT_DATA } from '@/types/cohort';
 import { useCohortData } from '@/hooks/useCohortData';
 import PartnerFeedbackMatrix from './PartnerFeedbackMatrix';
+import { Timeline } from './Timeline';
+import { TechPartnerChart } from './TechPartnerChart';
 
 export default function DeveloperEngagementDashboard() {
   const {
@@ -131,7 +132,7 @@ export default function DeveloperEngagementDashboard() {
                 <RefreshCw
                   className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`}
                 />
-                <p className="w-full  text-xs">Refresh Data</p>
+                <p className="w-full text-xs">Refresh Data</p>
               </Button>
             </div>
           </div>
@@ -163,6 +164,10 @@ export default function DeveloperEngagementDashboard() {
             done: processedData.issueMetrics[0]?.closed || 0,
           }}
         />
+      </div>
+
+      <div className="mb-8">
+        <Timeline />
       </div>
 
       {/* Full Width Sections */}

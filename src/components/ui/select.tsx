@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, ElementRef, ComponentPropsWithoutRef } from 'react';
-import { Select } from 'radix-ui';
+import * as Select from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -104,6 +104,7 @@ const SelectSeparator = forwardRef<
   />
 ));
 SelectSeparator.displayName = Select.Separator.displayName;
+
 export {
   SelectRoot,
   SelectGroup,

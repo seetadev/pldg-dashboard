@@ -489,6 +489,7 @@ function calculateActionItems(data: EngagementData[]): ActionItem[] {
 function processRawIssueMetrics(entries: EngagementData[]): IssueMetrics[] {
   const weeklyMetrics = _.groupBy(entries, 'Program Week');
 
+
   return Object.entries(weeklyMetrics).map(([week, weekEntries]) => {
     const totalIssues = weekEntries.reduce((sum, entry) => {
       const value = entry['How many issues, PRs, or projects this week?'];
@@ -500,6 +501,7 @@ function processRawIssueMetrics(entries: EngagementData[]): IssueMetrics[] {
       ? weekEntries.filter((entry) => entry['Issue Link 1']?.includes('closed'))
           .length
       : Math.round(totalIssues * 0.7);
+
 
     return {
       week: week.replace(/\(.*?\)/, '').trim(),
@@ -701,6 +703,7 @@ export function processData(
     },
     keyHighlights: {
       activeContributorsAcrossTechPartners: `${activeContributors} across ${techPartners.size}`,
+      activeContributorsAcrossTechPartners: `${activeContributors} across ${techPartners.size}`,
       totalContributions: `${totalContributions} total`,
       positiveFeedback: `${calculatePositiveFeedback(csvData)} positive`,
       weeklyContributions: `${calculateWeeklyChange(csvData)}% change`,
@@ -712,7 +715,15 @@ export function processData(
     technicalProgress: calculateTechnicalProgress(csvData, githubData),
     issueMetrics: processRawIssueMetrics(csvData),
     actionItems: calculateActionItems(csvData),
+    topPerformers: calculateTopPerformers(csvData),
+    techPartnerMetrics: calculateTechPartnerMetrics(csvData),
+    techPartnerPerformance,
+    engagementTrends: calculateEngagementTrends(csvData),
+    technicalProgress: calculateTechnicalProgress(csvData, githubData),
+    issueMetrics: processRawIssueMetrics(csvData),
+    actionItems: calculateActionItems(csvData),
     feedbackSentiment: {
+      positive: calculatePositiveFeedback(csvData),
       positive: calculatePositiveFeedback(csvData),
       neutral: 0,
       negative: 0,

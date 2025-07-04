@@ -7,7 +7,7 @@ import {
   ElementRef,
   ComponentPropsWithoutRef,
 } from 'react';
-import { ToggleGroup } from 'radix-ui';
+import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import { VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';

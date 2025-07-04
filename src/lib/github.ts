@@ -13,6 +13,7 @@ const fetcher = async (): Promise<GitHubData> => {
     throw new Error(`GitHub API error: ${response.statusText}`);
   }
 
+
   const rawData = await response.json();
 
   if (!rawData || !rawData.statusGroups) {
@@ -63,3 +64,4 @@ export function useGitHubData() {
     timestamp: data?.timestamp,
   };
 }
+

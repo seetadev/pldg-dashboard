@@ -17,19 +17,18 @@ export interface FeedbackEntry {
 
 export interface EngagementData {
   Name: string;
-  Cohort?: CohortId; // New field
-  "Github Username"?: string;
-  "Program Week": string; // Now consistently formatted
-  "Engagement Participation ": string; // Now without leading numbers
-  "How many issues, PRs, or projects this week?": string; // Now "4+" becomes "4"
-  "Which Tech Partner": string[] | string; // Always array
-  "Tech Partner Collaboration?": string;
-  "Issue Title 1"?: string | string[];
-  "Issue Link 1"?: string | string[];
-  "Issue Title 2"?: string | string[];
-  "Issue Link 2"?: string | string[];
-  "Issue Title 3"?: string | string[];
-  "Issue Link 3"?: string | string[];
+  'Github Username'?: string;
+  'Program Week': string;
+  'Engagement Participation '?: string;
+  'Tech Partner Collaboration?': string;
+  'Which Tech Partner': string | string[];
+  'How many issues, PRs, or projects this week?': string;
+  'Issue Title 1'?: string | string[];
+  'Issue Link 1'?: string | string[];
+  'Issue Title 2'?: string | string[];
+  'Issue Link 2'?: string | string[];
+  'Issue Title 3'?: string | string[];
+  'Issue Link 3'?: string | string[];
   [key: string]: string | string[] | undefined;
 }
 
@@ -44,6 +43,20 @@ export interface IssueResult {
 export interface IssueHighlight {
   title: string;
   url: string;
+  Cohort?: CohortId;
+  "Github Username"?: string;
+  "Program Week": string;
+  "Engagement Participation ": string;
+  "How many issues, PRs, or projects this week?": string;
+  "Which Tech Partner": string[] | string;
+  "Tech Partner Collaboration?": string;
+  "Issue Title 1"?: string | string[];
+  "Issue Link 1"?: string | string[];
+  "Issue Title 2"?: string | string[];
+  "Issue Link 2"?: string | string[];
+  "Issue Title 3"?: string | string[];
+  "Issue Link 3"?: string | string[];
+  [key: string]: string | string[] | undefined;
 }
 
 export interface IssueMetrics {
@@ -162,10 +175,9 @@ export interface EnhancedTechPartnerData extends TechPartnerPerformance {
 export interface EngagementTrend {
   week: string;
   total: number;
-  // Optional fields for backward compatibility
-  'High Engagement'?: number;
-  'Medium Engagement'?: number;
-  'Low Engagement'?: number;
+  'High Engagement': number;
+  'Medium Engagement': number;
+  'Low Engagement': number;
 }
 
 export interface TechnicalProgress {
@@ -178,6 +190,11 @@ export interface ContributorGrowth {
   newContributors: number;
   returningContributors: number;
   totalActive: number;
+}
+
+export interface DateRange {
+  from: Date;
+  to: Date;
 }
 
 export interface ProcessedData {
@@ -363,4 +380,31 @@ export interface GitHubIssue {
     merged_at: string | null;
   };
   requested_reviewers?: Array<{ login: string }>;
+}
+
+export interface TimelineEvent {
+  id: string;
+  type: 'issue' | 'pr' | 'survey';
+  title: string;
+  description?: string;
+  date: string;
+  contributor: string;
+  cohort: string;
+  url?: string;
+  status?: string;
+}
+
+export interface TimelineFilters {
+  dateRange?: DateRange;
+  contributors: string[];
+  cohorts: string[];
+  eventTypes: Array<'issue' | 'pr' | 'survey'>;
+}
+
+export interface TimelineSnapshot {
+  id: string;
+  name: string;
+  events: TimelineEvent[];
+  filters: TimelineFilters;
+  createdAt: string;
 }

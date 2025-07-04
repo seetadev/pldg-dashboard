@@ -67,6 +67,12 @@ export default function EngagementChart({ data }: Props) {
             <YAxis
               tick={{ fontSize: 12 }}
               tickMargin={10}
+              label={{ 
+                value: 'Contributors', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle' }
+              }}
               label={{
                 value: 'Contributors',
                 angle: -90,

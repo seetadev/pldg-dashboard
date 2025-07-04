@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DeveloperEngagementDashboard from '../DeveloperEngagementDashboard';
 import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
-import { Tooltip } from 'radix-ui';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 // Mock ResizeObserver
 class ResizeObserver {

@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useAirtableData } from './airtable';
 import { useGitHubData } from './github';
 import { useCSVData } from '@/hooks/useCSVData';
+import { useCSVData } from '@/hooks/useCSVData';
 import { processData } from './data-processing';
 import { GitHubData } from '@/types/dashboard';
 
@@ -22,6 +23,8 @@ export function useDashboardSystem() {
     timestamp: airtableTimestamp,
   } = useAirtableData();
 
+  const {
+    data: githubData,
   const {
     data: githubData,
     isLoading: isGithubLoading,
@@ -156,6 +159,7 @@ export function useDashboardSystem() {
     refresh: useCallback(async () => {
       console.log('Starting Refresh');
       try {
+        await Promise.all([refreshCSV(), refreshAirtable(), refreshGithub()]);
         await Promise.all([refreshCSV(), refreshAirtable(), refreshGithub()]);
         console.log('Refresh Complete');
       } catch (error) {

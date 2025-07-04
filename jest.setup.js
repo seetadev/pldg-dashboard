@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import '@testing-library/jest-dom';
 import jest from 'next/jest';
 
@@ -51,3 +52,6 @@ class IntersectionObserver {
 }
 
 global.IntersectionObserver = IntersectionObserver;
+=======
+import '@testing-library/jest-dom'
+>>>>>>> feature/Implement_Interactive_Timeline_for_Engagement_Events

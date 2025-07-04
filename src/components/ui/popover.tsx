@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, ElementRef, ComponentPropsWithoutRef } from 'react';
-import { Popover } from 'radix-ui';
+import * as Popover from '@radix-ui/react-popover';
 import { cn } from '@/lib/utils';
 
 const PopoverRoot = Popover.Root;

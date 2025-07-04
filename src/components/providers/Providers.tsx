@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, ReactNode } from 'react';
 import { DashboardSystemProvider } from '@/context/DashboardSystemContext';
-import { Tooltip } from 'radix-ui';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 export function Providers({ children }: { children: ReactNode }) {
   // Use a stable ref to prevent re-renders
