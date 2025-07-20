@@ -26,6 +26,35 @@ export interface EngagementData {
   [key: string]: string | string[] | undefined;
 }
 
+export interface EngagementAlert {
+  id: string;
+  contributorName: string;
+  githubUsername?: string;
+  severity: 'warning' | 'critical';
+  type: 'inactivity' | 'engagement_drop';
+  lastActiveWeek: string;
+  inactiveWeeks: number;
+  previousEngagementLevel?: number;
+  currentEngagementLevel?: number;
+  createdAt: string;
+  updatedAt: string;
+  status: 'active' | 'resolved' | 'dismissed';
+  resolution?: {
+    resolvedAt: string;
+    resolvedBy: string;
+    reason: string;
+  };
+}
+
+export interface EngagementAlertSummary {
+  totalAlerts: number;
+  criticalAlerts: number;
+  warningAlerts: number;
+  inactivityAlerts: number;
+  engagementDropAlerts: number;
+  alerts: EngagementAlert[];
+}
+
 export interface IssueResult {
   title: string;
   link: string;
@@ -198,6 +227,15 @@ export interface ProcessedData {
   techPartnerPerformance: TechPartnerPerformance[];
   contributorGrowth: ContributorGrowth[];
   rawEngagementData: EngagementData[];
+  engagementAlerts: EngagementAlertSummary;
+  cohortId?: string;
+  cohortInfo?: {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  } | null;
 }
 
 export interface AIMetrics {

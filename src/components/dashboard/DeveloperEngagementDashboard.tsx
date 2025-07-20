@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React from 'react';
 import { useDashboardSystemContext } from '@/context/DashboardSystemContext';
 import ExecutiveSummary from './ExecutiveSummary';
 import { ActionableInsights } from './ActionableInsights';
@@ -15,60 +15,88 @@ import { RefreshCw } from 'lucide-react';
 import { enhanceTechPartnerData } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
-import { processData, loadCohortData } from '@/lib/data-processing';
-import { EngagementData } from '@/types/dashboard';
+import { processData } from '@/lib/data-processing';
+import { ProcessedData } from '@/types/dashboard';
+import { EngagementAlerts } from './EngagementAlerts';
 import { CohortSelector } from './CohortSelector';
-import { CohortId, COHORT_DATA } from '@/types/cohort';
-import { useCohortData } from '@/hooks/useCohortData';
+import { CohortId } from '@/types/cohort';
+import normalizeEngagementData from '@/lib/formatDBData';
 
 export default function DeveloperEngagementDashboard() {
-  const { 
-    isError, 
-    refresh, 
-    lastUpdated, 
-    isFetching,
-    selectedCohort,
-    setSelectedCohort 
-  } = useDashboardSystemContext();
+  const { data, isLoading, isError, refresh, lastUpdated, isFetching, selectedCohort, setSelectedCohort } = useDashboardSystemContext();
+  const [csvData, setCsvData] = useState<ProcessedData[]>([]);
+  const [isLoadingCSV, setIsLoadingCSV] = useState(true);
+  const [errorCSV, setErrorCSV] = useState<string | null>(null);
+  
+  
 
-  const {
-    data: csvData,
-    isLoading: isLoadingCSV,
-    error: errorCSV,
-  } = useCohortData(selectedCohort);
+  useEffect(() => {
+    async function loadCSVData() {
+      try {
+        console.log('Loading CSV data...');
+        const response = await fetch('/data/weekly-engagement-data.csv');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+        }
 
-  const processedData = React.useMemo(() => 
-    csvData.length > 0 ? processData(csvData, null, selectedCohort) : null,
-    [csvData, selectedCohort]
-  );
+        const csvText = await response.text();
+        console.log('CSV loaded, first 100 chars:', csvText.slice(0, 100));
+
+        if (!csvText) {
+          throw new Error('CSV file is empty');
+        }
+
+        Papa.parse<Record<string, any>>(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results: ParseResult<Record<string, any>>) => {
+            console.log('CSV parsed, row count:', results.data.length);
+            const rawData = results.data;
+            const cleanedData: ProcessedData[] = rawData.map(normalizeEngagementData);
+            console.log('Data processed:', cleanedData.length);
+            setCsvData(cleanedData);
+            setIsLoadingCSV(false);
+          },
+          error: (error: Error) => {
+            console.error('Failed to parse CSV:', error);
+            setErrorCSV('Failed to parse CSV data');
+          }
+        });
+      } catch (error) {
+        console.error('Failed to load CSV:', error);
+        setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
+        setIsLoadingCSV(false);
+      }
+    }
+    loadCSVData();
+  }, []);
+
+  const processedData = csvData.length > 0 ? processData(csvData) : null;
 
   const enhancedTechPartnerData = React.useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
       ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
       : [],
-    [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-  );
+  [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
+);
 
   React.useEffect(() => {
     console.log('Dashboard State:', {
       hasData: !!processedData,
       metrics: processedData ? {
-        contributors: processedData.activeContributors,
-        techPartners: processedData.programHealth.activeTechPartners,
-        engagementTrends: processedData.engagementTrends.length,
-        technicalProgress: processedData.technicalProgress.length,
+            contributors: processedData.activeContributors,
+            techPartners: processedData.programHealth.activeTechPartners,
+            engagementTrends: processedData.engagementTrends.length,
+            technicalProgress: processedData.technicalProgress.length,
         techPartnerData: enhancedTechPartnerData
       } : null,
-      isLoadingCSV,
+      isLoading,
       isError,
       isFetching,
       lastUpdated: new Date(lastUpdated).toISOString()
     });
-  }, [processedData, isLoadingCSV, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
-
-  const handleCohortChange = (cohortId: CohortId) => {
-    setSelectedCohort(cohortId);
-  };
+  }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
   if (isLoadingCSV) {
     return <div>Loading CSV data...</div>;
@@ -78,7 +106,7 @@ export default function DeveloperEngagementDashboard() {
     return <div>Error: {errorCSV || 'No data available'}</div>;
   }
 
-  if (!processedData && isLoadingCSV) {
+  if (!processedData && isLoading) {
     return (
       <div className="container mx-auto p-4">
         <div className="h-[calc(100vh-200px)] flex items-center justify-center">
@@ -108,73 +136,64 @@ export default function DeveloperEngagementDashboard() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Header Section */}
-      <header className="mb-8 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-2xl p-6 text-white shadow-xl">
+      <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">PLDG Developer Engagement</h1>
-            <p className="mt-2 text-indigo-100">
-              {COHORT_DATA[selectedCohort].name} - Real-time insights and engagement metrics
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <CohortSelector 
-              selectedCohort={selectedCohort}
-              onCohortChange={handleCohortChange}
-            />
-            <span className="text-sm text-indigo-200">
-              Last updated: {new Date(lastUpdated).toLocaleString()}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refresh}
-              disabled={isFetching}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
-            >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-              Refresh Data
-            </Button>
-          </div>
+          <h1 className="text-2xl font-bold">Developer Engagement Dashboard</h1>
+          <CohortSelector 
+            selectedCohort={selectedCohort}
+            onCohortChange={setSelectedCohort}
+          />
         </div>
-      </header>
 
-      {/* Top Section - Executive Summary */}
-      <div className="mb-6 bg-white rounded-lg shadow-md">
-        <ExecutiveSummary data={processedData} />
-      </div>
+        {data && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <EngagementAlerts
+              alertSummary={data.engagementAlerts}
+              onResolveAlert={async (alertId, reason) => {
+             
+                console.log('Resolving alert:', alertId, reason);
+              }}
+              onDismissAlert={async (alertId) => {
+             
+                console.log('Dismissing alert:', alertId);
+              }}
+            />
+            <ExecutiveSummary data={data} />
+          </div>
+        )}
 
-      {/* Action Items Section */}
-      <div className="mb-8">
-        <ActionableInsights data={processedData} />
-      </div>
+        {/* Action Items Section */}
+        <div className="mb-8">
+          <ActionableInsights data={processedData} />
+        </div>
 
-      {/* Charts Section - Side by Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <EngagementChart data={processedData.engagementTrends} />
-        <TechnicalProgressChart
-          data={processedData.technicalProgress}
-          githubData={{
-            inProgress: processedData.issueMetrics[0]?.open || 0,
-            done: processedData.issueMetrics[0]?.closed || 0
-          }}
-        />
-      </div>
+        {/* Charts Section - Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <EngagementChart data={processedData.engagementTrends} />
+          <TechnicalProgressChart
+            data={processedData.technicalProgress}
+            githubData={{
+              inProgress: processedData.issueMetrics[0]?.open || 0,
+              done: processedData.issueMetrics[0]?.closed || 0
+            }}
+          />
+        </div>
 
-      {/* Full Width Sections */}
-      <div className="space-y-8">
-        {/* Tech Partner Overview */}
-        <TechPartnerChart data={enhancedTechPartnerData} />
+        {/* Full Width Sections */}
+        <div className="space-y-8">
+          {/* Tech Partner Overview */}
+          <TechPartnerChart data={enhancedTechPartnerData} />
 
-        {/* Top Contributors */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Contributors</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TopPerformersTable data={processedData.topPerformers} />
-          </CardContent>
-        </Card>
+          {/* Top Contributors */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Contributors</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TopPerformersTable data={processedData.topPerformers} />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

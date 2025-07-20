@@ -1,5 +1,6 @@
 import { GitHubData, GitHubUserContribution, ValidatedContribution } from '@/types/dashboard';
 import { VALIDATION_CONFIG, normalizeContributorName } from './constants';
+import { z } from 'zod';
 
 export interface AirtableRecord {
   fields: {
@@ -85,3 +86,34 @@ export function countUserGithubContributions(contribution?: GitHubUserContributi
     contribution.pullRequests.reviewed
   );
 }
+
+export const engagementAlertResolutionSchema = z.object({
+  resolvedAt: z.string().datetime(),
+  resolvedBy: z.string(),
+  reason: z.string().min(1)
+});
+
+export const engagementAlertSchema = z.object({
+  id: z.string().min(1),
+  contributorName: z.string().min(1),
+  githubUsername: z.string().optional(),
+  severity: z.enum(['warning', 'critical']),
+  type: z.enum(['inactivity', 'engagement_drop']),
+  lastActiveWeek: z.string().min(1),
+  inactiveWeeks: z.number().int().min(0),
+  previousEngagementLevel: z.number().int().min(0).max(3).optional(),
+  currentEngagementLevel: z.number().int().min(0).max(3).optional(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  status: z.enum(['active', 'resolved', 'dismissed']),
+  resolution: engagementAlertResolutionSchema.optional()
+});
+
+export const engagementAlertSummarySchema = z.object({
+  totalAlerts: z.number().int().min(0),
+  criticalAlerts: z.number().int().min(0),
+  warningAlerts: z.number().int().min(0),
+  inactivityAlerts: z.number().int().min(0),
+  engagementDropAlerts: z.number().int().min(0),
+  alerts: z.array(engagementAlertSchema)
+});

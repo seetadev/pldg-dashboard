@@ -3,11 +3,12 @@ import {
   EngagementData, ProcessedData, TechPartnerMetrics,
   TechPartnerPerformance, ContributorDetails, IssueResult,
   IssueHighlight, EnhancedTechPartnerData, ActionItem,
-  GitHubData, IssueMetrics, EngagementTrend, CohortId
+  GitHubData, IssueMetrics, EngagementTrend
 } from '@/types/dashboard';
+import type { EngagementAlert, EngagementAlertSummary } from '@/types/dashboard';
 import * as utils from './utils';
 import Papa from 'papaparse';
-import { getCohortDataPath, COHORT_DATA } from "@/types/cohort";
+import { getCohortDataPath, COHORT_DATA, CohortId } from "@/types/cohort";
 
 // Types for CSV data structure
 interface WeeklyEngagementEntry {
@@ -119,7 +120,7 @@ function parseTechPartners(techPartner: string | string[]): string[] {
 // Update the week parsing function to handle CSV format correctly
 function parseWeekNumber(weekString: string): number {
   // Format: "Week X (Month Day - Month Day, Year)"
-  const match = weekString.match(/Week (\d+)/i);
+  const match = weekString?.match(/Week (\d+)/i);
   if (!match) {
     console.warn(`Invalid week format: ${weekString}`);
     return 0;
@@ -177,7 +178,7 @@ function calculateWeeklyChange(data: EngagementData[]): number {
   if (weekNumbers.length < 2) return 0;
 
   const currentWeek = weeks[weekNumbers[weekNumbers.length - 1]];
-  const previousWeek = weeks[weekNumbers[weekNumbers.length - 2]];
+  const previousWeek = weeks[weekNumbers.length - 2];
 
   const currentTotal = currentWeek.reduce((sum, entry) => {
     const value = parseInt(entry['How many issues, PRs, or projects this week?'] || '0');
@@ -628,6 +629,107 @@ function calculateTotalContributions(csvData: any[]): number {
   }, 0);
 }
 
+
+function detectEngagementDropOffs(data: EngagementData[]): EngagementAlert[] {
+  const alerts: EngagementAlert[] = [];
+  const contributorMap = new Map<string, {
+    weeks: { week: string; engagement: number }[];
+    lastActive: string;
+  }>();
+
+ 
+  const sortedData = _.sortBy(data, 'Program Week');
+  sortedData.forEach(entry => {
+    const name = entry.Name;
+    const week = entry['Program Week'];
+    const engagement = entry['Engagement Participation ']?.includes('3 -') ? 3 :
+                      entry['Engagement Participation ']?.includes('2 -') ? 2 :
+                      entry['Engagement Participation ']?.includes('1 -') ? 1 : 0;
+    
+    if (!contributorMap.has(name)) {
+      contributorMap.set(name, { weeks: [], lastActive: week });
+    }
+    
+    const contributor = contributorMap.get(name)!;
+    contributor.weeks.push({ week, engagement });
+    
+    if (engagement > 0) {
+      contributor.lastActive = week;
+    }
+  });
+
+
+  const latestWeek = sortedData[sortedData.length - 1]?.['Program Week'] || '';
+  const latestWeekNum = parseWeekNumber(latestWeek);
+
+
+  contributorMap.forEach((data, name) => {
+    const { weeks, lastActive } = data;
+    const lastActiveWeekNum = parseWeekNumber(lastActive);
+    const inactiveWeeks = latestWeekNum - lastActiveWeekNum;
+
+
+    if (inactiveWeeks >= 2) {
+      alerts.push({
+        id: `inactivity-${name}-${Date.now()}`,
+        contributorName: name,
+        githubUsername: getStringField(sortedData.find(e => e.Name === name)!, 'Github Username'),
+        severity: inactiveWeeks >= 4 ? 'critical' : 'warning',
+        type: 'inactivity',
+        lastActiveWeek: lastActive,
+        inactiveWeeks,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'active'
+      });
+    }
+
+
+    if (weeks.length >= 2) {
+      for (let i = 1; i < weeks.length; i++) {
+        const prevWeek = weeks[i - 1];
+        const currWeek = weeks[i];
+        const engagementDrop = prevWeek.engagement - currWeek.engagement;
+
+        if (engagementDrop >= 2) {
+          alerts.push({
+            id: `drop-${name}-${currWeek.week}-${Date.now()}`,
+            contributorName: name,
+            githubUsername: getStringField(sortedData.find(e => e.Name === name)!, 'Github Username'),
+            severity: 'warning',
+            type: 'engagement_drop',
+            lastActiveWeek: currWeek.week,
+            inactiveWeeks: 0,
+            previousEngagementLevel: prevWeek.engagement,
+            currentEngagementLevel: currWeek.engagement,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            status: 'active'
+          });
+        }
+      }
+    }
+  });
+
+  return alerts;
+}
+
+function generateEngagementAlertSummary(alerts: EngagementAlert[]): EngagementAlertSummary {
+  return {
+    totalAlerts: alerts.length,
+    criticalAlerts: alerts.filter(a => a.severity === 'critical').length,
+    warningAlerts: alerts.filter(a => a.severity === 'warning').length,
+    inactivityAlerts: alerts.filter(a => a.type === 'inactivity').length,
+    engagementDropAlerts: alerts.filter(a => a.type === 'engagement_drop').length,
+    alerts: alerts.sort((a, b) => {
+     
+      if (a.severity === 'critical' && b.severity !== 'critical') return -1;
+      if (a.severity !== 'critical' && b.severity === 'critical') return 1;
+      return b.inactiveWeeks - a.inactiveWeeks;
+    })
+  };
+}
+
 // Update the processData function to return all required ProcessedData fields
 export function processData(
   csvData: any[],
@@ -669,6 +771,10 @@ export function processData(
            weekDate <= new Date(cohortInfo!.endDate);
   }) : csvData;
 
+ 
+  const engagementAlerts = detectEngagementDropOffs(cohortDataFiltered);
+  const alertSummary = generateEngagementAlertSummary(engagementAlerts);
+
   return {
     weeklyChange: calculateWeeklyChange(cohortDataFiltered),
     activeContributors,
@@ -703,14 +809,15 @@ export function processData(
       totalActive: activeContributors
     }],
     rawEngagementData: cohortDataFiltered,
-    cohortId,
+    cohortId: cohortId,
     cohortInfo: cohortInfo ? {
       id: cohortInfo.id,
       name: cohortInfo.name,
       startDate: cohortInfo.startDate,
       endDate: cohortInfo.endDate,
-      description: cohortInfo.description
+      description: cohortInfo.description || '' 
     } : null,
+    engagementAlerts: alertSummary, 
   };
 }
 

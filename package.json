@@ -22,6 +22,7 @@
     "@radix-ui/react-tooltip": "^1.1.5",
     "@tremor/react": "^3.18.3",
     "@upstash/redis": "^1.34.3",
+    "@vercel/kv": "^3.0.0",
     "airtable": "^0.12.2",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",

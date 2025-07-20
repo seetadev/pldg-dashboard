@@ -130,3 +130,29 @@ export const COLUMN_STATUS = {
   'Backlog': 'Todo',
   'Triage': 'Todo'
 } as const;
+
+
+export const ENGAGEMENT_ALERT_CONFIG = {
+  inactivity: {
+    warning: {
+      weeks: 2,
+      description: 'No activity for 2 weeks'
+    },
+    critical: {
+      weeks: 4,
+      description: 'No activity for 4 weeks'
+    }
+  },
+  engagementDrop: {
+    warning: {
+      threshold: 2,
+      description: 'Engagement level dropped by 2 or more levels'
+    }
+  },
+ 
+  checkInterval: 24 * 60 * 60 * 1000, // Daily
+ 
+  retentionPeriod: 30 * 24 * 60 * 60 * 1000, // 30 days
+ 
+  maxDisplayAlerts: 50
+} as const;
