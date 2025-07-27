@@ -28,12 +28,14 @@ class MetricsCollector {
       lastUpdated: Date.now(),
     };
 
-    // Update memory metrics every 30 seconds
-    this.cleanupInterval = setInterval(() => {
-      this.metrics.memoryUsage = process.memoryUsage();
-      this.metrics.lastUpdated = Date.now();
-      this.cleanup();
-    }, 30000);
+    // Conditionally update memory metrics every 30 seconds
+    if (process.env.ENABLE_CLEANUP_INTERVAL === 'true') {
+      this.cleanupInterval = setInterval(() => {
+        this.metrics.memoryUsage = process.memoryUsage();
+        this.metrics.lastUpdated = Date.now();
+        this.cleanup();
+      }, 30000);
+    }
   }
 
   public static getInstance(): MetricsCollector {
