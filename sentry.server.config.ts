@@ -17,7 +17,7 @@ Sentry.init({
   },
   
   // Performance monitoring
-  // enableTracing: true, // Removed due to API changes
+  // enableTracing: true, // Removed in Sentry SDK v7.0.0. Use the "tracesSampleRate" or "tracesSampler" options for performance monitoring.
   
   // Enhanced error context
   beforeSend(event, hint) {
