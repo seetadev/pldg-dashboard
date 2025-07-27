@@ -118,7 +118,7 @@ if (config.enableFile) {
   transports.push(
     new winston.transports.File({
       filename: `${config.logDirectory}/app.log`,
-      maxsize: parseFloat(config.maxFileSize.replace(/\D/g, "")) * 1024 * 1024,
+      maxsize: parseFileSize(config.maxFileSize),
       maxFiles: parseInt(config.maxFiles.replace(/\D/g, "")) || 5,
       format: customFormat,
     })
