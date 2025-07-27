@@ -1,0 +1,313 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pldg-dashboard
+  namespace: production
+  labels:
+    app: pldg-dashboard
+    version: v1
+    environment: production
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: pldg-dashboard
+  template:
+    metadata:
+      labels:
+        app: pldg-dashboard
+        version: v1
+        environment: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: pldg-dashboard
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: pldg-dashboard
+        image: pldg-dashboard:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: ENABLE_CONSOLE_LOGS
+          value: "true"
+        - name: ENABLE_FILE_LOGS
+          value: "false"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: pldg-dashboard-secrets
+              key: mongodb-uri
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: pldg-dashboard-secrets
+              key: github-token
+        - name: AIRTABLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pldg-dashboard-secrets
+              key: airtable-api-key
+        - name: AIRTABLE_BASE_ID
+          valueFrom:
+            secretKeyRef:
+              name: pldg-dashboard-secrets
+              key: airtable-base-id
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pldg-dashboard-secrets
+              key: anthropic-api-key
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: pldg-dashboard-secrets
+              key: sentry-dsn
+        - name: CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: pldg-dashboard-config
+              key: cors-origins
+        - name: RATE_LIMIT_WINDOW_MS
+          valueFrom:
+            configMapKeyRef:
+              name: pldg-dashboard-config
+              key: rate-limit-window-ms
+        - name: RATE_LIMIT_MAX_REQUESTS
+          valueFrom:
+            configMapKeyRef:
+              name: pldg-dashboard-config
+              key: rate-limit-max-requests
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30
+          successThreshold: 1
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: logs-volume
+          mountPath: /app/logs
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+      - name: logs-volume
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - pldg-dashboard
+              topologyKey: kubernetes.io/hostname
+      tolerations:
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 300
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 300
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pldg-dashboard-config
+  namespace: production
+  labels:
+    app: pldg-dashboard
+data:
+  cors-origins: "https://your-domain.com,https://www.your-domain.com"
+  rate-limit-window-ms: "900000"
+  rate-limit-max-requests: "100"
+  trusted-proxies: "1"
+  log-level: "info"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pldg-dashboard-secrets
+  namespace: production
+  labels:
+    app: pldg-dashboard
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual encoded secrets
+  mongodb-uri: bW9uZ29kYitzcnY6Ly91c2VybmFtZTpwYXNzd29yZEBjbHVzdGVyLm1vbmdvZGIubmV0L2RiX25hbWU=
+  github-token: Z2hwX1lPVVJfR0lUSFVCX1RPS0VO
+  airtable-api-key: a2V5WU9VUl9BSVJUQUJMRV9BUElfS0VZ
+  airtable-base-id: YXBwWU9VUl9BSVJUQUJMRV9CQVNFX0lE
+  anthropic-api-key: c2stYW50LVlPVVJfQU5USFJPUElDX0FQSV9LRVk=
+  sentry-dsn: aHR0cHM6Ly9ZT1VSX1NFTlRSWV9EU04=
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pldg-dashboard
+  namespace: production
+  labels:
+    app: pldg-dashboard
+automountServiceAccountToken: false
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pldg-dashboard-hpa
+  namespace: production
+  labels:
+    app: pldg-dashboard
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pldg-dashboard
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pldg-dashboard-pdb
+  namespace: production
+  labels:
+    app: pldg-dashboard
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: pldg-dashboard
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pldg-dashboard-network-policy
+  namespace: production
+  labels:
+    app: pldg-dashboard
+spec:
+  podSelector:
+    matchLabels:
+      app: pldg-dashboard
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-system
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443  # HTTPS
+    - protocol: TCP
+      port: 80   # HTTP
+    - protocol: TCP
+      port: 53   # DNS
+    - protocol: UDP
+      port: 53   # DNS

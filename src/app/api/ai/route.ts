@@ -1,14 +1,33 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { withMiddleware } from '@/lib/middleware';
+import { Logger } from '@/lib/logger';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-export async function POST(request: Request) {
-  try {
-    const data = await request.json();
+const logger = Logger.getInstance();
 
+async function handlePOST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = request.headers.get('x-request-id') || 'unknown';
+  
+  try {
+    logger.info('AI insights request started', {
+      requestId,
+      operation: 'ai_insights_generation',
+    });
+
+    const data = await request.json();
+    
+    logger.info('AI request data received', {
+      requestId,
+      dataSize: JSON.stringify(data).length,
+      hasData: !!data,
+    });
+
+    const aiStartTime = Date.now();
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 1000,
@@ -36,18 +55,40 @@ export async function POST(request: Request) {
       ],
     });
 
+    const aiDuration = Date.now() - aiStartTime;
+
+    logger.logAIOperation('insights_generation', 'claude-3-5-haiku-20241022', response.usage?.output_tokens, aiDuration, {
+      requestId,
+      inputTokens: response.usage?.input_tokens,
+      totalTokens: (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0),
+    });
+
     // Type guard to check if the content is text
     const textContent = response.content[0];
     if (!('text' in textContent)) {
       throw new Error('Unexpected response format from Claude');
     }
 
+    const totalDuration = Date.now() - startTime;
+    logger.info('AI insights generated successfully', {
+      requestId,
+      duration: totalDuration,
+      aiDuration,
+      responseLength: textContent.text.length,
+    });
+
     return NextResponse.json({
       insights: textContent.text,
       success: true,
     });
   } catch (error) {
-    console.error('Error generating AI insights:', error);
+    const duration = Date.now() - startTime;
+    logger.error('AI insights generation failed', error as Error, {
+      requestId,
+      duration,
+      operation: 'ai_insights_generation',
+    });
+    
     return NextResponse.json(
       {
         error: 'Failed to generate insights',
@@ -59,3 +100,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = withMiddleware(handlePOST);

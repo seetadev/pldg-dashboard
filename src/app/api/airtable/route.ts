@@ -1,16 +1,33 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import Papa from 'papaparse';
 import { EngagementData } from '@/types/dashboard';
+import { withMiddleware } from '@/lib/middleware';
+import { Logger } from '@/lib/logger';
 
-export async function GET() {
+const logger = Logger.getInstance();
+
+async function handleGET(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = request.headers.get('x-request-id') || 'unknown';
+  
   try {
+    logger.info('Airtable data request started', {
+      requestId,
+      operation: 'airtable_data_fetch',
+    });
+
     // Check if we should use local CSV data
     const useLocalData = process.env.USE_LOCAL_DATA === 'true';
 
     if (useLocalData) {
       try {
+        logger.info('Using local CSV data', {
+          requestId,
+          source: 'local_csv',
+        });
+
         // Read the CSV file from the public directory
         const csvPath = path.join(
           process.cwd(),
@@ -28,12 +45,24 @@ export async function GET() {
         });
 
         if (parsedData.errors.length > 0) {
-          console.warn('CSV parsing warnings:', parsedData.errors);
+          logger.warn('CSV parsing warnings', {
+            requestId,
+            errors: parsedData.errors,
+          });
         }
+
+        const duration = Date.now() - startTime;
+        logger.info('Local CSV data loaded successfully', {
+          requestId,
+          duration,
+          recordCount: parsedData.data.length,
+        });
 
         return NextResponse.json(parsedData.data);
       } catch (error) {
-        console.error('Error loading CSV:', error);
+        logger.error('Error loading CSV data', error as Error, {
+          requestId,
+        });
         throw new Error('Failed to load CSV data');
       }
     }
@@ -44,34 +73,55 @@ export async function GET() {
     const tableName = process.env.AIRTABLE_TABLE_NAME;
 
     if (!baseId || !apiKey || !tableName) {
-      console.error('Missing required Airtable environment variables');
+      logger.error('Missing Airtable environment variables', undefined, {
+        requestId,
+        hasBaseId: !!baseId,
+        hasApiKey: !!apiKey,
+        hasTableName: !!tableName,
+      });
       return NextResponse.json(
         { error: 'Airtable configuration missing' },
         { status: 500 }
       );
     }
 
+    const apiUrl = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`;
+    
+    logger.info('Fetching from Airtable API', {
+      requestId,
+      baseId,
+      tableName,
+      url: apiUrl,
+    });
+
+    const apiStartTime = Date.now();
     // Use the table name from environment variables instead of hardcoded ID
-    const response = await fetch(
-      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        cache: 'no-store',
-      }
-    );
+    const response = await fetch(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    const apiDuration = Date.now() - apiStartTime;
+
+    logger.logExternalAPI('airtable', apiUrl, 'GET', response.status, apiDuration, {
+      requestId,
+      baseId,
+      tableName,
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Airtable API error:', {
+      logger.error('Airtable API error', undefined, {
+        requestId,
         status: response.status,
         statusText: response.statusText,
-        error: errorText,
+        errorResponse: errorText,
         baseId,
         tableName,
-        requestUrl: `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`,
+        url: apiUrl,
       });
       throw new Error(`Airtable API error: ${response.statusText}`);
     }
@@ -79,7 +129,12 @@ export async function GET() {
     const data = await response.json();
 
     if (!data.records || !Array.isArray(data.records)) {
-      console.error('Invalid Airtable response format:', data);
+      logger.error('Invalid Airtable response format', undefined, {
+        requestId,
+        hasRecords: !!data.records,
+        isRecordsArray: Array.isArray(data.records),
+        dataKeys: Object.keys(data),
+      });
       throw new Error('Invalid Airtable response format');
     }
 
@@ -105,15 +160,31 @@ export async function GET() {
       Created: record.fields['Created'] || record.createdTime || '',
     }));
 
+    const totalDuration = Date.now() - startTime;
+    logger.info('Airtable data fetched successfully', {
+      requestId,
+      duration: totalDuration,
+      apiDuration,
+      recordCount: data.records.length,
+      transformedCount: transformedData.length,
+    });
+
     return NextResponse.json(transformedData);
   } catch (error) {
-    console.error('Airtable API error:', error);
+    const duration = Date.now() - startTime;
+    logger.error('Airtable API error', error as Error, {
+      requestId,
+      duration,
+      operation: 'airtable_data_fetch',
+    });
     return NextResponse.json(
       { error: 'Failed to fetch Airtable data' },
       { status: 500 }
     );
   }
 }
+
+export const GET = withMiddleware(handleGET);
 
 function parseTechPartners(techPartner: string | string[]): string[] {
   if (Array.isArray(techPartner)) {
