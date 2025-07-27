@@ -27,8 +27,6 @@ import {
   PullRequestIdentifier,
   GitProvider,
   WebhookPayload,
-  IssueWebhookPayload,
-  PullRequestWebhookPayload,
 } from './git/types';
 
 import {
@@ -37,8 +35,6 @@ import {
   ApiCache,
   RateLimiter,
   parseRepositoryIdentifier,
-  buildUrl,
-  extractPaginationInfo,
   omitUndefined,
   isValidToken,
   validateEnvironment,
@@ -683,6 +679,7 @@ export class GitHubClient implements GitProvider {
     signature: string,
     secret: string
   ): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const crypto = require('crypto');
     const expectedSignature = `sha256=${crypto
       .createHmac('sha256', secret)
@@ -738,7 +735,14 @@ export class GitHubClient implements GitProvider {
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       pushedAt: data.pushed_at,
-      owner: this.transformUser(data.owner),
+      owner: {
+        id: data.owner.id,
+        login: data.owner.login,
+        name: data.owner.name,
+        type: data.owner.type as 'User' | 'Organization',
+        avatarUrl: data.owner.avatar_url,
+        url: data.owner.html_url,
+      },
       topics: data.topics || [],
       archived: data.archived,
       disabled: data.disabled,
@@ -1044,7 +1048,7 @@ export function useGitHubData() {
       refreshInterval: 5 * 60 * 1000,
       revalidateOnFocus: false,
       dedupingInterval: 10000,
-      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+      onErrorRetry: (_error, _key, _config, revalidate, { retryCount }) => {
         if (retryCount >= 3) return;
         setTimeout(() => revalidate({ retryCount }), 5000);
       },

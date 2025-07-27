@@ -723,6 +723,7 @@ export class GitLabClient implements GitProvider {
     signature: string,
     secret: string
   ): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const crypto = require('crypto');
     const expectedSignature = crypto
       .createHmac('sha256', secret)
