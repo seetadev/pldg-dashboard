@@ -3,12 +3,18 @@ import { MongoClient } from 'mongodb';
 
 const dbName = 'cohortDB';
 
-function getMongoClient() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    throw new Error('MONGODB_URI environment variable is not set');
+let mongoClient: MongoClient | null = null;
+
+async function getMongoClient() {
+  if (!mongoClient) {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      throw new Error('MONGODB_URI environment variable is not set');
+    }
+    mongoClient = new MongoClient(uri);
+    await mongoClient.connect();
   }
-  return new MongoClient(uri);
+  return mongoClient;
 }
 
 export async function GET(req: NextRequest) {
