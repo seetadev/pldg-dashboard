@@ -159,7 +159,7 @@ model UserSession {
 // =============================================================================
 
 // User document for MongoDB - denormalized structure
-type UserMongo {
+model UserMongo {
   // MongoDB ObjectId
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   
