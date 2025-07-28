@@ -189,7 +189,7 @@ model UserMongo {
 }
 
 // Analytics data - perfect for MongoDB's document model
-type Analytics {
+model Analytics {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   
   // Event tracking
