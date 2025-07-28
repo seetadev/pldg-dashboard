@@ -29,7 +29,7 @@ datasource mongodb {
 // AstraDB (Cassandra) datasource - for high-scale distributed data
 // Note: Requires Prisma's experimental Cassandra support
 datasource astradb {
-  provider = "cockroachdb" // Using CockroachDB provider as closest match
+  provider = "cassandra" // Using Cassandra provider for AstraDB
   url      = env("ASTRADB_URL")
   // AstraDB connection typically uses secure connection bundle
 }
