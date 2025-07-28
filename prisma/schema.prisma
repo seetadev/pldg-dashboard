@@ -1,0 +1,429 @@
+// Prisma Schema with Multi-Database Support
+// Supports: MongoDB, PostgreSQL, AstraDB (Cassandra), and AWS S3 metadata storage
+// Generator configuration for TypeScript client
+
+generator client {
+  provider = "prisma-client-js"
+  // Enable multiple database support
+  previewFeatures = ["multiSchema", "driverAdapters", "relationJoins"]
+}
+
+// =============================================================================
+// DATASOURCE CONFIGURATIONS
+// =============================================================================
+
+// Primary PostgreSQL datasource - for relational data and ACID transactions
+datasource postgresql {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+  // Optional: Connection pooling for high-performance applications
+  // directUrl = env("POSTGRESQL_DIRECT_URL")
+}
+
+// MongoDB datasource - for document storage and flexible schema
+datasource mongodb {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+// AstraDB (Cassandra) datasource - for high-scale distributed data
+// Note: Requires Prisma's experimental Cassandra support
+datasource astradb {
+  provider = "cassandra" // Using Cassandra provider for AstraDB
+  url      = env("ASTRADB_URL")
+  // AstraDB connection typically uses secure connection bundle
+}
+
+// =============================================================================
+// SHARED ENUMS - Work across all database types
+// =============================================================================
+
+enum UserRole {
+  ADMIN
+  MODERATOR
+  USER
+  GUEST
+}
+
+enum FileStatus {
+  UPLOADING
+  PROCESSING
+  COMPLETED
+  FAILED
+  DELETED
+}
+
+enum DataSource {
+  MONGODB
+  POSTGRESQL
+  ASTRADB
+  S3
+}
+
+// =============================================================================
+// POSTGRESQL MODELS - Relational data with strong consistency
+// =============================================================================
+
+// User model for PostgreSQL - normalized relational structure
+model User {
+  // Primary key with auto-increment
+  id        Int      @id @default(autoincrement())
+  
+  // User identification
+  username  String   @unique @db.VarChar(50)
+  email     String   @unique @db.VarChar(255)
+  
+  // User metadata
+  firstName String?  @db.VarChar(100)
+  lastName  String?  @db.VarChar(100)
+  role      UserRole @default(USER)
+  
+  // Audit fields
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  lastLogin DateTime? @db.Timestamptz
+  
+  // Soft delete support
+  isActive  Boolean  @default(true)
+  deletedAt DateTime? @db.Timestamptz
+  
+  // Relationships
+  posts     Post[]
+  files     FileMetadata[]
+  sessions  UserSession[]
+  
+  // Indexes for performance
+  @@index([email])
+  @@index([username])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// Content model - demonstrates relational structure
+model Post {
+  id        Int      @id @default(autoincrement())
+  
+  // Content fields
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  slug      String   @unique @db.VarChar(200)
+  
+  // Metadata
+  published Boolean  @default(false)
+  views     Int      @default(0)
+  
+  // Foreign key relationship
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+  publishedAt DateTime? @db.Timestamptz
+  
+  // Full-text search support
+  @@index([title, content])
+  @@index([publishedAt])
+  @@index([authorId])
+  @@map("posts")
+}
+
+// Session management for PostgreSQL
+model UserSession {
+  id        String   @id @default(cuid())
+  
+  // Session data
+  sessionToken String @unique @db.VarChar(255)
+  userId    Int
+  expires   DateTime @db.Timestamptz
+  
+  // Device/browser info
+  userAgent String?  @db.Text
+  ipAddress String?  @db.Inet
+  
+  // Relationship
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Audit
+  createdAt DateTime @default(now()) @db.Timestamptz
+  lastAccessed DateTime @default(now()) @db.Timestamptz
+  
+  @@index([sessionToken])
+  @@index([userId])
+  @@index([expires])
+  @@map("user_sessions")
+}
+
+// =============================================================================
+// MONGODB MODELS - Document-based flexible schema
+// =============================================================================
+
+// User document for MongoDB - denormalized structure
+model UserMongo {
+  // MongoDB ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // User data - embedded document approach
+  profile  Json   // Flexible profile data
+  settings Json   // User preferences and settings
+  
+  // Identification
+  username String @unique
+  email    String @unique
+  
+  // Metadata with MongoDB-specific features
+  role     UserRole @default(USER)
+  tags     String[] // Array field for MongoDB
+  
+  // Audit fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Embedded documents
+  addresses Json[] // Array of address objects
+  
+  // MongoDB-specific indexes
+  @@index([username])
+  @@index([email])
+  @@map("users_mongo")
+}
+
+// Analytics data - perfect for MongoDB's document model
+model Analytics {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Event tracking
+  eventType String
+  eventData Json   // Flexible event payload
+  
+  // User context
+  userId    String? @db.ObjectId
+  sessionId String?
+  
+  // Request context
+  metadata  Json    // Request headers, device info, etc.
+  
+  // Geolocation
+  location  Json?   // { lat, lng, city, country }
+  
+  // Timestamps
+  timestamp DateTime @default(now())
+  
+  // TTL for data retention (MongoDB feature)
+  expiresAt DateTime?
+  
+  @@index([eventType])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("analytics")
+}
+
+// Configuration storage - leverages MongoDB's flexible schema
+model Configuration {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Configuration key-value
+  key       String @unique
+  value     Json   // Flexible configuration values
+  
+  // Metadata
+  environment String  @default("production") // dev, staging, production
+  version     String  @default("1.0.0")
+  
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  
+  @@index([key])
+  @@index([environment])
+  @@map("configurations")
+}
+
+// =============================================================================
+// AWS S3 FILE METADATA MODELS - Works across all databases
+// =============================================================================
+
+// File metadata model - can be used in any database
+model FileMetadata {
+  // Universal ID that works across all DB types
+  id          String     @id @default(cuid())
+  
+  // S3 specific fields
+  s3Key       String     @unique // S3 object key
+  s3Bucket    String     // S3 bucket name
+  s3Region    String     // AWS region
+  s3Url       String?    // Pre-signed or public URL
+  
+  // File information
+  filename    String
+  originalName String
+  mimeType    String
+  fileSize    BigInt     // File size in bytes
+  
+  // File processing status
+  status      FileStatus @default(UPLOADING)
+  
+  // Metadata and tags
+  metadata    Json?      // Custom metadata as JSON
+  tags        String[]   // File tags for organization
+  
+  // Access control
+  isPublic    Boolean    @default(false)
+  uploadedBy  Int?       // References User.id
+  uploader    User?      @relation(fields: [uploadedBy], references: [id])
+  
+  // Checksums for integrity
+  md5Hash     String?
+  sha256Hash  String?
+  etag        String?    // S3 ETag
+  
+  // Timestamps
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  expiresAt   DateTime?  // Optional expiration
+  
+  // Performance indexes
+  @@index([s3Key])
+  @@index([s3Bucket])
+  @@index([uploadedBy])
+  @@index([status])
+  @@index([createdAt])
+  @@map("file_metadata")
+}
+
+// File processing jobs - for async file operations
+model FileProcessingJob {
+  id          String     @id @default(cuid())
+  
+  // Job details
+  fileId      String     // References FileMetadata.id
+  jobType     String     // "thumbnail", "transcoding", "analysis", etc.
+  status      String     @default("pending") // pending, processing, completed, failed
+  
+  // Processing configuration
+  parameters  Json?      // Job-specific parameters
+  
+  // Results
+  outputFiles Json?      // Array of generated file references
+  error       String?    // Error message if failed
+  
+  // Performance tracking
+  startedAt   DateTime?
+  completedAt DateTime?
+  retryCount  Int        @default(0)
+  maxRetries  Int        @default(3)
+  
+  // Audit
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  @@index([fileId])
+  @@index([status])
+  @@index([jobType])
+  @@index([createdAt])
+  @@map("file_processing_jobs")
+}
+
+// =============================================================================
+// CROSS-DATABASE COMPATIBILITY MODEL
+// =============================================================================
+
+// Universal model that works across all supported databases
+model UniversalRecord {
+  // ID strategy that works everywhere
+  id        String   @id @default(cuid())
+  
+  // Basic fields supported by all databases
+  title     String
+  content   String?
+  
+  // JSON field - supported by PostgreSQL, MongoDB, and modern databases
+  data      Json?
+  
+  // Enum field - works across all databases
+  source    DataSource @default(POSTGRESQL)
+  
+  // Array field - works in PostgreSQL and MongoDB
+  // For databases without native array support, this becomes JSON
+  categories String[]
+  
+  // Timestamps - universally supported
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Boolean field - universally supported
+  isActive  Boolean  @default(true)
+  
+  // Numeric fields
+  version   Int      @default(1)
+  priority  Float    @default(0.0)
+  
+  // Optional fields that gracefully degrade
+  metadata  Json?    // Additional flexible data
+  
+  // Indexes that work across databases
+  @@index([source])
+  @@index([createdAt])
+  @@index([isActive])
+  @@map("universal_records")
+}
+
+// =============================================================================
+// MIGRATION AND DEPLOYMENT HELPERS
+// =============================================================================
+
+// Database migration tracking - helps manage multi-db deployments
+model MigrationHistory {
+  id            String   @id @default(cuid())
+  
+  // Migration details
+  migrationName String   @unique
+  databaseType  String   // "postgresql", "mongodb", "astradb"
+  
+  // Execution tracking
+  executedAt    DateTime @default(now())
+  executionTime Int?     // Milliseconds
+  
+  // Status tracking
+  success       Boolean
+  errorMessage  String?
+  
+  // Metadata
+  version       String
+  checksum      String?
+  
+  @@index([databaseType])
+  @@index([executedAt])
+  @@map("migration_history")
+}
+
+// =============================================================================
+// PERFORMANCE AND MONITORING MODELS
+// =============================================================================
+
+// Query performance monitoring across databases
+model QueryMetrics {
+  id           String   @id @default(cuid())
+  
+  // Query identification
+  queryHash    String   // Hash of the query
+  database     String   // Which database was queried
+  operation    String   // SELECT, INSERT, UPDATE, DELETE, etc.
+  
+  // Performance metrics
+  executionTime Float   // Milliseconds
+  rowsAffected  Int?
+  
+  // Context
+  timestamp    DateTime @default(now())
+  userId       String?  // User who executed the query
+  
+  // Monitoring
+  isSlowQuery  Boolean  @default(false)
+  
+  @@index([database])
+  @@index([executionTime])
+  @@index([timestamp])
+  @@map("query_metrics")
+}
