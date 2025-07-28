@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGO_URI!;
-const client = new MongoClient(uri);
 const dbName = 'cohortDB';
+
+function getMongoClient() {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error('MONGODB_URI environment variable is not set');
+  }
+  return new MongoClient(uri);
+}
 
 export async function GET(req: NextRequest) {
   const cohortId = req.nextUrl.searchParams.get('id');
@@ -14,6 +20,7 @@ export async function GET(req: NextRequest) {
   const collectionName = `cohort${cohortId}feedback`;
 
   try {
+    const client = getMongoClient();
     await client.connect();
     const data = await client
       .db(dbName)

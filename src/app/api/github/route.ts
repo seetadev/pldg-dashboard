@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { GitHubData } from '@/types/dashboard';
+import { withMiddleware } from '@/lib/middleware';
+import { Logger } from '@/lib/logger';
 
 const PROJECT_ID = '7';
 const USERNAME = 'kt-wawro';
@@ -33,8 +35,20 @@ interface ProjectItem {
   };
 }
 
-export async function GET() {
+const logger = Logger.getInstance();
+
+async function handleGET(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = request.headers.get('x-request-id') || 'unknown';
+  
   try {
+    logger.info('GitHub data request started', {
+      requestId,
+      operation: 'github_data_fetch',
+      projectId: PROJECT_ID,
+      username: USERNAME,
+    });
+
     if (!process.env.GITHUB_TOKEN) {
       throw new Error('GitHub token not found');
     }
@@ -99,14 +113,27 @@ export async function GET() {
       `,
     };
 
+    const apiStartTime = Date.now();
     const response = await fetch('https://api.github.com/graphql', {
       method: 'POST',
       headers,
       body: JSON.stringify(projectQuery),
     });
 
+    const apiDuration = Date.now() - apiStartTime;
+
+    logger.logExternalAPI('github', 'https://api.github.com/graphql', 'POST', response.status, apiDuration, {
+      requestId,
+      rateLimit: {
+        limit: response.headers.get('x-ratelimit-limit'),
+        remaining: response.headers.get('x-ratelimit-remaining'),
+        reset: response.headers.get('x-ratelimit-reset'),
+      }
+    });
+
     if (!response.ok) {
-      console.error('GitHub API Error:', {
+      logger.warn('GitHub API error response', {
+        requestId,
         status: response.status,
         statusText: response.statusText,
       });
@@ -116,7 +143,13 @@ export async function GET() {
     const rawData = await response.json();
 
     if (!rawData?.data?.user?.projectV2?.items?.nodes) {
-      console.error('Invalid GitHub response structure:', rawData);
+      logger.error('Invalid GitHub response structure', undefined, {
+        requestId,
+        hasData: !!rawData.data,
+        hasUser: !!rawData.data?.user,
+        hasProject: !!rawData.data?.user?.projectV2,
+        hasItems: !!rawData.data?.user?.projectV2?.items,
+      });
       throw new Error('Invalid response structure from GitHub');
     }
 
@@ -148,12 +181,22 @@ export async function GET() {
       timestamp: Date.now(),
     };
 
+    const totalDuration = Date.now() - startTime;
+    logger.info('GitHub data fetched successfully', {
+      requestId,
+      duration: totalDuration,
+      apiDuration,
+      itemCount: items.length,
+      statusCounts,
+    });
+
     return NextResponse.json(responseData);
   } catch (error) {
-    console.error('GitHub API error:', {
-      error,
-      timestamp: new Date().toISOString(),
-      message: error instanceof Error ? error.message : 'Unknown error',
+    const duration = Date.now() - startTime;
+    logger.error('GitHub API error', error as Error, {
+      requestId,
+      duration,
+      operation: 'github_data_fetch',
     });
 
     // Return a properly structured empty response
@@ -177,6 +220,8 @@ export async function GET() {
     } as GitHubData);
   }
 }
+
+export const GET = withMiddleware(handleGET);
 
 function getItemStatus(item: ProjectItem): string {
   try {

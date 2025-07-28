@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pldg-dashboard-service
+  namespace: production
+  labels:
+    app: pldg-dashboard
+    service: pldg-dashboard
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account:certificate/cert-id"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: pldg-dashboard
+  sessionAffinity: None
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pldg-dashboard-headless
+  namespace: production
+  labels:
+    app: pldg-dashboard
+    service: pldg-dashboard-headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: pldg-dashboard
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pldg-dashboard-nodeport
+  namespace: production
+  labels:
+    app: pldg-dashboard
+    service: pldg-dashboard-nodeport
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    nodePort: 30080
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 3000
+    nodePort: 30443
+    protocol: TCP
+  selector:
+    app: pldg-dashboard
+  sessionAffinity: None
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: pldg-dashboard-service
+  namespace: production
+  labels:
+    app: pldg-dashboard
+# Endpoints will be automatically populated by the service selector
