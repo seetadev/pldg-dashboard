@@ -523,11 +523,10 @@ export class GitLabClient implements GitProvider {
     // GitLab doesn't have a dedicated rate limit endpoint
     // We'll make a simple request and extract rate limit info from headers
     try {
-      const response = await this.httpClient.request('user', {
+      const response = await this.makeRequest('user', {
         headers: {
           'Authorization': `Bearer ${this.config.token}`,
         },
-        platform: 'gitlab',
       });
 
       const rateLimitInfo = response.rateLimitInfo;
