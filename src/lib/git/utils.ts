@@ -609,8 +609,8 @@ export function isValidToken(token: string, platform: 'github' | 'gitlab'): bool
   if (!token || typeof token !== 'string') return false;
   
   if (platform === 'github') {
-    // GitHub tokens can be classic tokens (ghp_), fine-grained (github_pat_), or app tokens (ghs_)
-    return /^(ghp_|github_pat_|ghs_)[a-zA-Z0-9]{36,255}$/.test(token);
+    // GitHub tokens are alphanumeric with optional special characters and a reasonable length range
+    return /^[a-zA-Z0-9_-]{20,255}$/.test(token);
   } else if (platform === 'gitlab') {
     // GitLab tokens are typically alphanumeric and at least 20 characters
     return /^[a-zA-Z0-9_-]{20,255}$/.test(token);
