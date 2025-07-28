@@ -219,7 +219,7 @@ model Analytics {
 }
 
 // Configuration storage - leverages MongoDB's flexible schema
-type Configuration {
+model Configuration {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   
   // Configuration key-value
