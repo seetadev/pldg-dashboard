@@ -10,7 +10,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-3 text-indigo-900">Data Sources</h3>
             <ul className="space-y-3">
-              <li>
+              {/* <li>
                 <a 
                   href="https://airtable.com/appFEDy5FPBFHPY5r/shr773Cn3Q3owRDDR"
                   target="_blank"
@@ -26,10 +26,10 @@ export function Footer() {
                   />
                   <span>Engagement Data (Airtable)</span>
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a 
-                  href="https://github.com/jbarnes850/pldg-dashboard/tree/main"
+                  href="https://github.com/seetadev/pldg-dashboard"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"

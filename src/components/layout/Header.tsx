@@ -17,7 +17,7 @@ export function Header() {
         
         <nav className="flex items-center gap-6">
           <div className="hidden md:flex items-center gap-6">
-            <Link 
+            {/* <Link 
               href="https://airtable.com/appFEDy5FPBFHPY5r/shr773Cn3Q3owRDDR" 
               target="_blank"
               className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
@@ -31,10 +31,10 @@ export function Header() {
                 priority
               />
               <span>Airtable</span>
-            </Link>
+            </Link> */}
             
             <Link 
-              href="https://github.com/jbarnes850/pldg-dashboard/tree/main" 
+              href="https://github.com/seetadev/pldg-dashboard" 
               target="_blank"
               className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors group"
             >
