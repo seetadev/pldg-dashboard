@@ -1,11 +1,11 @@
 # PLDG Dashboard
 
-A real-time analytics dashboard for tracking developer engagement, technical progress, and contribution metrics across the PLDG (Protocol Labs Developer Guild) program — now enhanced with **Storacha MCP**, **ElizaOS Plugin**, and **Builder Insights** integration.
+A real-time analytics dashboard for tracking developer engagement, technical progress, and contribution metrics across the PLDG (Protocol Labs Developer Guild) program — now enhanced with **Py-libp2p**, **Storacha MCP**, **ElizaOS Plugin**, and **Builder Insights** integration.
 
 ## Features
 
 * 📊 Real-time engagement metrics visualization
-* 🤝 Tech partner collaboration tracking
+* 🤝 Tech partner collaboration tracking and communication using Py-libp2p, universal connectivity dapp
 * 📈 Technical progress monitoring
 * 🏆 Top performer analytics
 * 🤖 AI-powered insights generation (via ElizaOS Plugin)
