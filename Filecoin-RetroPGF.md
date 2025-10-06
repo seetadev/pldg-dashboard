@@ -1,4 +1,3 @@
-```markdown
 ## 🧭 Project Name  
 **PLDG Dashboard**
 
@@ -36,7 +35,7 @@ Over time, it aims to become a cornerstone of **impact metrics and self-reflecti
 🔗 [PLDG Dashboard GitHub Repository](https://github.com/seetadev/pldg-dashboard)
 🔗 [PLDG Dashboard Cohort-2 & 1 Website](https://pldg-dashboard-theta.vercel.app/)
 🔗 [PLDG Dashboard Cohort 1 Website](https://pldg-dashboard.vercel.app/)
-```
+
 
 
 
