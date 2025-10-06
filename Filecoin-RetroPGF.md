@@ -50,9 +50,9 @@ PLDG Dashboard contributors are now invited to **share feedback, collaborate, an
 
 🔗 [PLDG Dashboard Cohort-2 & 1 Website](https://pldg-dashboard-theta.vercel.app/)
 
-🔗 Join us at Discord: [Discord](https://discord.gg/CaxSQM5a)
-
 🔗 [PLDG Dashboard Cohort 1 Website](https://pldg-dashboard.vercel.app/)
+
+🔗 Join us at Discord: [Discord](https://discord.gg/CaxSQM5a)
 
 
 
