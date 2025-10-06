@@ -56,6 +56,9 @@ PLDG Dashboard contributors are now invited to **share feedback, collaborate, an
 
 🔗 Join us at Discord: [Discord](https://discord.gg/CaxSQM5a)
 
+🔗 [IPFS Storage Link of Cohort Data](https://bafybeibjszo66ory4ybpet2hz5f67kesxs6anxz6o67wcpmmepwfoaogha.ipfs.w3s.link/)
+
+
 
 
 
