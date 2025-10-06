@@ -5,7 +5,7 @@
 Developer Tooling / Ecosystem Infrastructure
 
 ## 🧠 Project Description  
-The **PLDG Dashboard** is a real-time analytics platform for tracking developer engagement, technical progress, and contribution metrics across the **Protocol Labs Developer Guild (PLDG)** program. It offers transparent, data-driven insights into the health and growth of the Filecoin and Libp2p ecosystems through integrations with **Py-libp2p**, **Storacha MCP**, **ElizaOS Plugin**, and **Builder Insights**.  
+The **PLDG Dashboard** is a real-time analytics platform for tracking developer engagement, technical progress, and contribution metrics across the **Protocol Labs Developer Guild (PLDG)** program. It offers transparent, data-driven insights into the health and growth of the Filecoin and Libp2p ecosystems through integrations with **Py-libp2p**, **Storacha**, and **Builder Insights**.  
 
 This voluntary initiative, developed by **C4GT (Code for GovTech)** contributors, fosters collaborative learning and ecosystem alignment. It enables participants to visualize their open-source impact and identify growth pathways within the **Filecoin**, **Libp2p**, **Fil-Oz**, **Fil-B**, and **Storacha** communities.  
 
@@ -33,7 +33,9 @@ Over time, it aims to become a cornerstone of **impact metrics and self-reflecti
 
 ## 🌐 URL  
 🔗 [PLDG Dashboard GitHub Repository](https://github.com/seetadev/pldg-dashboard)
+
 🔗 [PLDG Dashboard Cohort-2 & 1 Website](https://pldg-dashboard-theta.vercel.app/)
+
 🔗 [PLDG Dashboard Cohort 1 Website](https://pldg-dashboard.vercel.app/)
 
 
