@@ -52,6 +52,8 @@ PLDG Dashboard contributors are now invited to **share feedback, collaborate, an
 
 🔗 [PLDG Dashboard Cohort 1 Website](https://pldg-dashboard.vercel.app/)
 
+🔗 [Screencast for saving PLDG cohort data to Filecoin and Storacha](https://drive.google.com/file/d/1lUdhCe_Wu_aNgs-57Lhmqy6zDQMadR0a/view?usp=drive_link)
+
 🔗 Join us at Discord: [Discord](https://discord.gg/CaxSQM5a)
 
 
