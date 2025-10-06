@@ -39,7 +39,6 @@ We’re excited to announce a collaboration with **Agentic OS**, an open-source 
 
 PLDG Dashboard contributors are now invited to **share feedback, collaborate, and contribute** to Agentic OS, enabling stronger interoperability between **developer analytics, autonomous agent tooling, and Web3 infrastructure**.
 
-* **Join the Agentic OS community:** [Discord](https://discord.gg/3fvxzs4E)
 * **Goal:** Amplify developer productivity, collaboration, and ecosystem insights across Filecoin, Libp2p, and broader Web3 networks.
 
 ---
