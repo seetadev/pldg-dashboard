@@ -2,7 +2,7 @@
 **PLDG Dashboard**
 
 ## 🧩 Project Category  
-Developer Tooling / Ecosystem Infrastructure
+Developer Tooling / Filecoin Education & Ecosystem Infrastructure
 
 ## 🧠 Project Description  
 The **PLDG Dashboard** is a real-time analytics platform for tracking developer engagement, technical progress, and contribution metrics across the **Protocol Labs Developer Guild (PLDG)** program. It offers transparent, data-driven insights into the health and growth of the Filecoin and Libp2p ecosystems through integrations with **Storacha**, **Filecoin & IPFS**, **Py-libp2p** and **Builder Insights**.  
@@ -29,9 +29,23 @@ Over time, it aims to become a cornerstone of **impact metrics and self-reflecti
 - GitHub + Airtable integration  
 - Core analytics  
 - Basic AI summarization  
-- Storacha test storage integration  
+- Storacha test storage integration
+
+---
+
+## 🤝 New Collaboration: Agentic OS
+
+We’re excited to announce a collaboration with **Agentic OS**, an open-source initiative led by **Eva and the Hyperspace team**. Agentic OS brings together **1,000+ agents, 100+ AI models, and hundreds of MCPs** into a unified orchestration environment to empower developers.
+
+PLDG Dashboard contributors are now invited to **share feedback, collaborate, and contribute** to Agentic OS, enabling stronger interoperability between **developer analytics, autonomous agent tooling, and Web3 infrastructure**.
+
+* **Join the Agentic OS community:** [Discord](https://discord.gg/3fvxzs4E)
+* **Goal:** Amplify developer productivity, collaboration, and ecosystem insights across Filecoin, Libp2p, and broader Web3 networks.
+
+---
 
 ## 🌐 URL  
+
 🔗 [PLDG Dashboard GitHub Repository](https://github.com/seetadev/pldg-dashboard)
 
 🔗 [PLDG Dashboard Cohort-2 & 1 Website](https://pldg-dashboard-theta.vercel.app/)
