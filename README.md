@@ -1,4 +1,4 @@
-# PLDG Dashboard
+# PLDG Dashboard (Protocol Labs Dev Guild Dashboard)
 
 A real-time analytics dashboard for tracking developer engagement, technical progress, and contribution metrics across the PLDG (Protocol Labs Developer Guild) program — now enhanced with **Py-libp2p**, **Storacha MCP**, **ElizaOS Plugin**, and **Builder Insights** integration.
 
