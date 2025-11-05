@@ -46,6 +46,8 @@ PLDG Dashboard contributors are now invited to **share feedback, collaborate, an
 
 ## 🌐 URL  
 
+🔗 [FIL RetroPGF for Builders: Supporting Open Source Coordination Through PLDG](https://docs.google.com/presentation/d/15WzERsBLdPg_I36Cew4M7glKy6-eOWvDueNfel5-wRc/edit?usp=sharing)
+
 🔗 [PLDG Dashboard GitHub Repository](https://github.com/seetadev/pldg-dashboard)
 
 🔗 [PLDG Dashboard Cohort-2 & 1 Website](https://pldg-dashboard-theta.vercel.app/)
