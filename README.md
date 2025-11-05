@@ -202,17 +202,27 @@ It contributes to improving **transparency**, **impact measurement**, and **tale
 ## 📎 Reference Links & Resources
 
 * 🧾 [**Filecoin RetroPGF Application**](https://github.com/filecoin-project/community/discussions/744#discussioncomment-14603907)
+  
 * 💻 [**PLDG Dashboard Live**](https://pldg-dashboard-theta.vercel.app/)
+  
 * 💾 [**PLDG Dashboard GitHub Repository**](https://github.com/protocollabs/pldg-dashboard)
-* 🌐 [**PLDG Dashboard (v2) Cohort-2 & 1 Website**](https://pldg-dashboard-theta.vercel.app/)
-* 🎥 [**Screencast: Saving PLDG Cohort Data to Filecoin & Storacha**](#)
-* 🌍 [**PLDG Dashboard (v1) Website**](#)
-* 📦 [**IPFS Storage Link of Cohort Data**](#)
+  
+* 🎥 [**Screencast: Saving PLDG Cohort Data to Filecoin & Storacha**](https://drive.google.com/file/u/4/d/1lUdhCe_Wu_aNgs-57Lhmqy6zDQMadR0a/view?usp=drive_link)
+  
+* 🌍 [**PLDG Dashboard (v1) Website**](https://pldg-dashboard.vercel.app/)
+  
+* 📦 [**IPFS Storage Link of Cohort Data**](https://bafybeibjszo66ory4ybpet2hz5f67kesxs6anxz6o67wcpmmepwfoaogha.ipfs.w3s.link/)
+  
+* 🌐 **PLDG Website:** [https://www.pldg.xyz/#about](https://www.pldg.xyz/#about)
+  
 * 🧱 [**FIL RetroPGF for Builders: Supporting Open Source Coordination Through PLDG**](#)
-* 💬 [**Collaborate and meet us on Discord**](#)
-* 🗓️ **Community Participation at PL EngRes “The Gathering”**
+  
+* 💬 [**Collaborate and meet us on Discord**](https://discord.com/invite/CaxSQM5a)
 
+* 
+* 🗓️ **Community Participation at PL EngRes “The Gathering”**
   * August 2025 · May 2025 · April 2025 · February 2025 · December 2024
+  
 * 🧵 [**X (Twitter) Thread — PLDG Dashboard × Filecoin × Storacha × IPFS Progress**](https://x.com/UserApps/status/1975217388754002221)
 
 ---
