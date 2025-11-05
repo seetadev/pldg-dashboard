@@ -3,7 +3,7 @@
 
 A real-time analytics dashboard for tracking developer engagement, technical progress, and contribution metrics across the **Protocol Labs Developer Guild (PLDG)** program — now enhanced with **Py-libp2p**, **Storacha MCP**, **ElizaOS Plugin**, and **Builder Insights** integration.
 
-🌐 **Live Demo:** [https://pldg-dashboard-theta.vercel.app/](https://pldg-dashboard-theta.vercel.app/)
+🌐 **Deployment Link:** [https://pldg-dashboard-theta.vercel.app/](https://pldg-dashboard-theta.vercel.app/)
 
 ---
 
