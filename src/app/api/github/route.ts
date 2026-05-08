@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GitHubData } from '@/types/dashboard';
 
-const PROJECT_ID = '7';
-const USERNAME = 'kt-wawro';
+const PROJECT_ID = process.env.GITHUB_PROJECT_ID || '7';
+const USERNAME = process.env.GITHUB_OWNER || 'kt-wawro';
 
 const COLUMN_STATUS = {
   'In Progress': 'In Progress',

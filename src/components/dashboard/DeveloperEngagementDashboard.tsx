@@ -12,12 +12,9 @@ import { LoadingSpinner } from '../ui/loading';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
-import { enhanceTechPartnerData } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
-import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
-import normalizeEngagementData from '@/lib/formatDBData';
+import { processDashboardData } from '@/lib/processor';
+import { validateEngagementData } from '@/lib/validation';
 
 export default function DeveloperEngagementDashboard() {
   const { data, isLoading, isError, refresh, lastUpdated, isFetching } = useDashboardSystemContext();
@@ -36,9 +33,9 @@ export default function DeveloperEngagementDashboard() {
 
         const rawData: Record<string, any>[] = await response.json();
 
-         // Normalize each entry
-        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
-        console.log('CSV Text:', cleanedData);
+         // Data is now normalized and validated inside processDashboardData
+         const cleanedData: EngagementData[] = rawData as EngagementData[];
+         console.log('Cleaned Data:', cleanedData);
 
         setCsvData(cleanedData);
         setIsLoadingCSV(false)
@@ -51,14 +48,11 @@ export default function DeveloperEngagementDashboard() {
     loadCSVData();
   }, []);
 
-  const processedData = csvData.length > 0 ? processData(csvData) : null;
+  const processedData = React.useMemo(() => 
+    csvData.length > 0 ? processDashboardData(csvData) : null,
+  [csvData]);
 
-  const enhancedTechPartnerData = React.useMemo(() =>
-    processedData?.techPartnerPerformance && processedData?.rawEngagementData
-      ? enhanceTechPartnerData(processedData.techPartnerPerformance, processedData.rawEngagementData)
-      : [],
-  [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
-);
+  const enhancedTechPartnerData = processedData?.techPartnerPerformance || [];
 
   React.useEffect(() => {
     console.log('Dashboard State:', {
