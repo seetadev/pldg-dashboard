@@ -104,7 +104,7 @@ export async function GET() {
       'Name': record.fields['Name'] || '',
       'Engagement Participation ': record.fields['Engagement Participation '] || '',
       'Tech Partner Collaboration?': record.fields['Tech Partner Collaboration?'] || 'No',
-      'Which Tech Partner': parseTechPartners(record.fields['Which Tech Partner'] || []),
+      'Which Tech Partner': record.fields['Which Tech Partner'] || [],
       'How many issues, PRs, or projects this week?': record.fields['How many issues, PRs, or projects this week?'] || '0',
       'How likely are you to recommend the PLDG to others?': record.fields['How likely are you to recommend the PLDG to others?'] || '0',
       'PLDG Feedback': record.fields['PLDG Feedback'] || '',
@@ -129,9 +129,3 @@ export async function GET() {
   }
 }
 
-function parseTechPartners(techPartner: string | string[]): string[] {
-  if (Array.isArray(techPartner)) {
-    return techPartner;
-  }
-  return techPartner?.split(',').map(p => p.trim()) ?? [];
-} 

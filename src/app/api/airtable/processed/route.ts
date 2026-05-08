@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { processData } from '@/lib/data-processing';
+import { processDashboardData } from '@/lib/processor';
 import { GitHubData, EngagementData } from '@/types/dashboard';
 
 async function fetchAirtableData(): Promise<EngagementData[]> {
@@ -45,7 +45,7 @@ export async function GET() {
     const githubData = await fetchGitHubData();
 
     // Process the data using our enhanced processing functions
-    const processedData = processData(rawData, githubData);
+    const processedData = processDashboardData(rawData, githubData);
     console.log('Processed data:', {
       weeklyChange: processedData.weeklyChange,
       activeContributors: processedData.activeContributors,

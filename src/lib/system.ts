@@ -2,9 +2,9 @@ import { useCallback, useMemo } from 'react';
 import { useAirtableData } from './airtable';
 import { useGitHubData } from './github';
 import { useCSVData } from '@/hooks/useCSVData';
-import { processData } from './data-processing';
 import { GitHubData } from '@/types/dashboard';
 import React from 'react';
+import { processDashboardData } from './processor';
 
 export function useDashboardSystem() {
   const {
@@ -120,7 +120,7 @@ export function useDashboardSystem() {
           sampleRecord: transformedData[0]
         });
 
-        const result = processData(transformedData, githubData || mockGitHubData);
+        const result = processDashboardData(transformedData, githubData || mockGitHubData);
         return result;
       } catch (error) {
         console.error('Error processing CSV data:', error);
@@ -150,7 +150,7 @@ export function useDashboardSystem() {
           },
           timestamp: Date.now()
         };
-        const result = processData(airtableData, githubData || mockGitHubData);
+        const result = processDashboardData(airtableData, githubData || mockGitHubData);
         return result;
       } catch (error) {
         console.error('Error processing Airtable data:', error);

@@ -1,87 +1,83 @@
-import { GitHubData, GitHubUserContribution, ValidatedContribution } from '@/types/dashboard';
-import { VALIDATION_CONFIG, normalizeContributorName } from './constants';
+import { z } from 'zod';
 
-export interface AirtableRecord {
-  fields: {
-    Name: string;
-    'How many issues, PRs, or projects this week?': string;
-    [key: string]: any;
+/**
+ * Zod schema for Airtable engagement records.
+ * Provides strict validation and normalization of field names.
+ */
+export const EngagementRecordSchema = z.object({
+  'Name': z.preprocess((val) => {
+    if (typeof val === 'string') return val.trim();
+    return val;
+  }, z.string().min(1)),
+  'Program Week': z.string().min(1),
+  'Engagement Participation ': z.string().optional().default('1 - Low'),
+  'Tech Partner Collaboration?': z.string().optional().default('No'),
+  'Which Tech Partner': z.union([z.string(), z.array(z.string())]).optional().default([]),
+  'How many issues, PRs, or projects this week?': z.string().optional().default('0'),
+  'PLDG Feedback': z.string().optional().default(''),
+  'GitHub Issue Title': z.string().optional().default(''),
+  'GitHub Issue URL': z.string().optional().default(''),
+  'Created': z.string().optional().default(''),
+  'Issue Title 1': z.string().optional().default(''),
+  'Issue Link 1': z.string().optional().default(''),
+  'Issue Title 2': z.string().optional().default(''),
+  'Issue Link 2': z.string().optional().default(''),
+  'Issue Title 3': z.string().optional().default(''),
+  'Issue Link 3': z.string().optional().default(''),
+}).passthrough();
+
+export type ValidatedEngagementRecord = z.infer<typeof EngagementRecordSchema>;
+
+/**
+ * Normalizes and validates raw data records.
+ * Handles common inconsistencies like BOM characters or alternative field names.
+ */
+export function normalizeAndValidateRecord(record: Record<string, any>): ValidatedEngagementRecord {
+  const normalized: Record<string, any> = {};
+  
+  // Mapping of common variations to canonical field names
+  const mapping: Record<string, string> = {
+    'Name': 'Name',
+    '﻿Name': 'Name', // BOM character
+    'Program Week': 'Program Week',
+    'Engagement Participation ': 'Engagement Participation ',
+    'Engagement Participation': 'Engagement Participation ',
+    'Tech Partner Collaboration?': 'Tech Partner Collaboration?',
+    'Which Tech Partner': 'Which Tech Partner',
+    'How many issues, PRs, or projects this week?': 'How many issues, PRs, or projects this week?',
+    'PLDG Feedback': 'PLDG Feedback',
+    'GitHub Issue Title': 'GitHub Issue Title',
+    'GitHub Issue URL': 'GitHub Issue URL',
+    'Issue Title 1': 'Issue Title 1',
+    'Issue Link 1': 'Issue Link 1',
+    'Issue Title 2': 'Issue Title 2',
+    'Issue Link 2': 'Issue Link 2',
+    'Issue Title 3': 'Issue Title 3',
+    'Issue Link 3': 'Issue Link 3',
   };
-}
 
-export interface AirtableResponse {
-  records: AirtableRecord[];
-}
-
-export function validateContributions(
-  projectBoard: GitHubData,
-  userContributions: Record<string, GitHubUserContribution>,
-  airtableData: AirtableResponse
-): {
-  validatedContributions: Record<string, ValidatedContribution>;
-  discrepancies: Array<{ username: string; discrepancy: string }>;
-} {
-  const discrepancies: Array<{ username: string; discrepancy: string }> = [];
-  const validatedContributions: Record<string, ValidatedContribution> = {};
-
-  if (!projectBoard?.projectBoard?.issues) {
-    console.warn('No project board data available for validation');
-    return { validatedContributions, discrepancies };
+  for (const [key, value] of Object.entries(record)) {
+    const canonicalKey = mapping[key.trim()];
+    if (canonicalKey) {
+      normalized[canonicalKey] = value;
+    } else {
+      normalized[key] = value;
+    }
   }
 
-  // First validate against project board (primary source)
-  for (const record of airtableData.records) {
-    if (!record?.fields?.Name) continue;
-
-    const githubUsername = normalizeContributorName(record.fields.Name);
-    const reportedCount = parseInt(record.fields['How many issues, PRs, or projects this week?'] || '0', 10);
-    
-    const projectBoardCount = countUserProjectBoardItems(projectBoard, githubUsername);
-    const githubCount = countUserGithubContributions(userContributions[githubUsername]);
-
-    // Primary validation against project board
-    const projectBoardValid = Math.abs(reportedCount - projectBoardCount) <= VALIDATION_CONFIG.maxIssueDifference;
-
-    // Secondary validation against contributor profile
-    const contributorValid = Math.abs(githubCount - projectBoardCount) <= VALIDATION_CONFIG.maxIssueDifference;
-
-    if (!projectBoardValid) {
-      discrepancies.push({
-        username: githubUsername,
-        discrepancy: `Project Board: Reported ${reportedCount} vs actual ${projectBoardCount}`
-      });
-    }
-
-    if (!contributorValid) {
-      discrepancies.push({
-        username: githubUsername,
-        discrepancy: `Contributor Profile: Board shows ${projectBoardCount} vs profile shows ${githubCount}`
-      });
-    }
-
-    validatedContributions[githubUsername] = {
-      reported: reportedCount,
-      projectBoard: projectBoardCount,
-      github: githubCount,
-      isValid: projectBoardValid, // Primary source determines validity
-      contributorValid: contributorValid // Additional validation info
-    };
-  }
-
-  return { validatedContributions, discrepancies };
+  return EngagementRecordSchema.parse(normalized);
 }
 
-export function countUserProjectBoardItems(projectBoard: GitHubData, username: string): number {
-  return (projectBoard.projectBoard?.issues || projectBoard.issues || []).filter(issue => 
-    issue.assignee?.login === username
-  ).length;
-}
-
-export function countUserGithubContributions(contribution?: GitHubUserContribution): number {
-  if (!contribution) return 0;
-  return (
-    contribution.issues.created +
-    contribution.pullRequests.created +
-    contribution.pullRequests.reviewed
-  );
+/**
+ * Validates an array of raw engagement data.
+ */
+export function validateEngagementData(data: any[]): ValidatedEngagementRecord[] {
+  return data.map(record => {
+    try {
+      return normalizeAndValidateRecord(record);
+    } catch (error) {
+      console.warn('Record validation failed, using raw record as fallback:', { record, error });
+      return record as ValidatedEngagementRecord;
+    }
+  });
 }
