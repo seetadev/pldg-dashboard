@@ -33,19 +33,27 @@ export default function DeveloperEngagementDashboard() {
         console.log('Loading CSV data...');
         const response = await fetch('/api/cohort');
 
+        if (!response.ok) {
+          throw new Error(`Failed to load cohort data: ${response.status} ${response.statusText}`);
+        }
 
-        const rawData: Record<string, any>[] = await response.json();
+        const rawData = await response.json();
+
+        if (!Array.isArray(rawData)) {
+          throw new Error('Invalid cohort data format');
+        }
 
          // Normalize each entry
         const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
         console.log('CSV Text:', cleanedData);
 
         setCsvData(cleanedData);
-        setIsLoadingCSV(false)
         
       } catch (error) {
         console.error('Failed to load CSV:', error);
         setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
+      } finally {
+        setIsLoadingCSV(false);
       }
     }
     loadCSVData();
