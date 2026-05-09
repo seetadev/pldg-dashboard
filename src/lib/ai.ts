@@ -75,6 +75,36 @@ export function generateAIInsights(data: ProcessedData): AIInsights {
   const recommendations: string[] = [];
   const achievements: string[] = [];
 
+  // --- Key Trends: factual observations about the current state of the data ---
+  const latestIssues = data.issueMetrics[data.issueMetrics.length - 1];
+  const completionRate = (latestIssues.closed / (latestIssues.total || 1)) * 100;
+
+  // Contribution momentum
+  if (data.weeklyChange > 0) {
+    keyTrends.push(`Contributions are up ${Math.round(data.weeklyChange)}% week-over-week`);
+  } else if (data.weeklyChange < 0) {
+    keyTrends.push(`Contributions are down ${Math.abs(Math.round(data.weeklyChange))}% week-over-week`);
+  } else {
+    keyTrends.push('Contribution volume is stable compared to last week');
+  }
+
+  // Engagement rate
+  keyTrends.push(`Current engagement rate is ${data.programHealth.engagementRate}%`);
+
+  // NPS
+  keyTrends.push(`Program NPS stands at ${data.programHealth.npsScore}`);
+
+  // Tech partner activity
+  keyTrends.push(`${data.programHealth.activeTechPartners} tech partner${data.programHealth.activeTechPartners !== 1 ? 's' : ''} actively collaborating this period`);
+
+  // Issue completion
+  keyTrends.push(`Issue completion rate is ${Math.round(completionRate)}% (${latestIssues.closed} of ${latestIssues.total} issues closed)`);
+
+  // Active contributors
+  keyTrends.push(`${data.activeContributors} active contributor${data.activeContributors !== 1 ? 's' : ''} with ${data.totalContributions} total contributions`);
+
+  // --- Achievements, concerns, recommendations ---
+
   // Analyze engagement trends
   if (data.weeklyChange > 10) {
     achievements.push(`Strong growth with ${Math.round(data.weeklyChange)}% increase in contributions`);
@@ -84,8 +114,6 @@ export function generateAIInsights(data: ProcessedData): AIInsights {
   }
 
   // Analyze technical progress
-  const latestIssues = data.issueMetrics[data.issueMetrics.length - 1];
-  const completionRate = (latestIssues.closed / (latestIssues.total || 1)) * 100;
   if (completionRate > 70) {
     achievements.push(`High issue completion rate at ${Math.round(completionRate)}%`);
   } else if (completionRate < 30) {
