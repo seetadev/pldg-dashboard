@@ -309,8 +309,10 @@ export function calculateEngagementScore(data: ProcessedData): number {
 
   // Calculate engagement rate based on active contributors
   // Compare to the average number of contributors across all weeks
-  const averageContributors = data.engagementTrends.reduce((sum, week) => sum + week.total, 0) / 
-    data.engagementTrends.length;
+  
+  const totalAcrossWeeks = data.engagementTrends.reduce((sum, week) => sum + week.total, 0);
+  if (totalAcrossWeeks === 0) return 0;
+  const averageContributors = totalAcrossWeeks / data.engagementTrends.length;
   
   const engagementRate = (recentEngagement.total / averageContributors) * 100;
 
@@ -334,6 +336,7 @@ export function calculateCollaborationIndex(data: ProcessedData): number {
   const partnersSet = new Set(data.techPartnerMetrics.map(m => m.partner));
   const activePartners = Array.from(partnersSet).length;
   const totalContributors = data.topPerformers.length;
+  if (totalContributors === 0) return 0;
   return Math.round((activePartners / totalContributors) * 100);
 }
 
