@@ -90,7 +90,7 @@ export const VALIDATION_CONFIG = {
 // Helper functions for name normalization
 export function normalizeContributorName(name: string): string {
   const normalized = name.toLowerCase().trim();
-  return CONTRIBUTOR_ALIASES[normalized] || name;
+  return CONTRIBUTOR_ALIASES[normalized] || normalized;
 }
 
 // Validation helper
