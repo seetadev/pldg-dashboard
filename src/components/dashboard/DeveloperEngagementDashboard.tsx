@@ -8,13 +8,11 @@ import EngagementChart from './EngagementChart';
 import TechnicalProgressChart from './TechnicalProgressChart';
 import { TechPartnerChart } from './TechPartnerChart';
 import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner } from '../ui/loading';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
 import { enhanceTechPartnerData } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
 import normalizeEngagementData from '@/lib/formatDBData';
@@ -32,6 +30,9 @@ export default function DeveloperEngagementDashboard() {
       try {
         console.log('Loading CSV data...');
         const response = await fetch('/api/cohort');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch cohort data: ${response.status} ${response.statusText}`);
+        }
 
 
         const rawData: Record<string, any>[] = await response.json();
@@ -83,16 +84,6 @@ export default function DeveloperEngagementDashboard() {
 
   if (errorCSV || !processedData) {
     return <div>Error: {errorCSV || 'No data available'}</div>;
-  }
-
-  if (!processedData && isLoading) {
-    return (
-      <div className="container mx-auto p-4">
-        <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      </div>
-    );
   }
 
   if (isError || !processedData) {
