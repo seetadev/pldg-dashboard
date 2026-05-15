@@ -3,7 +3,7 @@ import { KPICard } from "./KPICard";
 
 export function PerformanceIndicators({ data }: { data: ProcessedData }) {
   const latestIssueMetrics = data.issueMetrics[data.issueMetrics.length - 1];
-  const completionRate = latestIssueMetrics
+  const completionRate = latestIssueMetrics && latestIssueMetrics.total > 0
     ? Math.round((latestIssueMetrics.closed / latestIssueMetrics.total) * 100)
     : 0;
 
