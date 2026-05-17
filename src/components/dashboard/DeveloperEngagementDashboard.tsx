@@ -132,8 +132,9 @@ export default function DeveloperEngagementDashboard() {
               onClick={refresh}
               disabled={isFetching}
               className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+              aria-label={isFetching ? 'Refreshing dashboard data' : 'Refresh dashboard data'}
             >
-              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} aria-hidden="true" />
               Refresh Data
             </Button>
           </div>

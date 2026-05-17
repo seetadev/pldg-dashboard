@@ -39,7 +39,7 @@ export function Filters({
   };
 
   return (
-    <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white/50 backdrop-blur-sm rounded-lg p-4 border shadow-sm">
+    <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white/50 backdrop-blur-sm rounded-lg p-4 border shadow-sm" role="search" aria-label="Dashboard filters">
       <div className="flex flex-wrap gap-3">
         <DateRangePicker
           date={dateRange}
@@ -52,18 +52,19 @@ export function Filters({
             <Button
               variant="outline"
               className="flex items-center gap-2 h-9 px-3 text-sm font-medium"
+              aria-label={`Filter by tech partner${selectedPartners.length > 0 ? `, ${selectedPartners.length} selected` : ''}`}
             >
-              <Filter className="h-4 w-4" />
+              <Filter className="h-4 w-4" aria-hidden="true" />
               Tech Partners
               {selectedPartners.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary">
+                <Badge variant="secondary" className="ml-1 bg-primary/10 text-primary" aria-label={`${selectedPartners.length} tech partners selected`}>
                   {selectedPartners.length}
                 </Badge>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-64 p-2" align="start">
-            <div className="space-y-1">
+          <PopoverContent className="w-64 p-2" align="start" aria-label="Select tech partners">
+            <div className="space-y-1" role="group" aria-label="Tech partner options">
               {availablePartners.map(partner => (
                 <Button
                   key={partner}
@@ -73,6 +74,7 @@ export function Filters({
                     selectedPartners.includes(partner) && "bg-primary/10 text-primary"
                   )}
                   onClick={() => togglePartner(partner)}
+                  aria-pressed={selectedPartners.includes(partner)}
                 >
                   {partner}
                 </Button>
@@ -87,8 +89,9 @@ export function Filters({
             size="sm"
             onClick={clearFilters}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            aria-label="Clear all filters"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
             Clear
           </Button>
         )}
