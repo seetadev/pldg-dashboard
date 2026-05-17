@@ -1,4 +1,4 @@
-import { GitHubData, GitHubUserContribution, DashboardMetrics, ValidatedContribution } from '@/types/dashboard';
+import { GitHubData, GitHubUserContribution, DashboardMetrics, ValidatedContribution, EngagementTrend, TechnicalProgress, TechPartnerPerformance, ContributorGrowth } from '@/types/dashboard';
 
 export function calculateMetrics({
   projectBoard,
@@ -91,7 +91,13 @@ export function generateTrendData(data: {
   projectBoard: GitHubData;
   userContributions: Record<string, GitHubUserContribution>;
   validatedContributions: Record<string, ValidatedContribution>;
-}) {
+}): {
+  engagement: EngagementTrend[];
+  technical: TechnicalProgress[];
+  techPartner: TechPartnerPerformance[];
+  techPartnerPerformance: TechPartnerPerformance[];
+  contributorGrowth: ContributorGrowth[];
+} {
   const {
     projectBoard = { issues: [] },
     userContributions = {},

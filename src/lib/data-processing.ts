@@ -3,7 +3,7 @@ import {
   EngagementData, ProcessedData, TechPartnerMetrics,
   TechPartnerPerformance, ContributorDetails, IssueResult,
   IssueHighlight, EnhancedTechPartnerData, ActionItem,
-  GitHubData, IssueMetrics, EngagementTrend
+  GitHubData, IssueMetrics, EngagementTrend, TopPerformer, TechnicalProgress
 } from '@/types/dashboard';
 import * as utils from './utils';
 
@@ -202,7 +202,7 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
 }
 
 // Calculate Top Performers
-function calculateTopPerformers(data: EngagementData[]) {
+function calculateTopPerformers(data: EngagementData[]): TopPerformer[] {
   return _(data)
     .groupBy('Name')
     .map((entries, name) => ({
@@ -223,7 +223,7 @@ function calculateTopPerformers(data: EngagementData[]) {
 }
 
 // Calculate Tech Partner Metrics
-function calculateTechPartnerMetrics(data: EngagementData[]) {
+function calculateTechPartnerMetrics(data: EngagementData[]): TechPartnerMetrics[] {
   return _(data)
     .groupBy('Which Tech Partner')
     .map((items, partner) => ({
@@ -729,7 +729,7 @@ function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
   });
 }
 
-function calculateTechnicalProgress(csvData: any[], githubData?: GitHubData | null) {
+function calculateTechnicalProgress(csvData: any[], githubData?: GitHubData | null): TechnicalProgress[] {
   return Object.entries(_.groupBy(csvData, 'Program Week'))
     .sort((a, b) => parseWeekNumber(a[0]) - parseWeekNumber(b[0]))
     .map(([week, entries]) => ({
