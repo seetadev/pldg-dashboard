@@ -52,7 +52,13 @@ export default function DeveloperEngagementDashboard() {
     loadCSVData();
   }, []);
 
+  const resolvePlatformMetrics = (metrics: any[], platformName: string) => {
+    if (!Array.isArray(metrics)) return null;
+    return metrics.find((m) => m.platform === platformName) || metrics[0];
+  };
+
   const processedData = csvData.length > 0 ? processData(csvData) : null;
+  const targetPlatformMetrics = processedData ? resolvePlatformMetrics(processedData.issueMetrics, 'github') : null;
 
   const enhancedTechPartnerData = React.useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
@@ -147,8 +153,8 @@ export default function DeveloperEngagementDashboard() {
         <TechnicalProgressChart
           data={processedData.technicalProgress}
           githubData={{
-            inProgress: processedData.issueMetrics[0]?.open || 0,
-            done: processedData.issueMetrics[0]?.closed || 0
+            inProgress: targetPlatformMetrics?.open || 0,
+            done: targetPlatformMetrics?.closed || 0
           }}
         />
       </div>
