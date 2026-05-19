@@ -8,13 +8,11 @@ import EngagementChart from './EngagementChart';
 import TechnicalProgressChart from './TechnicalProgressChart';
 import { TechPartnerChart } from './TechPartnerChart';
 import TopPerformersTable from './TopPerformersTable';
-import { LoadingSpinner } from '../ui/loading';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
 import { enhanceTechPartnerData } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
 import normalizeEngagementData from '@/lib/formatDBData';
@@ -32,6 +30,9 @@ export default function DeveloperEngagementDashboard() {
       try {
         console.log('Loading CSV data...');
         const response = await fetch('/api/cohort');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch cohort data: ${response.status} ${response.statusText}`);
+        }
 
 
         const rawData: Record<string, any>[] = await response.json();
@@ -51,7 +52,13 @@ export default function DeveloperEngagementDashboard() {
     loadCSVData();
   }, []);
 
+  const resolvePlatformMetrics = (metrics: any[], platformName: string) => {
+    if (!Array.isArray(metrics)) return null;
+    return metrics.find((m) => m.platform === platformName) || metrics[0];
+  };
+
   const processedData = csvData.length > 0 ? processData(csvData) : null;
+  const targetPlatformMetrics = processedData ? resolvePlatformMetrics(processedData.issueMetrics, 'github') : null;
 
   const enhancedTechPartnerData = React.useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
@@ -77,36 +84,52 @@ export default function DeveloperEngagementDashboard() {
     });
   }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
-  if (isLoadingCSV) {
-    return <div>Loading CSV data...</div>;
-  }
+  if (isLoadingCSV && !data) {
+    if (!isFetching && !isLoading) {
+      return (
+        <div className="container mx-auto p-4 max-w-xl mt-12">
+          <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center shadow-sm">
+            <h2 className="text-red-800 font-semibold text-lg">Configuration Required</h2>
+            <p className="text-red-600 text-sm mt-1 mb-4">
+              Dashboard data stream empty. Please verify your local .env configuration setup.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refresh}
+              className="mx-auto flex items-center gap-2 border-red-200 text-red-700 hover:bg-red-100"
+            >
+              <RefreshCw className="w-4 h-4" /> Retry Sync
+            </Button>
+          </div>
+        </div>
+      );
+    }
 
-  if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
-  }
-
-  if (!processedData && isLoading) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="h-[calc(100vh-200px)] flex items-center justify-center">
-          <LoadingSpinner />
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center font-medium text-gray-500">
+          Loading dashboard telemetry...
         </div>
       </div>
     );
   }
 
-  if (isError || !processedData) {
+  if (isError || errorCSV || !processedData) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="p-4 text-center text-red-600">
-          Unable to load dashboard data. Please try refreshing.
+      <div className="container mx-auto p-4 max-w-xl mt-12">
+        <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center shadow-sm">
+          <h2 className="text-red-800 font-semibold text-lg">System Data Incomplete</h2>
+          <p className="text-red-600 text-sm mt-1 mb-4">
+            {errorCSV || 'Missing system environment configuration.'}
+          </p>
           <Button
             variant="outline"
             size="sm"
             onClick={refresh}
-            className="mt-4 mx-auto"
+            className="mx-auto flex items-center gap-2 border-red-200 text-red-700 hover:bg-red-100"
           >
-            Retry
+            <RefreshCw className="w-4 h-4" /> Retry Connection
           </Button>
         </div>
       </div>
@@ -156,8 +179,8 @@ export default function DeveloperEngagementDashboard() {
         <TechnicalProgressChart
           data={processedData.technicalProgress}
           githubData={{
-            inProgress: processedData.issueMetrics[0]?.open || 0,
-            done: processedData.issueMetrics[0]?.closed || 0
+            inProgress: targetPlatformMetrics?.open || 0,
+            done: targetPlatformMetrics?.closed || 0
           }}
         />
       </div>
