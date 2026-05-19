@@ -201,6 +201,39 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
   }).length;
 }
 
+// Calculate Neutral Feedback
+function calculateNeutralFeedback(data: EngagementData[]): number {
+  return data.filter(entry => {
+    const feedback = getStringValue(entry['PLDG Feedback']);
+    if (!feedback) return false;
+
+    const lowerFeedback = feedback.toLowerCase();
+    const isPositive = lowerFeedback.includes('great') ||
+                       lowerFeedback.includes('good');
+    const isNegative = lowerFeedback.includes('bad') ||
+                       lowerFeedback.includes('poor') ||
+                       lowerFeedback.includes('disappointed') ||
+                       lowerFeedback.includes('frustrated') ||
+                       lowerFeedback.includes('difficult');
+
+    return !isPositive && !isNegative && feedback.trim().length > 0;
+  }).length;
+}
+
+// Calculate Negative Feedback
+function calculateNegativeFeedback(data: EngagementData[]): number {
+  return data.filter(entry => {
+    const feedback = getStringValue(entry['PLDG Feedback']);
+    const lowerFeedback = feedback.toLowerCase();
+
+    return lowerFeedback.includes('bad') ||
+           lowerFeedback.includes('poor') ||
+           lowerFeedback.includes('disappointed') ||
+           lowerFeedback.includes('frustrated') ||
+           lowerFeedback.includes('difficult');
+  }).length;
+}
+
 // Calculate Top Performers
 function calculateTopPerformers(data: EngagementData[]) {
   return _(data)
@@ -224,9 +257,20 @@ function calculateTopPerformers(data: EngagementData[]) {
 
 // Calculate Tech Partner Metrics
 function calculateTechPartnerMetrics(data: EngagementData[]) {
-  return _(data)
-    .groupBy('Which Tech Partner')
-    .map((items, partner) => ({
+  const partnerMap = new Map<string, EngagementData[]>();
+
+  data.forEach(entry => {
+    const partners = normalizeTechPartners(entry['Which Tech Partner']);
+    partners.forEach(partner => {
+      if (!partnerMap.has(partner)) {
+        partnerMap.set(partner, []);
+      }
+      partnerMap.get(partner)!.push(entry);
+    });
+  });
+
+  return Array.from(partnerMap.entries())
+    .map(([partner, items]) => ({
       partner,
       totalIssues: _.sumBy(items, item => {
         const value = item['How many issues, PRs, or projects this week?'];
@@ -235,8 +279,7 @@ function calculateTechPartnerMetrics(data: EngagementData[]) {
       activeContributors: new Set(items.map(item => item.Name)).size,
       avgIssuesPerContributor: 0,
       collaborationScore: 0
-    }))
-    .value();
+    }));
 }
 
 // Update the interfaces at the top
@@ -677,8 +720,8 @@ export function processData(
     actionItems: calculateActionItems(csvData),
     feedbackSentiment: {
       positive: calculatePositiveFeedback(csvData),
-      neutral: 0,
-      negative: 0
+      neutral: calculateNeutralFeedback(csvData),
+      negative: calculateNegativeFeedback(csvData)
     },
     contributorGrowth: [{
       week: new Date().toISOString().split('T')[0],
