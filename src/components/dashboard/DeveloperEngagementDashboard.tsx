@@ -84,9 +84,7 @@ export default function DeveloperEngagementDashboard() {
     });
   }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
-  // 1. If it's loading files and we don't have core context data yet, show loading
   if (isLoadingCSV && !data) {
-    // If the context explicitly says it's not fetching anymore but data is still missing, it's an error
     if (!isFetching && !isLoading) {
       return (
         <div className="container mx-auto p-4 max-w-xl mt-12">
@@ -117,7 +115,6 @@ export default function DeveloperEngagementDashboard() {
     );
   }
 
-  // 2. Fallback catch-all for structural or network processing crashes
   if (isError || errorCSV || !processedData) {
     return (
       <div className="container mx-auto p-4 max-w-xl mt-12">
