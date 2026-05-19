@@ -84,26 +84,55 @@ export default function DeveloperEngagementDashboard() {
     });
   }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
 
-  if (isLoadingCSV) {
-    return <div>Loading CSV data...</div>;
-  }
+  // 1. If it's loading files and we don't have core context data yet, show loading
+  if (isLoadingCSV && !data) {
+    // If the context explicitly says it's not fetching anymore but data is still missing, it's an error
+    if (!isFetching && !isLoading) {
+      return (
+        <div className="container mx-auto p-4 max-w-xl mt-12">
+          <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center shadow-sm">
+            <h2 className="text-red-800 font-semibold text-lg">Configuration Required</h2>
+            <p className="text-red-600 text-sm mt-1 mb-4">
+              Dashboard data stream empty. Please verify your local .env configuration setup.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refresh}
+              className="mx-auto flex items-center gap-2 border-red-200 text-red-700 hover:bg-red-100"
+            >
+              <RefreshCw className="w-4 h-4" /> Retry Sync
+            </Button>
+          </div>
+        </div>
+      );
+    }
 
-  if (errorCSV || !processedData) {
-    return <div>Error: {errorCSV || 'No data available'}</div>;
-  }
-
-  if (isError || !processedData) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="p-4 text-center text-red-600">
-          Unable to load dashboard data. Please try refreshing.
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center font-medium text-gray-500">
+          Loading dashboard telemetry...
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Fallback catch-all for structural or network processing crashes
+  if (isError || errorCSV || !processedData) {
+    return (
+      <div className="container mx-auto p-4 max-w-xl mt-12">
+        <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center shadow-sm">
+          <h2 className="text-red-800 font-semibold text-lg">System Data Incomplete</h2>
+          <p className="text-red-600 text-sm mt-1 mb-4">
+            {errorCSV || 'Missing system environment configuration.'}
+          </p>
           <Button
             variant="outline"
             size="sm"
             onClick={refresh}
-            className="mt-4 mx-auto"
+            className="mx-auto flex items-center gap-2 border-red-200 text-red-700 hover:bg-red-100"
           >
-            Retry
+            <RefreshCw className="w-4 h-4" /> Retry Connection
           </Button>
         </div>
       </div>
