@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import {
   EngagementData, ProcessedData, TechPartnerMetrics,
-  TechPartnerPerformance, ContributorDetails, IssueResult,
-  IssueHighlight, EnhancedTechPartnerData, ActionItem,
-  GitHubData, IssueMetrics, EngagementTrend
+  TopPerformer, TechPartnerPerformance, ContributorDetails,
+  IssueResult, IssueHighlight, EnhancedTechPartnerData,
+  ActionItem, GitHubData, IssueMetrics, EngagementTrend,
+  TechnicalProgress
 } from '@/types/dashboard';
 import * as utils from './utils';
 
@@ -202,7 +203,7 @@ function calculatePositiveFeedback(data: EngagementData[]): number {
 }
 
 // Calculate Top Performers
-function calculateTopPerformers(data: EngagementData[]) {
+function calculateTopPerformers(data: EngagementData[]): TopPerformer[] {
   return _(data)
     .groupBy('Name')
     .map((entries, name) => ({
@@ -223,7 +224,7 @@ function calculateTopPerformers(data: EngagementData[]) {
 }
 
 // Calculate Tech Partner Metrics
-function calculateTechPartnerMetrics(data: EngagementData[]) {
+function calculateTechPartnerMetrics(data: EngagementData[]): TechPartnerMetrics[] {
   return _(data)
     .groupBy('Which Tech Partner')
     .map((items, partner) => ({
@@ -672,7 +673,7 @@ export function processData(
     techPartnerMetrics: calculateTechPartnerMetrics(csvData),
     techPartnerPerformance,
     engagementTrends: calculateEngagementTrends(csvData),
-    technicalProgress: calculateTechnicalProgress(csvData, githubData),
+    technicalProgress: calculateTechnicalProgress(csvData),
     issueMetrics: processRawIssueMetrics(csvData),
     actionItems: calculateActionItems(csvData),
     feedbackSentiment: {
@@ -729,16 +730,14 @@ function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
   });
 }
 
-function calculateTechnicalProgress(csvData: any[], githubData?: GitHubData | null) {
+function calculateTechnicalProgress(csvData: any[]): TechnicalProgress[] {
   return Object.entries(_.groupBy(csvData, 'Program Week'))
     .sort((a, b) => parseWeekNumber(a[0]) - parseWeekNumber(b[0]))
     .map(([week, entries]) => ({
       week: formatWeekString(week),
       'Total Issues': entries.reduce((sum, entry) =>
         sum + parseInt(entry['How many issues, PRs, or projects this week?'] || '0'), 0
-      ),
-      'In Progress': githubData?.statusGroups?.inProgress || 0,
-      'Done': githubData?.statusGroups?.done || 0
+      )
     }));
 }
 
