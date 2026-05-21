@@ -468,10 +468,25 @@ function processRawIssueMetrics(entries: EngagementData[]): IssueMetrics[] {
       return sum + (value === '4+' ? 4 : parseInt(value || '0'));
     }, 0);
 
-    const hasGitHubLink = weekEntries.some(entry => entry['Issue Link 1']);
-    const closedIssues = hasGitHubLink
-      ? weekEntries.filter(entry => entry['Issue Link 1']?.includes('closed')).length
-      : Math.round(totalIssues * 0.7);
+    // GitHub issue URLs do not indicate state; closed issues use the same URL.
+    // Treat issues as closed only when contributors explicitly describe them that way.
+    const closedIssues = weekEntries.filter(entry => {
+      const desc1 = getStringValue(entry['Issue Description 1']).toLowerCase();
+      const desc2 = getStringValue(entry['Issue Description 2']).toLowerCase();
+      const desc3 = getStringValue(entry['Issue Description 3']).toLowerCase();
+
+      return (
+        desc1.includes('closed') ||
+        desc1.includes('resolved') ||
+        desc1.includes('merged') ||
+        desc2.includes('closed') ||
+        desc2.includes('resolved') ||
+        desc2.includes('merged') ||
+        desc3.includes('closed') ||
+        desc3.includes('resolved') ||
+        desc3.includes('merged')
+      );
+    }).length;
 
     return {
       week: week.replace(/\(.*?\)/, '').trim(),
@@ -718,13 +733,24 @@ function calculateEngagementTrends(csvData: any[]): EngagementTrend[] {
       uniqueNames: new Set(entries.map(e => e.Name))
     });
 
+    const highEngagement = entries.filter(e =>
+      e['Engagement Participation ']?.trim().startsWith('3')
+    ).length;
+
+    const mediumEngagement = entries.filter(e =>
+      e['Engagement Participation ']?.trim().startsWith('2')
+    ).length;
+
+    const lowEngagement = entries.filter(e =>
+      e['Engagement Participation ']?.trim().startsWith('1')
+    ).length;
+
     return {
       week: `Week ${parseWeekNumber(week)}`,
       total: activeContributors,
-      // Add zero values for backward compatibility
-      'High Engagement': 0,
-      'Medium Engagement': 0,
-      'Low Engagement': 0
+      'High Engagement': highEngagement,
+      'Medium Engagement': mediumEngagement,
+      'Low Engagement': lowEngagement
     };
   });
 }
