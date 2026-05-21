@@ -91,7 +91,7 @@ export function generateTrendData(data: {
   projectBoard: GitHubData;
   userContributions: Record<string, GitHubUserContribution>;
   validatedContributions: Record<string, ValidatedContribution>;
-}) {
+}): DashboardMetrics['trends'] {
   const {
     projectBoard = { issues: [] },
     userContributions = {},
