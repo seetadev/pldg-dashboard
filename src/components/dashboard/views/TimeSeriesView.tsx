@@ -4,6 +4,7 @@ import * as React from 'react';
 import { EnhancedTechPartnerData } from '@/types/dashboard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
+import { TECH_PARTNER_CONFIG, DEFAULT_PARTNER_CHART_COLOR } from '@/lib/constants';
 
 interface TimeSeriesViewProps {
   data: EnhancedTechPartnerData[];
@@ -97,16 +98,6 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
     </div>;
   }
 
-  const COLORS = {
-    'Libp2p': '#3B82F6',
-    'IPFS': '#14B8A6',
-    'Fil-B': '#A855F7',
-    'Fil-Oz': '#6366F1',
-    'Coordination Network': '#F43F5E',
-    'Storacha': '#F59E0B',
-    'Drand': '#10B981'
-  };
-
   return (
     <div className="h-[400px] w-full">
       <ResponsiveContainer>
@@ -127,13 +118,13 @@ export function TimeSeriesView({ data }: TimeSeriesViewProps) {
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          {Object.entries(COLORS).map(([partner, color]) => (
+          {data.map(({ partner }) => (
             <Bar
               key={partner}
               dataKey={partner}
-              fill={color}
+              fill={TECH_PARTNER_CONFIG[partner]?.chartColor || DEFAULT_PARTNER_CHART_COLOR}
               stackId="stack"
-              name={partner} // Add name for tooltip
+              name={partner}
             />
           ))}
         </BarChart>

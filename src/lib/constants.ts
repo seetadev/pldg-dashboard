@@ -130,3 +130,55 @@ export const COLUMN_STATUS = {
   'Backlog': 'Todo',
   'Triage': 'Todo'
 } as const;
+
+// Tech partner configuration centralised so new ecosystems can be added
+export const TECH_PARTNER_CONFIG: Record<string, {
+  repoUrl: string;
+  color: { bg: string; text: string; hover: string };
+  chartColor: string;
+}> = {
+  'Fil-B': {
+    repoUrl: 'https://github.com/FIL-Builders/fil-frame',
+    color: { bg: 'bg-purple-50', text: 'text-purple-700', hover: 'hover:bg-purple-100' },
+    chartColor: '#A855F7'
+  },
+  'Drand': {
+    repoUrl: 'https://github.com/drand/drand/issues?q=is:open+is:issue+label:devguild',
+    color: { bg: 'bg-emerald-50', text: 'text-emerald-700', hover: 'hover:bg-emerald-100' },
+    chartColor: '#10B981'
+  },
+  'Libp2p': {
+    repoUrl: 'https://github.com/libp2p',
+    color: { bg: 'bg-blue-50', text: 'text-blue-700', hover: 'hover:bg-blue-100' },
+    chartColor: '#3B82F6'
+  },
+  'Storacha': {
+    repoUrl: 'https://github.com/storacha',
+    color: { bg: 'bg-amber-50', text: 'text-amber-700', hover: 'hover:bg-amber-100' },
+    chartColor: '#F59E0B'
+  },
+  'Fil-Oz': {
+    repoUrl: 'https://github.com/filecoin-project/filecoin-ffi',
+    color: { bg: 'bg-indigo-50', text: 'text-indigo-700', hover: 'hover:bg-indigo-100' },
+    chartColor: '#6366F1'
+  },
+  'IPFS': {
+    repoUrl: 'https://github.com/ipfs',
+    color: { bg: 'bg-teal-50', text: 'text-teal-700', hover: 'hover:bg-teal-100' },
+    chartColor: '#14B8A6'
+  },
+  'Coordination Network': {
+    repoUrl: 'https://github.com/coordnet/coordnet',
+    color: { bg: 'bg-rose-50', text: 'text-rose-700', hover: 'hover:bg-rose-100' },
+    chartColor: '#F43F5E'
+  }
+};
+
+// Fallback for unknown partners not in TECH_PARTNER_CONFIG
+export const DEFAULT_PARTNER_COLOR = {
+  bg: 'bg-gray-50',
+  text: 'text-gray-700',
+  hover: 'hover:bg-gray-100'
+};
+
+export const DEFAULT_PARTNER_CHART_COLOR = '#6B7280';
