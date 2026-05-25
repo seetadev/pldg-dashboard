@@ -13,7 +13,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { RefreshCw } from 'lucide-react';
 import { enhanceTechPartnerData } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { Logger, debugLog, infoLog, warnLog, errorLog } from '@/lib/logger';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Papa, { ParseResult, ParseConfig, ParseError, Parser } from 'papaparse';
 import { processData } from '@/lib/data-processing';
 import { EngagementData } from '@/types/dashboard';
@@ -25,33 +26,34 @@ export default function DeveloperEngagementDashboard() {
   const [isLoadingCSV, setIsLoadingCSV] = useState(true);
   const [errorCSV, setErrorCSV] = useState<string | null>(null);
   
-  
-
-  useEffect(() => {
-    async function loadCSVData() {
-      try {
-        console.log('Loading CSV data...');
-        const response = await fetch('/api/cohort');
-
-
-        const rawData: Record<string, any>[] = await response.json();
-
-         // Normalize each entry
-        const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
-        console.log('CSV Text:', cleanedData);
-
-        setCsvData(cleanedData);
-        setIsLoadingCSV(false)
-        
-      } catch (error) {
-        console.error('Failed to load CSV:', error);
-        setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
-      }
+  const loadCSVData = useCallback(async () => {
+    try {
+      debugLog('Loading CSV data...');
+      const response = await fetch('/api/cohort');
+      
+      
+      const rawData: Record<string, any>[] = await response.json();
+      
+       // Normalize each entry
+      const cleanedData: EngagementData[] = rawData.map(normalizeEngagementData);
+      debugLog('CSV Text:', cleanedData);
+      
+      setCsvData(cleanedData);
+      setIsLoadingCSV(false)
+      
+    } catch (error) {
+      errorLog('Failed to load CSV:', error);
+      setErrorCSV(error instanceof Error ? error.message : 'Failed to load data');
     }
-    loadCSVData();
   }, []);
+  
+  useEffect(() => {
+    loadCSVData();
+  }, [loadCSVData]);
 
-  const processedData = csvData.length > 0 ? processData(csvData) : null;
+  const processedData = useMemo(() => {
+  return csvData.length > 0 ? processData(csvData) : null;
+}, [csvData]);
 
   const enhancedTechPartnerData = React.useMemo(() =>
     processedData?.techPartnerPerformance && processedData?.rawEngagementData
@@ -60,22 +62,26 @@ export default function DeveloperEngagementDashboard() {
   [processedData?.techPartnerPerformance, processedData?.rawEngagementData]
 );
 
-  React.useEffect(() => {
-    console.log('Dashboard State:', {
-      hasData: !!processedData,
-      metrics: processedData ? {
-            contributors: processedData.activeContributors,
-            techPartners: processedData.programHealth.activeTechPartners,
-            engagementTrends: processedData.engagementTrends.length,
-            technicalProgress: processedData.technicalProgress.length,
-        techPartnerData: enhancedTechPartnerData
-      } : null,
-      isLoading,
-      isError,
-      isFetching,
-      lastUpdated: new Date(lastUpdated).toISOString()
-    });
-  }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
+   const logDashboardState = useCallback(() => {
+     debugLog('Dashboard State:', {
+       hasData: !!processedData,
+       metrics: processedData ? {
+             contributors: processedData.activeContributors,
+             techPartners: processedData.programHealth.activeTechPartners,
+             engagementTrends: processedData.engagementTrends.length,
+             technicalProgress: processedData.technicalProgress.length,
+         techPartnerData: enhancedTechPartnerData
+       } : null,
+       isLoading,
+       isError,
+       isFetching,
+       lastUpdated: new Date(lastUpdated).toISOString()
+     });
+   }, [processedData, isLoading, isError, isFetching, lastUpdated, enhancedTechPartnerData]);
+
+   React.useEffect(() => {
+     logDashboardState();
+   }, [logDashboardState]);
 
   if (isLoadingCSV) {
     return <div>Loading CSV data...</div>;
