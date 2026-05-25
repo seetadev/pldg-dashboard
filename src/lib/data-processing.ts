@@ -224,19 +224,42 @@ function calculateTopPerformers(data: EngagementData[]) {
 
 // Calculate Tech Partner Metrics
 function calculateTechPartnerMetrics(data: EngagementData[]) {
-  return _(data)
-    .groupBy('Which Tech Partner')
-    .map((items, partner) => ({
+  const partnerMap = new Map<string, { items: EngagementData[] }>();
+
+  data.forEach(entry => {
+    const partners = normalizeTechPartners(entry['Which Tech Partner']);
+
+    partners.forEach(partner => {
+      if (!partnerMap.has(partner)) {
+        partnerMap.set(partner, { items: [] });
+      }
+      partnerMap.get(partner)!.items.push(entry);
+    });
+  });
+
+  return Array.from(partnerMap.entries()).map(([partner, { items }]) => {
+    const totalIssues = _.sumBy(items, item => {
+      const value = item['How many issues, PRs, or projects this week?'];
+      return value === '4+' ? 4 : parseInt(value || '0');
+    });
+    const activeContributors = new Set(items.map(item => item.Name)).size;
+    const avgIssuesPerContributor = activeContributors > 0
+      ? Math.round((totalIssues / activeContributors) * 10) / 10
+      : 0;
+    const contributorScore = Math.min((activeContributors / 10) * 100, 100);
+    const issueScore = Math.min((avgIssuesPerContributor / 5) * 100, 100);
+    const collaborationScore = Math.round(
+      contributorScore * 0.4 + issueScore * 0.6
+    );
+
+    return {
       partner,
-      totalIssues: _.sumBy(items, item => {
-        const value = item['How many issues, PRs, or projects this week?'];
-        return value === '4+' ? 4 : parseInt(value || '0');
-      }),
-      activeContributors: new Set(items.map(item => item.Name)).size,
-      avgIssuesPerContributor: 0,
-      collaborationScore: 0
-    }))
-    .value();
+      totalIssues,
+      activeContributors,
+      avgIssuesPerContributor,
+      collaborationScore
+    };
+  });
 }
 
 // Update the interfaces at the top
