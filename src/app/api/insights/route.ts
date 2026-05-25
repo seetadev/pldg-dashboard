@@ -8,14 +8,14 @@ const anthropic = new Anthropic({
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    
+
     const response = await anthropic.messages.create({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 1000,
       messages: [{
         role: 'user',
-        content: `You are analyzing PLDG (Protocol Labs Developer Guild) engagement data. 
-        Please provide insights and recommendations based on the following metrics:
+        content: `You are analyzing PLDG (Protocol Labs Developer Guild) engagement data.
+        Please provide insights based on the following metrics:
 
         Engagement Trends:
         ${JSON.stringify(data.engagementMetrics.trends, null, 2)}
@@ -29,22 +29,34 @@ export async function POST(request: Request) {
         GitHub Activity:
         ${JSON.stringify(data.githubMetrics, null, 2)}
 
-        Please structure your analysis into these sections:
-        1. Key Trends
-        2. Areas of Concern
-        3. Specific Recommendations
-        4. Notable Achievements
-        
-        Format the response in markdown.`
+        Respond ONLY with a valid JSON object in exactly this shape, no markdown, no extra text:
+        {
+          "keyTrends": ["trend 1", "trend 2", "trend 3"],
+          "areasOfConcern": ["concern 1", "concern 2"],
+          "recommendations": ["recommendation 1", "recommendation 2"],
+          "achievements": ["achievement 1", "achievement 2"]
+        }`
       }]
     });
 
-    return NextResponse.json({
-      insights: response.content,
-      success: true
-    });
+    const textContent = response.content[0];
+    if (!('text' in textContent)) {
+      throw new Error('Unexpected response format from Claude');
+    }
+
+    let insights;
+    try {
+      insights = JSON.parse(textContent.text);
+    } catch {
+      throw new Error('Claude returned non-JSON response for insights');
+    }
+
+    return NextResponse.json({ insights, success: true });
   } catch (error) {
     console.error('Error generating insights:', error);
-    return NextResponse.json({ error: 'Failed to generate insights', success: false }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to generate insights', success: false },
+      { status: 500 }
+    );
   }
-} 
+}
