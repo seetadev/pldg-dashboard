@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GitHubData } from '@/types/dashboard';
+import { Logger, debugLog, infoLog, warnLog, errorLog } from '@/lib/logger';
 
 const PROJECT_ID = '7';
 const USERNAME = 'kt-wawro';
@@ -35,11 +36,134 @@ interface ProjectItem {
 
 export async function GET() {
   try {
-    console.log('GitHub API route called');
+    debugLog('GitHub API route called');
     
     if (!process.env.GITHUB_TOKEN) {
       throw new Error('GitHub token not found');
     }
+    
+    debugLog('Fetching GitHub Project data...');
+    
+    const headers = {
+      'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v3+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'PLDG-Dashboard'
+    };
+    
+    const projectQuery = {
+      query: `
+        query {
+          user(login: "${USERNAME}") {
+            projectV2(number: ${PROJECT_ID}) {
+              items(first: 100) {
+                nodes {
+                  id
+                  fieldValues(first: 8) {
+                    nodes {
+                      ... on ProjectV2ItemFieldSingleSelectValue {
+                        field {
+                          ... on ProjectV2SingleSelectField {
+                            name
+                          }
+                        }
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `
+    };
+    
+    const response = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(projectQuery)
+    });
+    
+    if (!response.ok) {
+      errorLog('GitHub API Error:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      throw new Error(`GitHub API error: ${response.statusText}`);
+    }
+    
+    const rawData = await response.json();
+    
+    // Add validation and logging
+    debugLog('GitHub Raw Response:', {
+      hasData: !!rawData?.data?.user?.projectV2,
+      itemsCount: rawData?.data?.user?.projectV2?.items?.nodes?.length || 0,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Validate response structure
+    if (!rawData?.data?.user?.projectV2?.items?.nodes) {
+      errorLog('Invalid GitHub response structure:', rawData);
+      throw new Error('Invalid response structure from GitHub');
+    }
+    
+    const items = rawData.data.user.projectV2.items.nodes as ProjectItem[];
+    
+    // Add type annotation for item parameters
+    const statusCounts = {
+      todo: items.filter((item: ProjectItem) => getItemStatus(item) === 'Todo').length,
+      inProgress: items.filter((item: ProjectItem) => getItemStatus(item) === 'In Progress').length,
+      done: items.filter((item: ProjectItem) => getItemStatus(item) === 'Done').length
+    };
+    
+    debugLog('Status counts:', statusCounts);
+    
+    const responseData: GitHubData = {
+      project: rawData.data,
+      issues: items.map((item: ProjectItem) => ({
+        id: item.id,
+        title: item.content?.title || '',
+        state: item.content?.state || '',
+        created_at: item.content?.createdAt || '',
+        closed_at: item.content?.closedAt || null,
+        status: getItemStatus(item),
+        assignee: item.content?.assignees?.nodes[0] || undefined
+      })),
+      statusGroups: statusCounts,
+      timestamp: Date.now()
+    };
+    
+    return NextResponse.json(responseData);
+  } catch (error) {
+    errorLog('GitHub API error:', {
+      error,
+      timestamp: new Date().toISOString(),
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+    
+    // Return a properly structured empty response
+    return NextResponse.json({ 
+      project: { 
+        user: { 
+          projectV2: { 
+            items: { 
+              nodes: [] 
+            } 
+          } 
+        } 
+      },
+      issues: [],
+      statusGroups: {
+        todo: 0,
+        inProgress: 0,
+        done: 0
+      },
+      timestamp: Date.now()
+    } as GitHubData);
+  }
+}
 
     console.log('Fetching GitHub Project data...');
 
@@ -196,13 +320,13 @@ function getItemStatus(item: ProjectItem): string {
     const columnStatus = statusField?.name;
     
     if (!columnStatus) {
-      console.warn('No status found for item:', item.id);
+      warnLog('No status found for item:', item.id);
       return 'Todo';
     }
     
     return COLUMN_STATUS[columnStatus as keyof typeof COLUMN_STATUS] || 'Todo';
   } catch (error) {
-    console.error('Error getting item status:', {
+    errorLog('Error getting item status:', {
       itemId: item.id,
       error
     });

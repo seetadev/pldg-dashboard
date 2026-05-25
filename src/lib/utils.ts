@@ -13,6 +13,7 @@ import {
   IssueTracking
 } from '../types/dashboard'
 import { processDataWithAI } from './ai';
+import { Logger, debugLog, infoLog, warnLog, errorLog } from './logger';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -217,7 +218,7 @@ export async function processEngagementData(rawData: EngagementData[]): Promise<
       }
     };
   } catch (error) {
-    console.error('AI processing error:', error);
+    errorLog('AI processing error:', error);
     // Return with default insights
     return {
       ...baseProcessedData,
@@ -302,10 +303,10 @@ export function calculateEngagementScore(data: ProcessedData): number {
   // Get the most recent week's data
   const recentEngagement = data.engagementTrends[data.engagementTrends.length - 1];
   
-  if (!recentEngagement) {
-    console.warn('No engagement data available for score calculation');
-    return 0;
-  }
+    if (!recentEngagement) {
+      warnLog('No engagement data available for score calculation');
+      return 0;
+    }
 
   // Calculate engagement rate based on active contributors
   // Compare to the average number of contributors across all weeks
@@ -317,14 +318,14 @@ export function calculateEngagementScore(data: ProcessedData): number {
   // Combine with NPS score for overall health metric
   const score = Math.round((engagementRate + data.programHealth.npsScore) / 2);
 
-  // Debug logging
-  console.log('Engagement Score Calculation:', {
-    recentWeekTotal: recentEngagement.total,
-    averageContributors,
-    engagementRate,
-    npsScore: data.programHealth.npsScore,
-    finalScore: score
-  });
+    // Debug logging
+    debugLog('Engagement Score Calculation:', {
+      recentWeekTotal: recentEngagement.total,
+      averageContributors,
+      engagementRate,
+      npsScore: data.programHealth.npsScore,
+      finalScore: score
+    });
 
   return score;
 }
@@ -393,7 +394,7 @@ export async function generateEnhancedInsights(data: ProcessedData): Promise<Enh
 
     return enhancedData;
   } catch (error) {
-    console.error('Error generating enhanced insights:', error);
+    errorLog('Error generating enhanced insights:', error);
     // Return with default insights structure
     return {
       ...data,
@@ -479,7 +480,7 @@ export function parseWeekNumber(weekString: string): number {
     return weekNum;
   }
 
-  console.warn(`Invalid week number found: ${weekString}, using current date`);
+  warnLog(`Invalid week number found: ${weekString}, using current date`);
   return new Date().getWeek() || 1;
 }
 
@@ -669,11 +670,11 @@ export function enhanceTechPartnerData(
   engagementData: EngagementData[] | undefined
 ): EnhancedTechPartnerData[] {
   if (!baseData || !engagementData) {
-    console.log('enhanceTechPartnerData: Missing data', { hasBaseData: !!baseData, hasEngagementData: !!engagementData });
+    debugLog('enhanceTechPartnerData: Missing data', { hasBaseData: !!baseData, hasEngagementData: !!engagementData });
     return [];
   }
 
-  console.log('enhanceTechPartnerData: Processing', {
+  debugLog('enhanceTechPartnerData: Processing', {
     baseDataCount: baseData.length,
     engagementDataCount: engagementData.length,
     sampleBaseData: baseData[0],
@@ -682,7 +683,7 @@ export function enhanceTechPartnerData(
 
   return baseData.map(partner => {
     if (!partner.partner) {
-      console.log('enhanceTechPartnerData: Partner missing name', partner);
+      debugLog('enhanceTechPartnerData: Partner missing name', partner);
       return {
         ...partner,
         timeSeriesData: [],
@@ -701,7 +702,7 @@ export function enhanceTechPartnerData(
       )
     );
 
-    console.log(`enhanceTechPartnerData: Processing partner ${partner.partner}`, {
+    debugLog(`enhanceTechPartnerData: Processing partner ${partner.partner}`, {
       engagementCount: partnerEngagements.length,
       sampleEngagement: partnerEngagements[0]
     });

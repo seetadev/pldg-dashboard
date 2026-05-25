@@ -4,6 +4,7 @@ import { useGitHubData } from './github';
 import { useCSVData } from '@/hooks/useCSVData';
 import { processData } from './data-processing';
 import { GitHubData } from '@/types/dashboard';
+import { Logger, debugLog, infoLog, warnLog, errorLog } from './logger';
 import React from 'react';
 
 export function useDashboardSystem() {
@@ -31,57 +32,57 @@ export function useDashboardSystem() {
     timestamp: githubTimestamp
   } = useGitHubData();
 
-  React.useEffect(() => {
-    console.log('Data Sources State:', {
-      csv: {
-        hasData: !!csvData?.length,
-        recordCount: csvData?.length,
-        isLoading: isCSVLoading
-      },
-      airtable: {
-        hasData: !!airtableData?.length,
-        recordCount: airtableData?.length,
-        isLoading: isAirtableLoading,
-        timestamp: airtableTimestamp
-      },
-      github: {
-        hasData: !!githubData,
-        statusGroups: githubData?.statusGroups,
-        isLoading: isGithubLoading,
-        timestamp: githubTimestamp
-      }
-    });
-  }, [csvData, airtableData, githubData, isCSVLoading, isAirtableLoading, isGithubLoading, csvTimestamp, airtableTimestamp, githubTimestamp]);
+    React.useEffect(() => {
+      debugLog('Data Sources State:', {
+        csv: {
+          hasData: !!csvData?.length,
+          recordCount: csvData?.length,
+          isLoading: isCSVLoading
+        },
+        airtable: {
+          hasData: !!airtableData?.length,
+          recordCount: airtableData?.length,
+          isLoading: isAirtableLoading,
+          timestamp: airtableTimestamp
+        },
+        github: {
+          hasData: !!githubData,
+          statusGroups: githubData?.statusGroups,
+          isLoading: isGithubLoading,
+          timestamp: githubTimestamp
+        }
+      });
+    }, [csvData, airtableData, githubData, isCSVLoading, isAirtableLoading, isGithubLoading, csvTimestamp, airtableTimestamp, githubTimestamp]);
 
-  const processedData = useMemo(() => {
-    console.log('Starting data processing...', {
-      csv: {
-        hasData: !!csvData?.length,
-        recordCount: csvData?.length,
-        sampleRecord: csvData?.[0],
-        isLoading: isCSVLoading,
-        error: isCSVError
-      },
-      airtable: {
-        hasData: !!airtableData?.length,
-        recordCount: airtableData?.length,
-        sampleRecord: airtableData?.[0],
-        isLoading: isAirtableLoading,
-        error: isAirtableError
-      },
-      github: {
-        hasData: !!githubData,
-        statusGroups: githubData?.statusGroups,
-        isLoading: isGithubLoading,
-        error: isGithubError
-      },
-      timestamp: new Date().toISOString()
-    });
+    const processedData = useMemo(() => {
+      infoLog('Starting data processing...', {
+        csv: {
+          hasData: !!csvData?.length,
+          recordCount: csvData?.length,
+          sampleRecord: csvData?.[0],
+          isLoading: isCSVLoading,
+          error: isCSVError
+        },
+        airtable: {
+          hasData: !!airtableData?.length,
+          recordCount: airtableData?.length,
+          sampleRecord: airtableData?.[0],
+          isLoading: isAirtableLoading,
+          error: isAirtableError
+        },
+        github: {
+          hasData: !!githubData,
+          statusGroups: githubData?.statusGroups,
+          isLoading: isGithubLoading,
+          error: isGithubError
+        },
+        timestamp: new Date().toISOString()
+      });
 
     // Try CSV data first - make GitHub data optional
     if (!isCSVLoading && csvData?.length > 0) {
       try {
-        console.log('Processing CSV data...');
+        debugLog('Processing CSV data...');
         // Transform CSV data to match Airtable format
         const transformedData = csvData.map(entry => ({
           Name: entry.Name,
@@ -115,7 +116,7 @@ export function useDashboardSystem() {
           timestamp: Date.now()
         };
 
-        console.log('Transformed CSV data:', {
+        debugLog('Transformed CSV data:', {
           recordCount: transformedData.length,
           sampleRecord: transformedData[0]
         });
@@ -123,7 +124,7 @@ export function useDashboardSystem() {
         const result = processData(transformedData, githubData || mockGitHubData);
         return result;
       } catch (error) {
-        console.error('Error processing CSV data:', error);
+        errorLog('Error processing CSV data:', error);
         // Fall through to try Airtable data
       }
     }
@@ -131,7 +132,7 @@ export function useDashboardSystem() {
     // Fall back to Airtable data if CSV fails or is unavailable
     if (!isAirtableLoading && airtableData?.length > 0) {
       try {
-        console.log('Processing Airtable data...');
+        debugLog('Processing Airtable data...');
         const mockGitHubData: GitHubData = {
           project: {
             user: {
@@ -153,7 +154,7 @@ export function useDashboardSystem() {
         const result = processData(airtableData, githubData || mockGitHubData);
         return result;
       } catch (error) {
-        console.error('Error processing Airtable data:', error);
+        errorLog('Error processing Airtable data:', error);
         return null;
       }
     }
@@ -162,11 +163,11 @@ export function useDashboardSystem() {
     if ((isCSVLoading && !csvData?.length) ||
         (isAirtableLoading && !airtableData?.length) ||
         isGithubLoading) {
-      console.log('Still loading initial data...');
+      debugLog('Still loading initial data...');
       return null;
     }
 
-    console.error('No valid data available from any source');
+    errorLog('No valid data available from any source');
     return null;
   }, [csvData, airtableData, githubData, isCSVLoading, isAirtableLoading, isGithubLoading, isCSVError, isAirtableError, isGithubError]);
 

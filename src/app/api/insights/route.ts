@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { Logger, debugLog, infoLog, warnLog, errorLog } from '@/lib/logger';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -43,8 +44,8 @@ export async function POST(request: Request) {
       insights: response.content,
       success: true
     });
-  } catch (error) {
-    console.error('Error generating insights:', error);
-    return NextResponse.json({ error: 'Failed to generate insights', success: false }, { status: 500 });
-  }
+    } catch (error) {
+      errorLog('Error generating insights:', error);
+      return NextResponse.json({ error: 'Failed to generate insights', success: false }, { status: 500 });
+    }
 } 

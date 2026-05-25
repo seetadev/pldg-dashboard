@@ -1,12 +1,13 @@
 import { GitHubData } from '@/types/dashboard';
 import useSWR from 'swr';
+import { Logger, debugLog, infoLog, warnLog, errorLog } from './logger';
 
 const fetcher = async (): Promise<GitHubData> => {
-  console.log('Fetching GitHub data...');
+  debugLog('Fetching GitHub data...');
   const response = await fetch('/api/github');
 
   if (!response.ok) {
-    console.error('GitHub API error:', {
+    errorLog('GitHub API error:', {
       status: response.status,
       statusText: response.statusText,
       timestamp: new Date().toISOString()
@@ -16,7 +17,7 @@ const fetcher = async (): Promise<GitHubData> => {
 
   const rawData = await response.json();
 
-  console.log('GitHub raw data:', {
+  debugLog('GitHub raw data:', {
     hasData: !!rawData,
     statusGroups: rawData?.statusGroups,
     issueCount: rawData?.issues?.length,
@@ -24,7 +25,7 @@ const fetcher = async (): Promise<GitHubData> => {
   });
 
   if (!rawData || !rawData.statusGroups) {
-    console.error('Invalid GitHub response format:', {
+    errorLog('Invalid GitHub response format:', {
       hasData: !!rawData,
       statusGroups: rawData?.statusGroups,
       timestamp: new Date().toISOString()
@@ -37,9 +38,9 @@ const fetcher = async (): Promise<GitHubData> => {
     statusGroups: rawData.statusGroups,
     project: rawData.project || { user: { projectV2: { items: { nodes: [] } } } },
     projectBoard: rawData.projectBoard || { issues: [], statusGroups: { todo: 0, inProgress: 0, done: 0 }, project: {} },
-    userContributions: rawData.userContributions || {},
     timestamp: Date.now()
   };
+};
 };
 
 export function useGitHubData() {
