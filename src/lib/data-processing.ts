@@ -626,6 +626,48 @@ function calculateTotalContributions(csvData: any[]): number {
   }, 0);
 }
 
+// Calculate per-week contributor growth
+// Tracks new contributors (first appearance) and returning
+// contributors (seen in a previous week) separately per week.
+function calculateContributorGrowth(csvData: any[]): Array<{
+  week: string;
+  newContributors: number;
+  returningContributors: number;
+  totalActive: number;
+}> {
+  const allWeeks = Array.from(new Set(csvData.map(row => row['Program Week'])))
+    .sort((a, b) => parseWeekNumber(a) - parseWeekNumber(b));
+
+  const weeklyData = _.groupBy(csvData, 'Program Week');
+  const seenBefore = new Set<string>();
+
+  return allWeeks.map(week => {
+    const entries = weeklyData[week] || [];
+    const weekContributors = Array.from(
+      new Set(entries.map((e: any) => e.Name).filter(Boolean))
+    );
+
+    const newContributors = weekContributors.filter(
+      name => !seenBefore.has(name)
+    ).length;
+
+    const returningContributors = weekContributors.filter(
+      name => seenBefore.has(name)
+    ).length;
+
+    // Add this week's contributors to the seen set
+    // for all subsequent weeks
+    weekContributors.forEach(name => seenBefore.add(name));
+
+    return {
+      week: `Week ${parseWeekNumber(week)}`,
+      newContributors,
+      returningContributors,
+      totalActive: weekContributors.length
+    };
+  });
+}
+
 // Update the processData function to return all required ProcessedData fields
 export function processData(
   csvData: any[],
@@ -680,12 +722,7 @@ export function processData(
       neutral: 0,
       negative: 0
     },
-    contributorGrowth: [{
-      week: new Date().toISOString().split('T')[0],
-      newContributors: activeContributors,
-      returningContributors: 0,
-      totalActive: activeContributors
-    }],
+    contributorGrowth: calculateContributorGrowth(csvData),
     rawEngagementData: csvData
   };
 }
